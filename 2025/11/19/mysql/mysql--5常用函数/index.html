@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <script>
+    (function () {
+        if ('') {
+            if (prompt('请输入文章密码') !== '') {
+                alert('密码错误！');
+                if (history.length === 1) {
+                    location.replace("http://xxxxxxx.xxx"); // 这里替换成你的首页
+                } else {
+                    history.back();
+                }
+            }    
+        }
+    })();
+</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 8.1.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css">
+  <script src="/lib/pace/pace.min.js"></script>
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"leslie-shell.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"always","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":true,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.json"};
+  </script>
+
+  <meta name="description" content="一、空值与条件处理（NULL &#x2F; 条件）IF(expr, true_val, false_val) — 三元判断1SELECT IF(score &gt;&#x3D; 60, &#x27;及格&#x27;, &#x27;不及格&#x27;) FROM exam;  IFNULL(expr, alt) — expr 为 NULL 则用 alt1SELECT IFNULL(nickname, &amp;#x2">
+<meta property="og:type" content="article">
+<meta property="og:title" content="mysql常用函数">
+<meta property="og:url" content="https://leslie-shell.github.io/2025/11/19/mysql/mysql--5%E5%B8%B8%E7%94%A8%E5%87%BD%E6%95%B0/index.html">
+<meta property="og:site_name" content="随笔">
+<meta property="og:description" content="一、空值与条件处理（NULL &#x2F; 条件）IF(expr, true_val, false_val) — 三元判断1SELECT IF(score &gt;&#x3D; 60, &#x27;及格&#x27;, &#x27;不及格&#x27;) FROM exam;  IFNULL(expr, alt) — expr 为 NULL 则用 alt1SELECT IFNULL(nickname, &amp;#x2">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2025-11-19T15:15:07.472Z">
+<meta property="article:modified_time" content="2025-11-29T15:19:40.834Z">
+<meta property="article:author" content="YeChengfeng">
+<meta property="article:tag" content="Mysql">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://leslie-shell.github.io/2025/11/19/mysql/mysql--5%E5%B8%B8%E7%94%A8%E5%87%BD%E6%95%B0/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>mysql常用函数 | 随笔</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">随笔</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-rank">
+
+    <a href="/rank/" rel="section"><i class="fa fa-fire fa-fw"></i>热度</a>
+
+  </li>
+        <li class="menu-item menu-item-recommended">
+
+    <a href="/recommended/" rel="section"><i class="fa fa-flag fa-fw"></i>推荐</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://leslie-shell.github.io/2025/11/19/mysql/mysql--5%E5%B8%B8%E7%94%A8%E5%87%BD%E6%95%B0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="YeChengfeng">
+      <meta itemprop="description" content="Make Learning and Organizing a Habit!">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="随笔">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          mysql常用函数
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2025-11-19 23:15:07" itemprop="dateCreated datePublished" datetime="2025-11-19T23:15:07+08:00">2025-11-19</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2025-11-29 23:19:40" itemprop="dateModified" datetime="2025-11-29T23:19:40+08:00">2025-11-29</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Mysql/" itemprop="url" rel="index"><span itemprop="name">Mysql</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/2025/11/19/mysql/mysql--5%E5%B8%B8%E7%94%A8%E5%87%BD%E6%95%B0/" class="post-meta-item leancloud_visitors" data-flag-title="mysql常用函数" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>5.4k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>5 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="一、空值与条件处理（NULL-条件）"><a href="#一、空值与条件处理（NULL-条件）" class="headerlink" title="一、空值与条件处理（NULL &#x2F; 条件）"></a>一、空值与条件处理（NULL &#x2F; 条件）</h1><h3 id="IF-expr-true-val-false-val-—-三元判断"><a href="#IF-expr-true-val-false-val-—-三元判断" class="headerlink" title="IF(expr, true_val, false_val) — 三元判断"></a><code>IF(expr, true_val, false_val)</code> — 三元判断</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> IF(score <span class="operator">&gt;=</span> <span class="number">60</span>, <span class="string">&#x27;及格&#x27;</span>, <span class="string">&#x27;不及格&#x27;</span>) <span class="keyword">FROM</span> exam;</span><br></pre></td></tr></table></figure>
+
+<h3 id="IFNULL-expr-alt-—-expr-为-NULL-则用-alt"><a href="#IFNULL-expr-alt-—-expr-为-NULL-则用-alt" class="headerlink" title="IFNULL(expr, alt) — expr 为 NULL 则用 alt"></a><code>IFNULL(expr, alt)</code> — expr 为 NULL 则用 alt</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> IFNULL(nickname, <span class="string">&#x27;未填写&#x27;</span>) <span class="keyword">FROM</span> <span class="keyword">user</span>;</span><br></pre></td></tr></table></figure>
+
+<h3 id="COALESCE-expr1-expr2-—-返回第一个非-NULL-值"><a href="#COALESCE-expr1-expr2-—-返回第一个非-NULL-值" class="headerlink" title="COALESCE(expr1, expr2, ...) — 返回第一个非 NULL 值"></a><code>COALESCE(expr1, expr2, ...)</code> — 返回第一个非 NULL 值</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="built_in">COALESCE</span>(<span class="keyword">NULL</span>, <span class="string">&#x27;&#x27;</span>, <span class="string">&#x27;a&#x27;</span>);  <span class="comment">-- 返回 &#x27;&#x27;</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="NULLIF-a-b-—-若-a-b-返回-NULL，否则返回-a"><a href="#NULLIF-a-b-—-若-a-b-返回-NULL，否则返回-a" class="headerlink" title="NULLIF(a, b) — 若 a &#x3D; b 返回 NULL，否则返回 a"></a><code>NULLIF(a, b)</code> — 若 a &#x3D; b 返回 NULL，否则返回 a</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="built_in">NULLIF</span>(<span class="string">&#x27;&#x27;</span>, <span class="string">&#x27;&#x27;</span>);  <span class="comment">-- 返回 NULL</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="CASE-WHEN-THEN-END-—-多分支条件"><a href="#CASE-WHEN-THEN-END-—-多分支条件" class="headerlink" title="CASE ... WHEN ... THEN ... END — 多分支条件"></a><code>CASE ... WHEN ... THEN ... END</code> — 多分支条件</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="keyword">CASE</span> <span class="keyword">WHEN</span> score<span class="operator">&gt;=</span><span class="number">90</span> <span class="keyword">THEN</span> <span class="string">&#x27;A&#x27;</span> <span class="keyword">WHEN</span> score<span class="operator">&gt;=</span><span class="number">60</span> <span class="keyword">THEN</span> <span class="string">&#x27;B&#x27;</span> <span class="keyword">ELSE</span> <span class="string">&#x27;C&#x27;</span> <span class="keyword">END</span> <span class="keyword">FROM</span> exam;</span><br></pre></td></tr></table></figure>
+
+<h1 id="二、字符串函数（String）"><a href="#二、字符串函数（String）" class="headerlink" title="二、字符串函数（String）"></a>二、字符串函数（String）</h1><h3 id="CONCAT-a-b-—-拼接"><a href="#CONCAT-a-b-—-拼接" class="headerlink" title="CONCAT(a,b,...) — 拼接"></a><code>CONCAT(a,b,...)</code> — 拼接</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> CONCAT(first_name, <span class="string">&#x27; &#x27;</span>, last_name) <span class="keyword">FROM</span> <span class="keyword">user</span>;</span><br></pre></td></tr></table></figure>
+
+<h3 id="CONCAT-WS-sep-a-b-—-带分隔符拼接（跳过-NULL）"><a href="#CONCAT-WS-sep-a-b-—-带分隔符拼接（跳过-NULL）" class="headerlink" title="CONCAT_WS(sep, a, b, ...) — 带分隔符拼接（跳过 NULL）"></a><code>CONCAT_WS(sep, a, b, ...)</code> — 带分隔符拼接（跳过 NULL）</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> CONCAT_WS(<span class="string">&#x27;-&#x27;</span>, country, province, city) <span class="keyword">FROM</span> addr;</span><br></pre></td></tr></table></figure>
+
+<h3 id="SUBSTRING-str-pos-len-SUBSTR-—-截取"><a href="#SUBSTRING-str-pos-len-SUBSTR-—-截取" class="headerlink" title="SUBSTRING(str, pos, len) &#x2F; SUBSTR — 截取"></a><code>SUBSTRING(str, pos, len)</code> &#x2F; <code>SUBSTR</code> — 截取</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="built_in">SUBSTRING</span>(<span class="string">&#x27;abcdef&#x27;</span>, <span class="number">2</span>, <span class="number">3</span>); <span class="comment">-- bcd</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="LEFT-str-n-RIGHT-str-n-—-左-右取-n-字符"><a href="#LEFT-str-n-RIGHT-str-n-—-左-右取-n-字符" class="headerlink" title="LEFT(str, n) &#x2F; RIGHT(str, n) — 左&#x2F;右取 n 字符"></a><code>LEFT(str, n)</code> &#x2F; <code>RIGHT(str, n)</code> — 左&#x2F;右取 n 字符</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="keyword">LEFT</span>(<span class="string">&#x27;abcdef&#x27;</span>, <span class="number">2</span>); <span class="comment">-- ab</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="LENGTH-str-—-字节长度；CHAR-LENGTH-str-—-字符长度"><a href="#LENGTH-str-—-字节长度；CHAR-LENGTH-str-—-字符长度" class="headerlink" title="LENGTH(str) — 字节长度；CHAR_LENGTH(str) — 字符长度"></a><code>LENGTH(str)</code> — 字节长度；<code>CHAR_LENGTH(str)</code> — 字符长度</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> LENGTH(<span class="string">&#x27;中文&#x27;</span>), <span class="keyword">CHAR_LENGTH</span>(<span class="string">&#x27;中文&#x27;</span>); <span class="comment">-- 6,2（视字符集）</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="INSTR-str-substr-LOCATE-substr-str-—-查子串位置（-0-表示存在）"><a href="#INSTR-str-substr-LOCATE-substr-str-—-查子串位置（-0-表示存在）" class="headerlink" title="INSTR(str, substr) &#x2F; LOCATE(substr, str) — 查子串位置（&gt;0 表示存在）"></a><code>INSTR(str, substr)</code> &#x2F; <code>LOCATE(substr, str)</code> — 查子串位置（&gt;0 表示存在）</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> INSTR(<span class="string">&#x27;hello&#x27;</span>, <span class="string">&#x27;ll&#x27;</span>); <span class="comment">-- 3</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="REPLACE-str-from-to-—-替换子串"><a href="#REPLACE-str-from-to-—-替换子串" class="headerlink" title="REPLACE(str, from, to) — 替换子串"></a><code>REPLACE(str, from, to)</code> — 替换子串</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> REPLACE(<span class="string">&#x27;a-b-c&#x27;</span>,<span class="string">&#x27;-&#x27;</span>,<span class="string">&#x27;_&#x27;</span>); <span class="comment">-- a_b_c</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="TRIM-str-LTRIM-RTRIM-—-去空白"><a href="#TRIM-str-LTRIM-RTRIM-—-去空白" class="headerlink" title="TRIM(str) &#x2F; LTRIM &#x2F; RTRIM — 去空白"></a><code>TRIM(str)</code> &#x2F; <code>LTRIM</code> &#x2F; <code>RTRIM</code> — 去空白</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="built_in">TRIM</span>(<span class="string">&#x27;  abc  &#x27;</span>);</span><br></pre></td></tr></table></figure>
+
+<h3 id="LPAD-str-len-pad-RPAD-—-左右补齐"><a href="#LPAD-str-len-pad-RPAD-—-左右补齐" class="headerlink" title="LPAD(str, len, pad) &#x2F; RPAD — 左右补齐"></a><code>LPAD(str, len, pad)</code> &#x2F; <code>RPAD</code> — 左右补齐</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> LPAD(<span class="string">&#x27;5&#x27;</span>, <span class="number">3</span>, <span class="string">&#x27;0&#x27;</span>); <span class="comment">-- &#x27;005&#x27;</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="LOWER-str-UPPER-str-—-大小写转换"><a href="#LOWER-str-UPPER-str-—-大小写转换" class="headerlink" title="LOWER(str) &#x2F; UPPER(str) — 大小写转换"></a><code>LOWER(str)</code> &#x2F; <code>UPPER(str)</code> — 大小写转换</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="built_in">UPPER</span>(<span class="string">&#x27;abc&#x27;</span>); <span class="comment">-- &#x27;ABC&#x27;</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="FORMAT-number-d-—-格式化数字（千分位、指定位小数）"><a href="#FORMAT-number-d-—-格式化数字（千分位、指定位小数）" class="headerlink" title="FORMAT(number, d) — 格式化数字（千分位、指定位小数）"></a><code>FORMAT(number, d)</code> — 格式化数字（千分位、指定位小数）</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> FORMAT(<span class="number">12345.678</span>, <span class="number">2</span>); <span class="comment">-- &#x27;12,345.68&#x27;</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="FIND-IN-SET-str-strlist-—-在逗号分隔列表中查找（常用于-set-like）"><a href="#FIND-IN-SET-str-strlist-—-在逗号分隔列表中查找（常用于-set-like）" class="headerlink" title="FIND_IN_SET(str, strlist) — 在逗号分隔列表中查找（常用于 set-like）"></a><code>FIND_IN_SET(str, strlist)</code> — 在逗号分隔列表中查找（常用于 set-like）</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> FIND_IN_SET(<span class="string">&#x27;b&#x27;</span>, <span class="string">&#x27;a,b,c&#x27;</span>); <span class="comment">-- 2</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="FIELD-val-val1-val2-—-自定义顺序排序-匹配索引（返回位置）"><a href="#FIELD-val-val1-val2-—-自定义顺序排序-匹配索引（返回位置）" class="headerlink" title="FIELD(val, val1, val2, ...) — 自定义顺序排序&#x2F;匹配索引（返回位置）"></a><code>FIELD(val, val1, val2, ...)</code> — 自定义顺序排序&#x2F;匹配索引（返回位置）</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> FIELD(<span class="string">&#x27;处理中&#x27;</span>,<span class="string">&#x27;待支付&#x27;</span>,<span class="string">&#x27;处理中&#x27;</span>,<span class="string">&#x27;已完成&#x27;</span>); <span class="comment">-- 2</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="REGEXP-RLIKE-—-正则匹配（不是函数但常用）"><a href="#REGEXP-RLIKE-—-正则匹配（不是函数但常用）" class="headerlink" title="REGEXP &#x2F; RLIKE — 正则匹配（不是函数但常用）"></a><code>REGEXP</code> &#x2F; <code>RLIKE</code> — 正则匹配（不是函数但常用）</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> <span class="keyword">user</span> <span class="keyword">WHERE</span> email REGEXP <span class="string">&#x27;^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]&#123;2,&#125;$&#x27;</span>;</span><br></pre></td></tr></table></figure>
+
+<h1 id="三、数值函数（Numeric）"><a href="#三、数值函数（Numeric）" class="headerlink" title="三、数值函数（Numeric）"></a>三、数值函数（Numeric）</h1><h3 id="ABS-x-—-绝对值"><a href="#ABS-x-—-绝对值" class="headerlink" title="ABS(x) — 绝对值"></a><code>ABS(x)</code> — 绝对值</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="built_in">ABS</span>(<span class="number">-5</span>); <span class="comment">-- 5</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="ROUND-x-d-TRUNCATE-x-d-—-四舍五入-截断"><a href="#ROUND-x-d-TRUNCATE-x-d-—-四舍五入-截断" class="headerlink" title="ROUND(x, d) &#x2F; TRUNCATE(x, d) — 四舍五入 &#x2F; 截断"></a><code>ROUND(x, d)</code> &#x2F; <code>TRUNCATE(x, d)</code> — 四舍五入 &#x2F; 截断</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> ROUND(<span class="number">3.14159</span>, <span class="number">2</span>), <span class="keyword">TRUNCATE</span>(<span class="number">3.14159</span>, <span class="number">2</span>); <span class="comment">-- 3.14, 3.14</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="CEIL-x-FLOOR-x-—-向上-向下取整"><a href="#CEIL-x-FLOOR-x-—-向上-向下取整" class="headerlink" title="CEIL(x) &#x2F; FLOOR(x) — 向上&#x2F;向下取整"></a><code>CEIL(x)</code> &#x2F; <code>FLOOR(x)</code> — 向上&#x2F;向下取整</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="built_in">CEIL</span>(<span class="number">2.1</span>), <span class="built_in">FLOOR</span>(<span class="number">2.9</span>); <span class="comment">-- 3,2</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="MOD-a-b-—-取模（余数）"><a href="#MOD-a-b-—-取模（余数）" class="headerlink" title="MOD(a, b) — 取模（余数）"></a><code>MOD(a, b)</code> — 取模（余数）</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="built_in">MOD</span>(<span class="number">10</span>,<span class="number">3</span>); <span class="comment">-- 1</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="POWER-x-y-—-幂"><a href="#POWER-x-y-—-幂" class="headerlink" title="POWER(x, y) — 幂"></a><code>POWER(x, y)</code> — 幂</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="built_in">POWER</span>(<span class="number">2</span>,<span class="number">3</span>); <span class="comment">-- 8</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="RAND-—-随机数（0-1）"><a href="#RAND-—-随机数（0-1）" class="headerlink" title="RAND() — 随机数（0~1）"></a><code>RAND()</code> — 随机数（0~1）</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> RAND();</span><br></pre></td></tr></table></figure>
+
+<h1 id="四、日期时间函数（Date-Time）"><a href="#四、日期时间函数（Date-Time）" class="headerlink" title="四、日期时间函数（Date &amp; Time）"></a>四、日期时间函数（Date &amp; Time）</h1><h3 id="NOW-CURRENT-TIMESTAMP-—-当前时间"><a href="#NOW-CURRENT-TIMESTAMP-—-当前时间" class="headerlink" title="NOW() &#x2F; CURRENT_TIMESTAMP() — 当前时间"></a><code>NOW()</code> &#x2F; <code>CURRENT_TIMESTAMP()</code> — 当前时间</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> NOW();</span><br></pre></td></tr></table></figure>
+
+<h3 id="CURDATE-CURTIME-—-当前日期-时间"><a href="#CURDATE-CURTIME-—-当前日期-时间" class="headerlink" title="CURDATE() &#x2F; CURTIME() — 当前日期 &#x2F; 时间"></a><code>CURDATE()</code> &#x2F; <code>CURTIME()</code> — 当前日期 &#x2F; 时间</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> CURDATE(), CURTIME();</span><br></pre></td></tr></table></figure>
+
+<h3 id="DATE-expr-—-取日期部分（去掉时分秒）"><a href="#DATE-expr-—-取日期部分（去掉时分秒）" class="headerlink" title="DATE(expr) — 取日期部分（去掉时分秒）"></a><code>DATE(expr)</code> — 取日期部分（去掉时分秒）</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="type">DATE</span>(<span class="string">&#x27;2025-11-19 12:34:56&#x27;</span>); <span class="comment">-- &#x27;2025-11-19&#x27;</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="DATE-FORMAT-date-fmt-—-按格式输出"><a href="#DATE-FORMAT-date-fmt-—-按格式输出" class="headerlink" title="DATE_FORMAT(date, fmt) — 按格式输出"></a><code>DATE_FORMAT(date, fmt)</code> — 按格式输出</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> DATE_FORMAT(NOW(), <span class="string">&#x27;%Y-%m&#x27;</span>); <span class="comment">-- &#x27;2025-11&#x27;</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="STR-TO-DATE-str-fmt-—-字符串转日期"><a href="#STR-TO-DATE-str-fmt-—-字符串转日期" class="headerlink" title="STR_TO_DATE(str, fmt) — 字符串转日期"></a><code>STR_TO_DATE(str, fmt)</code> — 字符串转日期</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> STR_TO_DATE(<span class="string">&#x27;2025-11-19&#x27;</span>,<span class="string">&#x27;%Y-%m-%d&#x27;</span>);</span><br></pre></td></tr></table></figure>
+
+<h3 id="DATE-ADD-date-INTERVAL-n-unit-DATE-SUB-—-日期加减"><a href="#DATE-ADD-date-INTERVAL-n-unit-DATE-SUB-—-日期加减" class="headerlink" title="DATE_ADD(date, INTERVAL n unit) &#x2F; DATE_SUB — 日期加减"></a><code>DATE_ADD(date, INTERVAL n unit)</code> &#x2F; <code>DATE_SUB</code> — 日期加减</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> DATE_ADD(<span class="string">&#x27;2025-01-01&#x27;</span>, <span class="type">INTERVAL</span> <span class="number">7</span> <span class="keyword">DAY</span>); <span class="comment">-- &#x27;2025-01-08&#x27;</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="DATEDIFF-a-b-—-天数差（a-b）"><a href="#DATEDIFF-a-b-—-天数差（a-b）" class="headerlink" title="DATEDIFF(a, b) — 天数差（a - b）"></a><code>DATEDIFF(a, b)</code> — 天数差（a - b）</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> DATEDIFF(<span class="string">&#x27;2025-01-10&#x27;</span>,<span class="string">&#x27;2025-01-01&#x27;</span>); <span class="comment">-- 9</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="TIMESTAMPDIFF-unit-a-b-—-指定单位差值（YEAR-MONTH-DAY-HOUR…）"><a href="#TIMESTAMPDIFF-unit-a-b-—-指定单位差值（YEAR-MONTH-DAY-HOUR…）" class="headerlink" title="TIMESTAMPDIFF(unit, a, b) — 指定单位差值（YEAR, MONTH, DAY, HOUR…）"></a><code>TIMESTAMPDIFF(unit, a, b)</code> — 指定单位差值（YEAR, MONTH, DAY, HOUR…）</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> TIMESTAMPDIFF(<span class="keyword">MINUTE</span>, <span class="string">&#x27;2025-01-01 00:00:00&#x27;</span>, <span class="string">&#x27;2025-01-01 01:30:00&#x27;</span>); <span class="comment">-- 90</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="UNIX-TIMESTAMP-FROM-UNIXTIME-—-时间戳互转"><a href="#UNIX-TIMESTAMP-FROM-UNIXTIME-—-时间戳互转" class="headerlink" title="UNIX_TIMESTAMP() &#x2F; FROM_UNIXTIME() — 时间戳互转"></a><code>UNIX_TIMESTAMP()</code> &#x2F; <code>FROM_UNIXTIME()</code> — 时间戳互转</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> UNIX_TIMESTAMP(NOW()), FROM_UNIXTIME(UNIX_TIMESTAMP());</span><br></pre></td></tr></table></figure>
+
+<h1 id="五、聚合函数（Aggregate）"><a href="#五、聚合函数（Aggregate）" class="headerlink" title="五、聚合函数（Aggregate）"></a>五、聚合函数（Aggregate）</h1><h3 id="COUNT-COUNT-col-—-计数"><a href="#COUNT-COUNT-col-—-计数" class="headerlink" title="COUNT(*) &#x2F; COUNT(col) — 计数"></a><code>COUNT(*)</code> &#x2F; <code>COUNT(col)</code> — 计数</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="built_in">COUNT</span>(<span class="operator">*</span>) <span class="keyword">FROM</span> orders;</span><br></pre></td></tr></table></figure>
+
+<h3 id="SUM-col-AVG-col-MIN-MAX-—-求和-平均-最小-最大"><a href="#SUM-col-AVG-col-MIN-MAX-—-求和-平均-最小-最大" class="headerlink" title="SUM(col) &#x2F; AVG(col) &#x2F; MIN &#x2F; MAX — 求和&#x2F;平均&#x2F;最小&#x2F;最大"></a><code>SUM(col)</code> &#x2F; <code>AVG(col)</code> &#x2F; <code>MIN</code> &#x2F; <code>MAX</code> — 求和&#x2F;平均&#x2F;最小&#x2F;最大</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="built_in">SUM</span>(amount), <span class="built_in">AVG</span>(amount), <span class="built_in">MIN</span>(amount), <span class="built_in">MAX</span>(amount) <span class="keyword">FROM</span> orders;</span><br></pre></td></tr></table></figure>
+
+<h3 id="GROUP-CONCAT-expr-ORDER-BY-SEPARATOR-—-分组拼接"><a href="#GROUP-CONCAT-expr-ORDER-BY-SEPARATOR-—-分组拼接" class="headerlink" title="GROUP_CONCAT(expr [ORDER BY ... SEPARATOR &#39;,&#39;]) — 分组拼接"></a><code>GROUP_CONCAT(expr [ORDER BY ... SEPARATOR &#39;,&#39;])</code> — 分组拼接</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> user_id, GROUP_CONCAT(product_name <span class="keyword">ORDER</span> <span class="keyword">BY</span> product_name SEPARATOR <span class="string">&#x27;;&#x27;</span>) <span class="keyword">FROM</span> orders <span class="keyword">GROUP</span> <span class="keyword">BY</span> user_id;</span><br></pre></td></tr></table></figure>
+
+<h1 id="六、JSON（MySQL-5-7-）"><a href="#六、JSON（MySQL-5-7-）" class="headerlink" title="六、JSON（MySQL 5.7+）"></a>六、JSON（MySQL 5.7+）</h1><h3 id="JSON-EXTRACT-json-path-或-col-a-b-—-取值"><a href="#JSON-EXTRACT-json-path-或-col-a-b-—-取值" class="headerlink" title="JSON_EXTRACT(json, path) 或 col-&gt;&#39;$.a.b&#39; — 取值"></a><code>JSON_EXTRACT(json, path)</code> 或 <code>col-&gt;&#39;$.a.b&#39;</code> — 取值</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> JSON_EXTRACT(info, <span class="string">&#x27;$.address.city&#x27;</span>) <span class="keyword">FROM</span> <span class="keyword">user</span>;</span><br><span class="line"><span class="keyword">SELECT</span> info<span class="operator">-</span><span class="operator">&gt;</span><span class="string">&#x27;$.address.city&#x27;</span> <span class="keyword">FROM</span> <span class="keyword">user</span>;</span><br></pre></td></tr></table></figure>
+
+<h3 id="JSON-SET-json-path-val-JSON-REPLACE-JSON-INSERT-—-修改或插入"><a href="#JSON-SET-json-path-val-JSON-REPLACE-JSON-INSERT-—-修改或插入" class="headerlink" title="JSON_SET(json, path, val) &#x2F; JSON_REPLACE &#x2F; JSON_INSERT — 修改或插入"></a><code>JSON_SET(json, path, val)</code> &#x2F; <code>JSON_REPLACE</code> &#x2F; <code>JSON_INSERT</code> — 修改或插入</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">UPDATE</span> <span class="keyword">user</span> <span class="keyword">SET</span> info <span class="operator">=</span> JSON_SET(info, <span class="string">&#x27;$.age&#x27;</span>, <span class="number">30</span>) <span class="keyword">WHERE</span> id <span class="operator">=</span> <span class="number">1</span>;</span><br></pre></td></tr></table></figure>
+
+<h3 id="JSON-CONTAINS-json-val-path-—-判断包含关系"><a href="#JSON-CONTAINS-json-val-path-—-判断包含关系" class="headerlink" title="JSON_CONTAINS(json, val [, path]) — 判断包含关系"></a><code>JSON_CONTAINS(json, val [, path])</code> — 判断包含关系</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> product <span class="keyword">WHERE</span> JSON_CONTAINS(tags, <span class="string">&#x27;&quot;热门&quot;&#x27;</span>);</span><br></pre></td></tr></table></figure>
+
+<h3 id="JSON-ARRAY-JSON-OBJECT-JSON-LENGTH-—-构造与长度"><a href="#JSON-ARRAY-JSON-OBJECT-JSON-LENGTH-—-构造与长度" class="headerlink" title="JSON_ARRAY() &#x2F; JSON_OBJECT() &#x2F; JSON_LENGTH() — 构造与长度"></a><code>JSON_ARRAY()</code> &#x2F; <code>JSON_OBJECT()</code> &#x2F; <code>JSON_LENGTH()</code> — 构造与长度</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="built_in">JSON_ARRAY</span>(<span class="string">&#x27;a&#x27;</span>,<span class="string">&#x27;b&#x27;</span>), <span class="built_in">JSON_OBJECT</span>(<span class="string">&#x27;k&#x27;</span>,<span class="string">&#x27;v&#x27;</span>), JSON_LENGTH(<span class="string">&#x27;[1,2,3]&#x27;</span>);</span><br></pre></td></tr></table></figure>
+
+<h1 id="七、类型转换（CAST-CONVERT）"><a href="#七、类型转换（CAST-CONVERT）" class="headerlink" title="七、类型转换（CAST &#x2F; CONVERT）"></a>七、类型转换（CAST &#x2F; CONVERT）</h1><h3 id="CAST-expr-AS-type-CONVERT-expr-type-—-强制类型转换"><a href="#CAST-expr-AS-type-CONVERT-expr-type-—-强制类型转换" class="headerlink" title="CAST(expr AS type) &#x2F; CONVERT(expr, type) — 强制类型转换"></a><code>CAST(expr AS type)</code> &#x2F; <code>CONVERT(expr, type)</code> — 强制类型转换</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="built_in">CAST</span>(<span class="string">&#x27;123&#x27;</span> <span class="keyword">AS</span> SIGNED), <span class="built_in">CAST</span>(<span class="number">123.45</span> <span class="keyword">AS</span> <span class="type">CHAR</span>);</span><br></pre></td></tr></table></figure>
+
+<h1 id="八、加密-编码-UUID"><a href="#八、加密-编码-UUID" class="headerlink" title="八、加密 &#x2F; 编码 &#x2F; UUID"></a>八、加密 &#x2F; 编码 &#x2F; UUID</h1><h3 id="MD5-str-SHA1-str-—-单向哈希"><a href="#MD5-str-SHA1-str-—-单向哈希" class="headerlink" title="MD5(str) &#x2F; SHA1(str) — 单向哈希"></a><code>MD5(str)</code> &#x2F; <code>SHA1(str)</code> — 单向哈希</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> MD5(<span class="string">&#x27;password&#x27;</span>);</span><br></pre></td></tr></table></figure>
+
+<h3 id="HEX-str-UNHEX-str-—-十六进制编码-解码"><a href="#HEX-str-UNHEX-str-—-十六进制编码-解码" class="headerlink" title="HEX(str) &#x2F; UNHEX(str) — 十六进制编码&#x2F;解码"></a><code>HEX(str)</code> &#x2F; <code>UNHEX(str)</code> — 十六进制编码&#x2F;解码</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> HEX(<span class="string">&#x27;abc&#x27;</span>), UNHEX(<span class="string">&#x27;616263&#x27;</span>);</span><br></pre></td></tr></table></figure>
+
+<h3 id="UUID-UUID-SHORT-—-唯一-ID"><a href="#UUID-UUID-SHORT-—-唯一-ID" class="headerlink" title="UUID() &#x2F; UUID_SHORT() — 唯一 ID"></a><code>UUID()</code> &#x2F; <code>UUID_SHORT()</code> — 唯一 ID</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> UUID(), UUID_SHORT();</span><br></pre></td></tr></table></figure>
+
+<h1 id="九、窗口函数（MySQL-8-0-）"><a href="#九、窗口函数（MySQL-8-0-）" class="headerlink" title="九、窗口函数（MySQL 8.0+）"></a>九、窗口函数（MySQL 8.0+）</h1><blockquote>
+<p>常用模式：<code>OVER(PARTITION BY ... ORDER BY ...)</code></p>
+</blockquote>
+<h3 id="ROW-NUMBER-—-行号"><a href="#ROW-NUMBER-—-行号" class="headerlink" title="ROW_NUMBER() — 行号"></a><code>ROW_NUMBER()</code> — 行号</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> id, user_id, amount, <span class="built_in">ROW_NUMBER</span>() <span class="keyword">OVER</span>(<span class="keyword">PARTITION</span> <span class="keyword">BY</span> user_id <span class="keyword">ORDER</span> <span class="keyword">BY</span> amount <span class="keyword">DESC</span>) rn <span class="keyword">FROM</span> orders;</span><br></pre></td></tr></table></figure>
+
+<h3 id="RANK-DENSE-RANK-—-排名（并列）"><a href="#RANK-DENSE-RANK-—-排名（并列）" class="headerlink" title="RANK() &#x2F; DENSE_RANK() — 排名（并列）"></a><code>RANK()</code> &#x2F; <code>DENSE_RANK()</code> — 排名（并列）</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> score, <span class="built_in">RANK</span>() <span class="keyword">OVER</span>(<span class="keyword">ORDER</span> <span class="keyword">BY</span> score <span class="keyword">DESC</span>) <span class="keyword">FROM</span> student;</span><br></pre></td></tr></table></figure>
+
+<h3 id="SUM-OVER-AVG-OVER-—-滚动-累计"><a href="#SUM-OVER-AVG-OVER-—-滚动-累计" class="headerlink" title="SUM(...) OVER(...) &#x2F; AVG(...) OVER(...) — 滚动&#x2F;累计"></a><code>SUM(...) OVER(...)</code> &#x2F; <code>AVG(...) OVER(...)</code> — 滚动&#x2F;累计</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> id, amount, <span class="built_in">SUM</span>(amount) <span class="keyword">OVER</span>(<span class="keyword">ORDER</span> <span class="keyword">BY</span> id) <span class="keyword">AS</span> running_total <span class="keyword">FROM</span> orders;</span><br></pre></td></tr></table></figure>
+
+<h3 id="LAG-col-offset-default-LEAD-—-前-后行值"><a href="#LAG-col-offset-default-LEAD-—-前-后行值" class="headerlink" title="LAG(col, offset, default) &#x2F; LEAD(...) — 前&#x2F;后行值"></a><code>LAG(col, offset, default)</code> &#x2F; <code>LEAD(...)</code> — 前&#x2F;后行值</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> id, amount, <span class="built_in">LAG</span>(amount) <span class="keyword">OVER</span>(<span class="keyword">ORDER</span> <span class="keyword">BY</span> id) prev_amt <span class="keyword">FROM</span> orders;</span><br></pre></td></tr></table></figure>
+
+<h1 id="十、实用组合示例（综合）"><a href="#十、实用组合示例（综合）" class="headerlink" title="十、实用组合示例（综合）"></a>十、实用组合示例（综合）</h1><h3 id="示例-1：查询用户当月消费-上月消费-同比环比"><a href="#示例-1：查询用户当月消费-上月消费-同比环比" class="headerlink" title="示例 1：查询用户当月消费 + 上月消费 + 同比环比"></a>示例 1：查询用户当月消费 + 上月消费 + 同比环比</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span></span><br><span class="line">  user_id,</span><br><span class="line">  DATE_FORMAT(pay_time, <span class="string">&#x27;%Y-%m&#x27;</span>) <span class="keyword">AS</span> <span class="keyword">month</span>,</span><br><span class="line">  <span class="built_in">SUM</span>(amount) <span class="keyword">AS</span> month_total,</span><br><span class="line">  <span class="built_in">LAG</span>(<span class="built_in">SUM</span>(amount)) <span class="keyword">OVER</span> (<span class="keyword">PARTITION</span> <span class="keyword">BY</span> user_id <span class="keyword">ORDER</span> <span class="keyword">BY</span> DATE_FORMAT(pay_time, <span class="string">&#x27;%Y-%m&#x27;</span>)) <span class="keyword">AS</span> prev_month_total</span><br><span class="line"><span class="keyword">FROM</span> orders</span><br><span class="line"><span class="keyword">GROUP</span> <span class="keyword">BY</span> user_id, DATE_FORMAT(pay_time, <span class="string">&#x27;%Y-%m&#x27;</span>);</span><br></pre></td></tr></table></figure>
+
+<h3 id="示例-2：将-NULL-或-空串统一成默认值"><a href="#示例-2：将-NULL-或-空串统一成默认值" class="headerlink" title="示例 2：将 NULL 或 空串统一成默认值"></a>示例 2：将 NULL 或 空串统一成默认值</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="built_in">COALESCE</span>(<span class="built_in">NULLIF</span>(nickname, <span class="string">&#x27;&#x27;</span>), <span class="string">&#x27;未填写&#x27;</span>) <span class="keyword">AS</span> nick <span class="keyword">FROM</span> <span class="keyword">user</span>;</span><br></pre></td></tr></table></figure>
+
+<h3 id="示例-3：带窗口的分组-TopN（每组前-3）"><a href="#示例-3：带窗口的分组-TopN（每组前-3）" class="headerlink" title="示例 3：带窗口的分组 TopN（每组前 3）"></a>示例 3：带窗口的分组 TopN（每组前 3）</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> (</span><br><span class="line">  <span class="keyword">SELECT</span> id, dept, score,</span><br><span class="line">    <span class="built_in">ROW_NUMBER</span>() <span class="keyword">OVER</span>(<span class="keyword">PARTITION</span> <span class="keyword">BY</span> dept <span class="keyword">ORDER</span> <span class="keyword">BY</span> score <span class="keyword">DESC</span>) <span class="keyword">AS</span> rn</span><br><span class="line">  <span class="keyword">FROM</span> employee</span><br><span class="line">) t <span class="keyword">WHERE</span> rn <span class="operator">&lt;=</span> <span class="number">3</span>;</span><br></pre></td></tr></table></figure>
+
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Mysql/" rel="tag"># Mysql</a>
+          </div>
+
+        
+  <div class="post-widgets">
+    <div class="wp_rating">
+      <div id="wpac-rating"></div>
+    </div>
+  </div>
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2025/11/19/mysql/mysql--%E5%8A%9B%E6%89%A3--3%E7%AC%ACn%E9%AB%98%E7%9A%84%E8%96%AA%E6%B0%B4/" rel="prev" title="力扣-Mysql-第n高的薪水 （Normal）">
+      <i class="fa fa-chevron-left"></i> 力扣-Mysql-第n高的薪水 （Normal）
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2025/11/19/mysql/mysql--6%E7%AA%97%E5%8F%A3%E5%87%BD%E6%95%B0/" rel="next" title="mysql窗口函数">
+      mysql窗口函数 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+
+
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    
+  <div class="comments">
+    <div id="lv-container" data-id="city" data-uid="MTAyMC82MDk4Ni8zNzQ1Ng=="></div>
+  </div>
+  
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%B8%80%E3%80%81%E7%A9%BA%E5%80%BC%E4%B8%8E%E6%9D%A1%E4%BB%B6%E5%A4%84%E7%90%86%EF%BC%88NULL-%E6%9D%A1%E4%BB%B6%EF%BC%89"><span class="nav-text">一、空值与条件处理（NULL &#x2F; 条件）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#IF-expr-true-val-false-val-%E2%80%94-%E4%B8%89%E5%85%83%E5%88%A4%E6%96%AD"><span class="nav-text">IF(expr, true_val, false_val) — 三元判断</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#IFNULL-expr-alt-%E2%80%94-expr-%E4%B8%BA-NULL-%E5%88%99%E7%94%A8-alt"><span class="nav-text">IFNULL(expr, alt) — expr 为 NULL 则用 alt</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#COALESCE-expr1-expr2-%E2%80%94-%E8%BF%94%E5%9B%9E%E7%AC%AC%E4%B8%80%E4%B8%AA%E9%9D%9E-NULL-%E5%80%BC"><span class="nav-text">COALESCE(expr1, expr2, ...) — 返回第一个非 NULL 值</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#NULLIF-a-b-%E2%80%94-%E8%8B%A5-a-b-%E8%BF%94%E5%9B%9E-NULL%EF%BC%8C%E5%90%A6%E5%88%99%E8%BF%94%E5%9B%9E-a"><span class="nav-text">NULLIF(a, b) — 若 a &#x3D; b 返回 NULL，否则返回 a</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#CASE-WHEN-THEN-END-%E2%80%94-%E5%A4%9A%E5%88%86%E6%94%AF%E6%9D%A1%E4%BB%B6"><span class="nav-text">CASE ... WHEN ... THEN ... END — 多分支条件</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BA%8C%E3%80%81%E5%AD%97%E7%AC%A6%E4%B8%B2%E5%87%BD%E6%95%B0%EF%BC%88String%EF%BC%89"><span class="nav-text">二、字符串函数（String）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#CONCAT-a-b-%E2%80%94-%E6%8B%BC%E6%8E%A5"><span class="nav-text">CONCAT(a,b,...) — 拼接</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#CONCAT-WS-sep-a-b-%E2%80%94-%E5%B8%A6%E5%88%86%E9%9A%94%E7%AC%A6%E6%8B%BC%E6%8E%A5%EF%BC%88%E8%B7%B3%E8%BF%87-NULL%EF%BC%89"><span class="nav-text">CONCAT_WS(sep, a, b, ...) — 带分隔符拼接（跳过 NULL）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#SUBSTRING-str-pos-len-SUBSTR-%E2%80%94-%E6%88%AA%E5%8F%96"><span class="nav-text">SUBSTRING(str, pos, len) &#x2F; SUBSTR — 截取</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#LEFT-str-n-RIGHT-str-n-%E2%80%94-%E5%B7%A6-%E5%8F%B3%E5%8F%96-n-%E5%AD%97%E7%AC%A6"><span class="nav-text">LEFT(str, n) &#x2F; RIGHT(str, n) — 左&#x2F;右取 n 字符</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#LENGTH-str-%E2%80%94-%E5%AD%97%E8%8A%82%E9%95%BF%E5%BA%A6%EF%BC%9BCHAR-LENGTH-str-%E2%80%94-%E5%AD%97%E7%AC%A6%E9%95%BF%E5%BA%A6"><span class="nav-text">LENGTH(str) — 字节长度；CHAR_LENGTH(str) — 字符长度</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#INSTR-str-substr-LOCATE-substr-str-%E2%80%94-%E6%9F%A5%E5%AD%90%E4%B8%B2%E4%BD%8D%E7%BD%AE%EF%BC%88-0-%E8%A1%A8%E7%A4%BA%E5%AD%98%E5%9C%A8%EF%BC%89"><span class="nav-text">INSTR(str, substr) &#x2F; LOCATE(substr, str) — 查子串位置（&gt;0 表示存在）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#REPLACE-str-from-to-%E2%80%94-%E6%9B%BF%E6%8D%A2%E5%AD%90%E4%B8%B2"><span class="nav-text">REPLACE(str, from, to) — 替换子串</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#TRIM-str-LTRIM-RTRIM-%E2%80%94-%E5%8E%BB%E7%A9%BA%E7%99%BD"><span class="nav-text">TRIM(str) &#x2F; LTRIM &#x2F; RTRIM — 去空白</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#LPAD-str-len-pad-RPAD-%E2%80%94-%E5%B7%A6%E5%8F%B3%E8%A1%A5%E9%BD%90"><span class="nav-text">LPAD(str, len, pad) &#x2F; RPAD — 左右补齐</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#LOWER-str-UPPER-str-%E2%80%94-%E5%A4%A7%E5%B0%8F%E5%86%99%E8%BD%AC%E6%8D%A2"><span class="nav-text">LOWER(str) &#x2F; UPPER(str) — 大小写转换</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#FORMAT-number-d-%E2%80%94-%E6%A0%BC%E5%BC%8F%E5%8C%96%E6%95%B0%E5%AD%97%EF%BC%88%E5%8D%83%E5%88%86%E4%BD%8D%E3%80%81%E6%8C%87%E5%AE%9A%E4%BD%8D%E5%B0%8F%E6%95%B0%EF%BC%89"><span class="nav-text">FORMAT(number, d) — 格式化数字（千分位、指定位小数）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#FIND-IN-SET-str-strlist-%E2%80%94-%E5%9C%A8%E9%80%97%E5%8F%B7%E5%88%86%E9%9A%94%E5%88%97%E8%A1%A8%E4%B8%AD%E6%9F%A5%E6%89%BE%EF%BC%88%E5%B8%B8%E7%94%A8%E4%BA%8E-set-like%EF%BC%89"><span class="nav-text">FIND_IN_SET(str, strlist) — 在逗号分隔列表中查找（常用于 set-like）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#FIELD-val-val1-val2-%E2%80%94-%E8%87%AA%E5%AE%9A%E4%B9%89%E9%A1%BA%E5%BA%8F%E6%8E%92%E5%BA%8F-%E5%8C%B9%E9%85%8D%E7%B4%A2%E5%BC%95%EF%BC%88%E8%BF%94%E5%9B%9E%E4%BD%8D%E7%BD%AE%EF%BC%89"><span class="nav-text">FIELD(val, val1, val2, ...) — 自定义顺序排序&#x2F;匹配索引（返回位置）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#REGEXP-RLIKE-%E2%80%94-%E6%AD%A3%E5%88%99%E5%8C%B9%E9%85%8D%EF%BC%88%E4%B8%8D%E6%98%AF%E5%87%BD%E6%95%B0%E4%BD%86%E5%B8%B8%E7%94%A8%EF%BC%89"><span class="nav-text">REGEXP &#x2F; RLIKE — 正则匹配（不是函数但常用）</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%B8%89%E3%80%81%E6%95%B0%E5%80%BC%E5%87%BD%E6%95%B0%EF%BC%88Numeric%EF%BC%89"><span class="nav-text">三、数值函数（Numeric）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#ABS-x-%E2%80%94-%E7%BB%9D%E5%AF%B9%E5%80%BC"><span class="nav-text">ABS(x) — 绝对值</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ROUND-x-d-TRUNCATE-x-d-%E2%80%94-%E5%9B%9B%E8%88%8D%E4%BA%94%E5%85%A5-%E6%88%AA%E6%96%AD"><span class="nav-text">ROUND(x, d) &#x2F; TRUNCATE(x, d) — 四舍五入 &#x2F; 截断</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#CEIL-x-FLOOR-x-%E2%80%94-%E5%90%91%E4%B8%8A-%E5%90%91%E4%B8%8B%E5%8F%96%E6%95%B4"><span class="nav-text">CEIL(x) &#x2F; FLOOR(x) — 向上&#x2F;向下取整</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#MOD-a-b-%E2%80%94-%E5%8F%96%E6%A8%A1%EF%BC%88%E4%BD%99%E6%95%B0%EF%BC%89"><span class="nav-text">MOD(a, b) — 取模（余数）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#POWER-x-y-%E2%80%94-%E5%B9%82"><span class="nav-text">POWER(x, y) — 幂</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#RAND-%E2%80%94-%E9%9A%8F%E6%9C%BA%E6%95%B0%EF%BC%880-1%EF%BC%89"><span class="nav-text">RAND() — 随机数（0~1）</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%9B%9B%E3%80%81%E6%97%A5%E6%9C%9F%E6%97%B6%E9%97%B4%E5%87%BD%E6%95%B0%EF%BC%88Date-Time%EF%BC%89"><span class="nav-text">四、日期时间函数（Date &amp; Time）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#NOW-CURRENT-TIMESTAMP-%E2%80%94-%E5%BD%93%E5%89%8D%E6%97%B6%E9%97%B4"><span class="nav-text">NOW() &#x2F; CURRENT_TIMESTAMP() — 当前时间</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#CURDATE-CURTIME-%E2%80%94-%E5%BD%93%E5%89%8D%E6%97%A5%E6%9C%9F-%E6%97%B6%E9%97%B4"><span class="nav-text">CURDATE() &#x2F; CURTIME() — 当前日期 &#x2F; 时间</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#DATE-expr-%E2%80%94-%E5%8F%96%E6%97%A5%E6%9C%9F%E9%83%A8%E5%88%86%EF%BC%88%E5%8E%BB%E6%8E%89%E6%97%B6%E5%88%86%E7%A7%92%EF%BC%89"><span class="nav-text">DATE(expr) — 取日期部分（去掉时分秒）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#DATE-FORMAT-date-fmt-%E2%80%94-%E6%8C%89%E6%A0%BC%E5%BC%8F%E8%BE%93%E5%87%BA"><span class="nav-text">DATE_FORMAT(date, fmt) — 按格式输出</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#STR-TO-DATE-str-fmt-%E2%80%94-%E5%AD%97%E7%AC%A6%E4%B8%B2%E8%BD%AC%E6%97%A5%E6%9C%9F"><span class="nav-text">STR_TO_DATE(str, fmt) — 字符串转日期</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#DATE-ADD-date-INTERVAL-n-unit-DATE-SUB-%E2%80%94-%E6%97%A5%E6%9C%9F%E5%8A%A0%E5%87%8F"><span class="nav-text">DATE_ADD(date, INTERVAL n unit) &#x2F; DATE_SUB — 日期加减</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#DATEDIFF-a-b-%E2%80%94-%E5%A4%A9%E6%95%B0%E5%B7%AE%EF%BC%88a-b%EF%BC%89"><span class="nav-text">DATEDIFF(a, b) — 天数差（a - b）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#TIMESTAMPDIFF-unit-a-b-%E2%80%94-%E6%8C%87%E5%AE%9A%E5%8D%95%E4%BD%8D%E5%B7%AE%E5%80%BC%EF%BC%88YEAR-MONTH-DAY-HOUR%E2%80%A6%EF%BC%89"><span class="nav-text">TIMESTAMPDIFF(unit, a, b) — 指定单位差值（YEAR, MONTH, DAY, HOUR…）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#UNIX-TIMESTAMP-FROM-UNIXTIME-%E2%80%94-%E6%97%B6%E9%97%B4%E6%88%B3%E4%BA%92%E8%BD%AC"><span class="nav-text">UNIX_TIMESTAMP() &#x2F; FROM_UNIXTIME() — 时间戳互转</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BA%94%E3%80%81%E8%81%9A%E5%90%88%E5%87%BD%E6%95%B0%EF%BC%88Aggregate%EF%BC%89"><span class="nav-text">五、聚合函数（Aggregate）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#COUNT-COUNT-col-%E2%80%94-%E8%AE%A1%E6%95%B0"><span class="nav-text">COUNT(*) &#x2F; COUNT(col) — 计数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#SUM-col-AVG-col-MIN-MAX-%E2%80%94-%E6%B1%82%E5%92%8C-%E5%B9%B3%E5%9D%87-%E6%9C%80%E5%B0%8F-%E6%9C%80%E5%A4%A7"><span class="nav-text">SUM(col) &#x2F; AVG(col) &#x2F; MIN &#x2F; MAX — 求和&#x2F;平均&#x2F;最小&#x2F;最大</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#GROUP-CONCAT-expr-ORDER-BY-SEPARATOR-%E2%80%94-%E5%88%86%E7%BB%84%E6%8B%BC%E6%8E%A5"><span class="nav-text">GROUP_CONCAT(expr [ORDER BY ... SEPARATOR &#39;,&#39;]) — 分组拼接</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%85%AD%E3%80%81JSON%EF%BC%88MySQL-5-7-%EF%BC%89"><span class="nav-text">六、JSON（MySQL 5.7+）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#JSON-EXTRACT-json-path-%E6%88%96-col-a-b-%E2%80%94-%E5%8F%96%E5%80%BC"><span class="nav-text">JSON_EXTRACT(json, path) 或 col-&gt;&#39;$.a.b&#39; — 取值</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#JSON-SET-json-path-val-JSON-REPLACE-JSON-INSERT-%E2%80%94-%E4%BF%AE%E6%94%B9%E6%88%96%E6%8F%92%E5%85%A5"><span class="nav-text">JSON_SET(json, path, val) &#x2F; JSON_REPLACE &#x2F; JSON_INSERT — 修改或插入</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#JSON-CONTAINS-json-val-path-%E2%80%94-%E5%88%A4%E6%96%AD%E5%8C%85%E5%90%AB%E5%85%B3%E7%B3%BB"><span class="nav-text">JSON_CONTAINS(json, val [, path]) — 判断包含关系</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#JSON-ARRAY-JSON-OBJECT-JSON-LENGTH-%E2%80%94-%E6%9E%84%E9%80%A0%E4%B8%8E%E9%95%BF%E5%BA%A6"><span class="nav-text">JSON_ARRAY() &#x2F; JSON_OBJECT() &#x2F; JSON_LENGTH() — 构造与长度</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%B8%83%E3%80%81%E7%B1%BB%E5%9E%8B%E8%BD%AC%E6%8D%A2%EF%BC%88CAST-CONVERT%EF%BC%89"><span class="nav-text">七、类型转换（CAST &#x2F; CONVERT）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#CAST-expr-AS-type-CONVERT-expr-type-%E2%80%94-%E5%BC%BA%E5%88%B6%E7%B1%BB%E5%9E%8B%E8%BD%AC%E6%8D%A2"><span class="nav-text">CAST(expr AS type) &#x2F; CONVERT(expr, type) — 强制类型转换</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%85%AB%E3%80%81%E5%8A%A0%E5%AF%86-%E7%BC%96%E7%A0%81-UUID"><span class="nav-text">八、加密 &#x2F; 编码 &#x2F; UUID</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#MD5-str-SHA1-str-%E2%80%94-%E5%8D%95%E5%90%91%E5%93%88%E5%B8%8C"><span class="nav-text">MD5(str) &#x2F; SHA1(str) — 单向哈希</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#HEX-str-UNHEX-str-%E2%80%94-%E5%8D%81%E5%85%AD%E8%BF%9B%E5%88%B6%E7%BC%96%E7%A0%81-%E8%A7%A3%E7%A0%81"><span class="nav-text">HEX(str) &#x2F; UNHEX(str) — 十六进制编码&#x2F;解码</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#UUID-UUID-SHORT-%E2%80%94-%E5%94%AF%E4%B8%80-ID"><span class="nav-text">UUID() &#x2F; UUID_SHORT() — 唯一 ID</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%B9%9D%E3%80%81%E7%AA%97%E5%8F%A3%E5%87%BD%E6%95%B0%EF%BC%88MySQL-8-0-%EF%BC%89"><span class="nav-text">九、窗口函数（MySQL 8.0+）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#ROW-NUMBER-%E2%80%94-%E8%A1%8C%E5%8F%B7"><span class="nav-text">ROW_NUMBER() — 行号</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#RANK-DENSE-RANK-%E2%80%94-%E6%8E%92%E5%90%8D%EF%BC%88%E5%B9%B6%E5%88%97%EF%BC%89"><span class="nav-text">RANK() &#x2F; DENSE_RANK() — 排名（并列）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#SUM-OVER-AVG-OVER-%E2%80%94-%E6%BB%9A%E5%8A%A8-%E7%B4%AF%E8%AE%A1"><span class="nav-text">SUM(...) OVER(...) &#x2F; AVG(...) OVER(...) — 滚动&#x2F;累计</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#LAG-col-offset-default-LEAD-%E2%80%94-%E5%89%8D-%E5%90%8E%E8%A1%8C%E5%80%BC"><span class="nav-text">LAG(col, offset, default) &#x2F; LEAD(...) — 前&#x2F;后行值</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%8D%81%E3%80%81%E5%AE%9E%E7%94%A8%E7%BB%84%E5%90%88%E7%A4%BA%E4%BE%8B%EF%BC%88%E7%BB%BC%E5%90%88%EF%BC%89"><span class="nav-text">十、实用组合示例（综合）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A4%BA%E4%BE%8B-1%EF%BC%9A%E6%9F%A5%E8%AF%A2%E7%94%A8%E6%88%B7%E5%BD%93%E6%9C%88%E6%B6%88%E8%B4%B9-%E4%B8%8A%E6%9C%88%E6%B6%88%E8%B4%B9-%E5%90%8C%E6%AF%94%E7%8E%AF%E6%AF%94"><span class="nav-text">示例 1：查询用户当月消费 + 上月消费 + 同比环比</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A4%BA%E4%BE%8B-2%EF%BC%9A%E5%B0%86-NULL-%E6%88%96-%E7%A9%BA%E4%B8%B2%E7%BB%9F%E4%B8%80%E6%88%90%E9%BB%98%E8%AE%A4%E5%80%BC"><span class="nav-text">示例 2：将 NULL 或 空串统一成默认值</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A4%BA%E4%BE%8B-3%EF%BC%9A%E5%B8%A6%E7%AA%97%E5%8F%A3%E7%9A%84%E5%88%86%E7%BB%84-TopN%EF%BC%88%E6%AF%8F%E7%BB%84%E5%89%8D-3%EF%BC%89"><span class="nav-text">示例 3：带窗口的分组 TopN（每组前 3）</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">YeChengfeng</p>
+  <div class="site-description" itemprop="description">Make Learning and Organizing a Habit!</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">204</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">43</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">55</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">YeChengfeng</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="站点总字数">435k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">6:35</span>
+</div>
+
+        
+
+
+
+
+
+
+<script>
+  (function() {
+    function leancloudSelector(url) {
+      url = encodeURI(url);
+      return document.getElementById(url).querySelector('.leancloud-visitors-count');
+    }
+
+    function addCount(Counter) {
+      var visitors = document.querySelector('.leancloud_visitors');
+      var url = decodeURI(visitors.id);
+      var title = visitors.dataset.flagTitle;
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          if (results.length > 0) {
+            var counter = results[0];
+            leancloudSelector(url).innerText = counter.time + 1;
+            Counter('put', '/classes/Counter/' + counter.objectId, { time: { '__op': 'Increment', 'amount': 1 } })
+              .catch(error => {
+                console.error('Failed to save visitor count', error);
+              });
+          } else {
+              Counter('post', '/classes/Counter', { title, url, time: 1 })
+                .then(response => response.json())
+                .then(() => {
+                  leancloudSelector(url).innerText = 1;
+                })
+                .catch(error => {
+                  console.error('Failed to create', error);
+                });
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    function showTime(Counter) {
+      var visitors = document.querySelectorAll('.leancloud_visitors');
+      var entries = [...visitors].map(element => {
+        return decodeURI(element.id);
+      });
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url: { '$in': entries } })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          for (let url of entries) {
+            let target = results.find(item => item.url === url);
+            leancloudSelector(url).innerText = target ? target.time : 0;
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    let { app_id, app_key, server_url } = {"enable":true,"app_id":"h7vZITYMXKA8TGvtiJFms589-MdYXbMMI","app_key":"TcCRmGMIrnp7A76AiTj67XKC","security":false};
+    function fetchData(api_server) {
+      var Counter = (method, url, data) => {
+        return fetch(`${api_server}/1.1${url}`, {
+          method,
+          headers: {
+            'X-LC-Id'     : app_id,
+            'X-LC-Key'    : app_key,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data)
+        });
+      };
+      if (CONFIG.page.isPost) {
+        if (CONFIG.hostname !== location.hostname) return;
+        addCount(Counter);
+      } else if (document.querySelectorAll('.post-title-link').length >= 1) {
+        showTime(Counter);
+      }
+    }
+
+    let api_server = app_id.slice(-9) !== '-MdYXbMMI' ? server_url : `https://${app_id.slice(0, 8).toLowerCase()}.api.lncldglobal.com`;
+
+    if (api_server) {
+      fetchData(api_server);
+    } else {
+      fetch('https://app-router.leancloud.cn/2/route?appId=' + app_id)
+        .then(response => response.json())
+        .then(({ api_server }) => {
+          fetchData('https://' + api_server);
+        });
+    }
+  })();
+</script>
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+  <script>
+  if (CONFIG.page.isPost) {
+    wpac_init = window.wpac_init || [];
+    wpac_init.push({
+      widget: 'Rating',
+      id    : h7vZITYMXKA8TGvtiJFms589-MdYXbMMI,
+      el    : 'wpac-rating',
+      color : 'fc6423'
+    });
+    (function() {
+      if ('WIDGETPACK_LOADED' in window) return;
+      WIDGETPACK_LOADED = true;
+      var mc = document.createElement('script');
+      mc.type = 'text/javascript';
+      mc.async = true;
+      mc.src = '//embed.widgetpack.com/widget.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(mc, s.nextSibling);
+    })();
+  }
+  </script>
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+<script>
+NexT.utils.loadComments(document.querySelector('#lv-container'), () => {
+  window.livereOptions = {
+    refer: location.pathname.replace(CONFIG.root, '').replace('index.html', '')
+  };
+  (function(d, s) {
+    var j, e = d.getElementsByTagName(s)[0];
+    if (typeof LivereTower === 'function') { return; }
+    j = d.createElement(s);
+    j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+    j.async = true;
+    e.parentNode.insertBefore(j, e);
+  })(document, 'script');
+});
+</script>
+
+</body>
+</html>

@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <script>
+    (function () {
+        if ('') {
+            if (prompt('请输入文章密码') !== '') {
+                alert('密码错误！');
+                if (history.length === 1) {
+                    location.replace("http://xxxxxxx.xxx"); // 这里替换成你的首页
+                } else {
+                    history.back();
+                }
+            }    
+        }
+    })();
+</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 8.1.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css">
+  <script src="/lib/pace/pace.min.js"></script>
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"leslie-shell.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"always","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":true,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.json"};
+  </script>
+
+  <meta name="description" content="参考:https:&#x2F;&#x2F;www.cnblogs.com&#x2F;vless&#x2F;p&#x2F;17939089https:&#x2F;&#x2F;bbs.huaweicloud.com&#x2F;blogs&#x2F;337855 https:&#x2F;&#x2F;www.bilibili.com&#x2F;video&#x2F;BV14L4y157Bv?spm_id_from&#x3D;333.788.videopod.episodes&amp;vd_source&#x3D;8db2bf2ffb3ab22965fc">
+<meta property="og:type" content="article">
+<meta property="og:title" content="SHELL 入门整理-2">
+<meta property="og:url" content="https://leslie-shell.github.io/2025/11/24/linux/shell-2/index.html">
+<meta property="og:site_name" content="随笔">
+<meta property="og:description" content="参考:https:&#x2F;&#x2F;www.cnblogs.com&#x2F;vless&#x2F;p&#x2F;17939089https:&#x2F;&#x2F;bbs.huaweicloud.com&#x2F;blogs&#x2F;337855 https:&#x2F;&#x2F;www.bilibili.com&#x2F;video&#x2F;BV14L4y157Bv?spm_id_from&#x3D;333.788.videopod.episodes&amp;vd_source&#x3D;8db2bf2ffb3ab22965fc">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2025-11-24T15:36:49.482Z">
+<meta property="article:modified_time" content="2025-11-29T15:21:59.396Z">
+<meta property="article:author" content="YeChengfeng">
+<meta property="article:tag" content="Linux">
+<meta property="article:tag" content="Shell">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://leslie-shell.github.io/2025/11/24/linux/shell-2/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>SHELL 入门整理-2 | 随笔</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">随笔</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-rank">
+
+    <a href="/rank/" rel="section"><i class="fa fa-fire fa-fw"></i>热度</a>
+
+  </li>
+        <li class="menu-item menu-item-recommended">
+
+    <a href="/recommended/" rel="section"><i class="fa fa-flag fa-fw"></i>推荐</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://leslie-shell.github.io/2025/11/24/linux/shell-2/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="YeChengfeng">
+      <meta itemprop="description" content="Make Learning and Organizing a Habit!">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="随笔">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          SHELL 入门整理-2
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2025-11-24 23:36:49" itemprop="dateCreated datePublished" datetime="2025-11-24T23:36:49+08:00">2025-11-24</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2025-11-29 23:21:59" itemprop="dateModified" datetime="2025-11-29T23:21:59+08:00">2025-11-29</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Linux/" itemprop="url" rel="index"><span itemprop="name">Linux</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Linux/Shell/" itemprop="url" rel="index"><span itemprop="name">Shell</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/2025/11/24/linux/shell-2/" class="post-meta-item leancloud_visitors" data-flag-title="SHELL 入门整理-2" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>1.5k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>1 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>参考:<a target="_blank" rel="noopener" href="https://www.cnblogs.com/vless/p/17939089">https://www.cnblogs.com/vless/p/17939089</a><br><a target="_blank" rel="noopener" href="https://bbs.huaweicloud.com/blogs/337855">https://bbs.huaweicloud.com/blogs/337855</a></p>
+<p><a target="_blank" rel="noopener" href="https://www.bilibili.com/video/BV14L4y157Bv?spm_id_from=333.788.videopod.episodes&vd_source=8db2bf2ffb3ab22965fccab48d4389ba&p=9">https://www.bilibili.com/video/BV14L4y157Bv?spm_id_from=333.788.videopod.episodes&amp;vd_source=8db2bf2ffb3ab22965fccab48d4389ba&amp;p=9</a></p>
+<h2 id="一、通过-set-检查父子-Shell-的变量继承"><a href="#一、通过-set-检查父子-Shell-的变量继承" class="headerlink" title="一、通过 set 检查父子 Shell 的变量继承"></a>一、通过 set 检查父子 Shell 的变量继承</h2><p>每次调用脚本或使用子 Shell（如 <code>( )</code> 或 <code>bash -c</code>）都会创建新的 shell 环境，父 shell 的普通变量默认不会传递到子 shell。</p>
+<h3 id="示例"><a href="#示例" class="headerlink" title="示例"></a>示例</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">v=100</span><br><span class="line">bash -c <span class="string">&#x27;echo 子 shell v: $v&#x27;</span>   <span class="comment"># 输出为空</span></span><br></pre></td></tr></table></figure>
+
+<p><code>set</code> 命令可以列出当前 shell 的所有变量和函数，用于检查父子 shell 变量的加载情况。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">set</span></span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="二、系统环境变量查看与操作命令区别"><a href="#二、系统环境变量查看与操作命令区别" class="headerlink" title="二、系统环境变量查看与操作命令区别"></a>二、系统环境变量查看与操作命令区别</h2><table>
+<thead>
+<tr>
+<th>命令</th>
+<th>功能</th>
+<th>作用与区别</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>set</code></td>
+<td>列出当前 shell 的所有变量和函数</td>
+<td>包含未导出的局部变量和 shell 函数，信息最全，但输出杂乱，主要用于调试当前 shell 状态</td>
+</tr>
+<tr>
+<td><code>env</code></td>
+<td>显示环境变量</td>
+<td>仅显示已导出的变量，子 shell 可继承，适合查看系统环境变量及传递给程序的变量</td>
+</tr>
+<tr>
+<td><code>declare</code></td>
+<td>查看变量类型、属性、函数</td>
+<td>可用于区分普通变量、数组、只读变量以及函数，支持 <code>-p</code> 查看值，适合脚本中精细管理变量</td>
+</tr>
+<tr>
+<td><code>export</code></td>
+<td>设置或查看导出变量</td>
+<td>将变量导出到环境，使其对子 shell可见，可在命令中直接查看或设置导出变量</td>
+</tr>
+</tbody></table>
+<h3 id="示例-1"><a href="#示例-1" class="headerlink" title="示例"></a>示例</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 创建变量</span></span><br><span class="line">var1=100          <span class="comment"># 普通变量，只在当前 shell 可见</span></span><br><span class="line"><span class="built_in">export</span> var2=200    <span class="comment"># 导出变量，子 shell 可继承</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 查看</span></span><br><span class="line"><span class="built_in">set</span> | grep var      <span class="comment"># 包含 var1, var2</span></span><br><span class="line"><span class="built_in">env</span> | grep var      <span class="comment"># 仅显示 var2</span></span><br><span class="line"><span class="built_in">declare</span> -p var2     <span class="comment"># 显示 var2 的类型和值</span></span><br><span class="line"><span class="built_in">export</span> -p | grep var2  <span class="comment"># 查看 var2 是否导出</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>总结区别</strong>:</p>
+<ul>
+<li><code>set</code> 最全，包含函数和局部变量</li>
+<li><code>env</code> 只显示导出变量</li>
+<li><code>declare</code> 用于查看类型和属性，适合调试和脚本控制</li>
+<li><code>export</code> 用于导出变量或显示导出状态</li>
+</ul>
+<hr>
+<h2 id="三、Shell-变量加载顺序与管理"><a href="#三、Shell-变量加载顺序与管理" class="headerlink" title="三、Shell 变量加载顺序与管理"></a>三、Shell 变量加载顺序与管理</h2><h3 id="加载顺序"><a href="#加载顺序" class="headerlink" title="加载顺序"></a>加载顺序</h3><ol>
+<li>普通变量：仅在当前 shell 有效</li>
+<li><code>export</code> 导出的环境变量：可被子 shell 继承</li>
+<li>配置文件加载：例如 <code>.bashrc</code>、<code>.profile</code></li>
+</ol>
+<h3 id="撤销变量"><a href="#撤销变量" class="headerlink" title="撤销变量"></a>撤销变量</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">unset</span> var</span><br></pre></td></tr></table></figure>
+
+<h3 id="只读变量"><a href="#只读变量" class="headerlink" title="只读变量"></a>只读变量</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">readonly</span> x=1</span><br><span class="line">x=2       <span class="comment"># 报错</span></span><br><span class="line"><span class="built_in">unset</span> x   <span class="comment"># 无效</span></span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="四、特殊参数变量（位置参数）"><a href="#四、特殊参数变量（位置参数）" class="headerlink" title="四、特殊参数变量（位置参数）"></a>四、特殊参数变量（位置参数）</h2><table>
+<thead>
+<tr>
+<th>参数</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>$0</code></td>
+<td>当前脚本名</td>
+</tr>
+<tr>
+<td><code>$#</code></td>
+<td>参数数量</td>
+</tr>
+<tr>
+<td><code>$*</code></td>
+<td>所有参数，整体展开（不保留引号）</td>
+</tr>
+<tr>
+<td><code>$@</code></td>
+<td>所有参数，逐个独立展开（保留引号）</td>
+</tr>
+</tbody></table>
+<h3 id="示例-2"><a href="#示例-2" class="headerlink" title="示例"></a>示例</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> arg <span class="keyword">in</span> <span class="string">&quot;<span class="variable">$@</span>&quot;</span>; <span class="keyword">do</span></span><br><span class="line">  <span class="built_in">echo</span> <span class="variable">$arg</span></span><br><span class="line"> <span class="keyword">done</span></span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="五、特殊状态变量"><a href="#五、特殊状态变量" class="headerlink" title="五、特殊状态变量"></a>五、特殊状态变量</h2><table>
+<thead>
+<tr>
+<th>参数</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>$?</code></td>
+<td>上一条命令退出状态码</td>
+</tr>
+<tr>
+<td><code>$$</code></td>
+<td>当前 shell 进程 PID</td>
+</tr>
+<tr>
+<td><code>$_</code></td>
+<td>上一条命令的最后一个参数</td>
+</tr>
+</tbody></table>
+<h3 id="示例-3"><a href="#示例-3" class="headerlink" title="示例"></a>示例</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">ls</span> /notfound</span><br><span class="line"><span class="built_in">echo</span> $?   <span class="comment"># 输出: 2</span></span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="六、Shell-内置命令"><a href="#六、Shell-内置命令" class="headerlink" title="六、Shell 内置命令"></a>六、Shell 内置命令</h2><h3 id="echo"><a href="#echo" class="headerlink" title="echo"></a>echo</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">echo</span> -n <span class="string">&quot;不换行&quot;</span></span><br><span class="line"><span class="built_in">echo</span> -e <span class="string">&quot;hello\nworld&quot;</span>  <span class="comment"># 支持转义</span></span><br></pre></td></tr></table></figure>
+
+<p>常用转义：\n、\t、\r、\b</p>
+<h3 id="printf"><a href="#printf" class="headerlink" title="printf"></a>printf</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">printf</span> <span class="string">&quot;%s %d\n&quot;</span> <span class="string">&quot;count&quot;</span> 10</span><br></pre></td></tr></table></figure>
+
+<p>格式化输出，更稳定可靠</p>
+<h3 id="eval"><a href="#eval" class="headerlink" title="eval"></a>eval</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">cmd=<span class="string">&quot;echo hello&quot;</span></span><br><span class="line"><span class="built_in">eval</span> <span class="variable">$cmd</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 动态变量名</span></span><br><span class="line">varname=MYVAR</span><br><span class="line">MYVAR=123</span><br><span class="line"><span class="built_in">eval</span> <span class="built_in">echo</span> \$<span class="variable">$varname</span>   <span class="comment"># 输出 123</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="exec"><a href="#exec" class="headerlink" title="exec"></a>exec</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">exec</span> <span class="built_in">ls</span>   <span class="comment"># 替换当前 shell 进程</span></span><br></pre></td></tr></table></figure>
+
+<p>执行后，shell 不再存在，被新进程替换</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Linux/" rel="tag"># Linux</a>
+              <a href="/tags/Shell/" rel="tag"># Shell</a>
+          </div>
+
+        
+  <div class="post-widgets">
+    <div class="wp_rating">
+      <div id="wpac-rating"></div>
+    </div>
+  </div>
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2025/11/24/linux/linux%E7%BB%88%E7%AB%AFbg,fg,jobs%E4%B8%80%E4%BA%9B%E5%B0%8F%E6%8A%80%E5%B7%A7/" rel="prev" title="linux终端中一些小技巧">
+      <i class="fa fa-chevron-left"></i> linux终端中一些小技巧
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2025/11/24/linux/shell-3.shell%E5%AD%90%E4%B8%B2%E7%9A%84%E8%AF%AD%E6%B3%95%E4%BB%8B%E7%BB%8D/" rel="next" title="SHELL 入门整理-2.子串的玩法">
+      SHELL 入门整理-2.子串的玩法 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+
+
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    
+  <div class="comments">
+    <div id="lv-container" data-id="city" data-uid="MTAyMC82MDk4Ni8zNzQ1Ng=="></div>
+  </div>
+  
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%80%E3%80%81%E9%80%9A%E8%BF%87-set-%E6%A3%80%E6%9F%A5%E7%88%B6%E5%AD%90-Shell-%E7%9A%84%E5%8F%98%E9%87%8F%E7%BB%A7%E6%89%BF"><span class="nav-text">一、通过 set 检查父子 Shell 的变量继承</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A4%BA%E4%BE%8B"><span class="nav-text">示例</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%8C%E3%80%81%E7%B3%BB%E7%BB%9F%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F%E6%9F%A5%E7%9C%8B%E4%B8%8E%E6%93%8D%E4%BD%9C%E5%91%BD%E4%BB%A4%E5%8C%BA%E5%88%AB"><span class="nav-text">二、系统环境变量查看与操作命令区别</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A4%BA%E4%BE%8B-1"><span class="nav-text">示例</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%89%E3%80%81Shell-%E5%8F%98%E9%87%8F%E5%8A%A0%E8%BD%BD%E9%A1%BA%E5%BA%8F%E4%B8%8E%E7%AE%A1%E7%90%86"><span class="nav-text">三、Shell 变量加载顺序与管理</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8A%A0%E8%BD%BD%E9%A1%BA%E5%BA%8F"><span class="nav-text">加载顺序</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%92%A4%E9%94%80%E5%8F%98%E9%87%8F"><span class="nav-text">撤销变量</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%AA%E8%AF%BB%E5%8F%98%E9%87%8F"><span class="nav-text">只读变量</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9B%9B%E3%80%81%E7%89%B9%E6%AE%8A%E5%8F%82%E6%95%B0%E5%8F%98%E9%87%8F%EF%BC%88%E4%BD%8D%E7%BD%AE%E5%8F%82%E6%95%B0%EF%BC%89"><span class="nav-text">四、特殊参数变量（位置参数）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A4%BA%E4%BE%8B-2"><span class="nav-text">示例</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%94%E3%80%81%E7%89%B9%E6%AE%8A%E7%8A%B6%E6%80%81%E5%8F%98%E9%87%8F"><span class="nav-text">五、特殊状态变量</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A4%BA%E4%BE%8B-3"><span class="nav-text">示例</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%AD%E3%80%81Shell-%E5%86%85%E7%BD%AE%E5%91%BD%E4%BB%A4"><span class="nav-text">六、Shell 内置命令</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#echo"><span class="nav-text">echo</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#printf"><span class="nav-text">printf</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#eval"><span class="nav-text">eval</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#exec"><span class="nav-text">exec</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">YeChengfeng</p>
+  <div class="site-description" itemprop="description">Make Learning and Organizing a Habit!</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">204</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">43</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">55</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">YeChengfeng</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="站点总字数">435k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">6:35</span>
+</div>
+
+        
+
+
+
+
+
+
+<script>
+  (function() {
+    function leancloudSelector(url) {
+      url = encodeURI(url);
+      return document.getElementById(url).querySelector('.leancloud-visitors-count');
+    }
+
+    function addCount(Counter) {
+      var visitors = document.querySelector('.leancloud_visitors');
+      var url = decodeURI(visitors.id);
+      var title = visitors.dataset.flagTitle;
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          if (results.length > 0) {
+            var counter = results[0];
+            leancloudSelector(url).innerText = counter.time + 1;
+            Counter('put', '/classes/Counter/' + counter.objectId, { time: { '__op': 'Increment', 'amount': 1 } })
+              .catch(error => {
+                console.error('Failed to save visitor count', error);
+              });
+          } else {
+              Counter('post', '/classes/Counter', { title, url, time: 1 })
+                .then(response => response.json())
+                .then(() => {
+                  leancloudSelector(url).innerText = 1;
+                })
+                .catch(error => {
+                  console.error('Failed to create', error);
+                });
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    function showTime(Counter) {
+      var visitors = document.querySelectorAll('.leancloud_visitors');
+      var entries = [...visitors].map(element => {
+        return decodeURI(element.id);
+      });
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url: { '$in': entries } })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          for (let url of entries) {
+            let target = results.find(item => item.url === url);
+            leancloudSelector(url).innerText = target ? target.time : 0;
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    let { app_id, app_key, server_url } = {"enable":true,"app_id":"h7vZITYMXKA8TGvtiJFms589-MdYXbMMI","app_key":"TcCRmGMIrnp7A76AiTj67XKC","security":false};
+    function fetchData(api_server) {
+      var Counter = (method, url, data) => {
+        return fetch(`${api_server}/1.1${url}`, {
+          method,
+          headers: {
+            'X-LC-Id'     : app_id,
+            'X-LC-Key'    : app_key,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data)
+        });
+      };
+      if (CONFIG.page.isPost) {
+        if (CONFIG.hostname !== location.hostname) return;
+        addCount(Counter);
+      } else if (document.querySelectorAll('.post-title-link').length >= 1) {
+        showTime(Counter);
+      }
+    }
+
+    let api_server = app_id.slice(-9) !== '-MdYXbMMI' ? server_url : `https://${app_id.slice(0, 8).toLowerCase()}.api.lncldglobal.com`;
+
+    if (api_server) {
+      fetchData(api_server);
+    } else {
+      fetch('https://app-router.leancloud.cn/2/route?appId=' + app_id)
+        .then(response => response.json())
+        .then(({ api_server }) => {
+          fetchData('https://' + api_server);
+        });
+    }
+  })();
+</script>
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+  <script>
+  if (CONFIG.page.isPost) {
+    wpac_init = window.wpac_init || [];
+    wpac_init.push({
+      widget: 'Rating',
+      id    : h7vZITYMXKA8TGvtiJFms589-MdYXbMMI,
+      el    : 'wpac-rating',
+      color : 'fc6423'
+    });
+    (function() {
+      if ('WIDGETPACK_LOADED' in window) return;
+      WIDGETPACK_LOADED = true;
+      var mc = document.createElement('script');
+      mc.type = 'text/javascript';
+      mc.async = true;
+      mc.src = '//embed.widgetpack.com/widget.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(mc, s.nextSibling);
+    })();
+  }
+  </script>
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+<script>
+NexT.utils.loadComments(document.querySelector('#lv-container'), () => {
+  window.livereOptions = {
+    refer: location.pathname.replace(CONFIG.root, '').replace('index.html', '')
+  };
+  (function(d, s) {
+    var j, e = d.getElementsByTagName(s)[0];
+    if (typeof LivereTower === 'function') { return; }
+    j = d.createElement(s);
+    j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+    j.async = true;
+    e.parentNode.insertBefore(j, e);
+  })(document, 'script');
+});
+</script>
+
+</body>
+</html>

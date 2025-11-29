@@ -1,0 +1,904 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <script>
+    (function () {
+        if ('') {
+            if (prompt('请输入文章密码') !== '') {
+                alert('密码错误！');
+                if (history.length === 1) {
+                    location.replace("http://xxxxxxx.xxx"); // 这里替换成你的首页
+                } else {
+                    history.back();
+                }
+            }    
+        }
+    })();
+</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 8.1.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css">
+  <script src="/lib/pace/pace.min.js"></script>
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"leslie-shell.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"always","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":true,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.json"};
+  </script>
+
+  <meta name="description" content="MySQL 知识整理">
+<meta property="og:type" content="article">
+<meta property="og:title" content="MySQL 知识整理">
+<meta property="og:url" content="https://leslie-shell.github.io/2025/11/22/mysql/mysql--10.%E5%B7%A5%E4%BD%9C%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98/index.html">
+<meta property="og:site_name" content="随笔">
+<meta property="og:description" content="MySQL 知识整理">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://leslieyedoc.oss-cn-shanghai.aliyuncs.com/img/20250909-161342-image-20250909161336285.png">
+<meta property="og:image" content="https://leslieyedoc.oss-cn-shanghai.aliyuncs.com/img/20250909-161705-image-20250909161703090.png">
+<meta property="article:published_time" content="2025-11-22T14:34:29.378Z">
+<meta property="article:modified_time" content="2025-11-29T15:18:59.914Z">
+<meta property="article:author" content="YeChengfeng">
+<meta property="article:tag" content="Mysql">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://leslieyedoc.oss-cn-shanghai.aliyuncs.com/img/20250909-161342-image-20250909161336285.png">
+
+<link rel="canonical" href="https://leslie-shell.github.io/2025/11/22/mysql/mysql--10.%E5%B7%A5%E4%BD%9C%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>MySQL 知识整理 | 随笔</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">随笔</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-rank">
+
+    <a href="/rank/" rel="section"><i class="fa fa-fire fa-fw"></i>热度</a>
+
+  </li>
+        <li class="menu-item menu-item-recommended">
+
+    <a href="/recommended/" rel="section"><i class="fa fa-flag fa-fw"></i>推荐</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://leslie-shell.github.io/2025/11/22/mysql/mysql--10.%E5%B7%A5%E4%BD%9C%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="YeChengfeng">
+      <meta itemprop="description" content="Make Learning and Organizing a Habit!">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="随笔">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          MySQL 知识整理
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2025-11-22 22:34:29" itemprop="dateCreated datePublished" datetime="2025-11-22T22:34:29+08:00">2025-11-22</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2025-11-29 23:18:59" itemprop="dateModified" datetime="2025-11-29T23:18:59+08:00">2025-11-29</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Mysql/" itemprop="url" rel="index"><span itemprop="name">Mysql</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/2025/11/22/mysql/mysql--10.%E5%B7%A5%E4%BD%9C%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98/" class="post-meta-item leancloud_visitors" data-flag-title="MySQL 知识整理" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>2.2k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>2 分钟</span>
+            </span>
+            <div class="post-description">MySQL 知识整理</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <hr>
+<h1 id="MySQL-知识整理"><a href="#MySQL-知识整理" class="headerlink" title="MySQL 知识整理"></a>MySQL 知识整理</h1><h2 id="1-MySQL-执行流程"><a href="#1-MySQL-执行流程" class="headerlink" title="1. MySQL 执行流程"></a>1. MySQL 执行流程</h2><h3 id="1-1-执行流程示意"><a href="#1-1-执行流程示意" class="headerlink" title="1.1 执行流程示意"></a>1.1 执行流程示意</h3><p><img src="https://leslieyedoc.oss-cn-shanghai.aliyuncs.com/img/20250909-161342-image-20250909161336285.png" alt="MySQL执行流程"></p>
+<h3 id="1-2-MySQL-逻辑架构"><a href="#1-2-MySQL-逻辑架构" class="headerlink" title="1.2 MySQL 逻辑架构"></a>1.2 MySQL 逻辑架构</h3><ol>
+<li><strong>客户端</strong></li>
+<li><strong>Services 层</strong><ul>
+<li>连接器</li>
+<li>查询缓存（MySQL 8.0 已禁用）</li>
+<li>解析器（Parser）</li>
+<li>优化器（Optimizer）</li>
+</ul>
+</li>
+<li><strong>存储引擎</strong>（InnoDB 等）</li>
+</ol>
+<h3 id="1-3-优化和执行"><a href="#1-3-优化和执行" class="headerlink" title="1.3 优化和执行"></a>1.3 优化和执行</h3><ul>
+<li><strong>查询解析和优化</strong><ul>
+<li>MySQL 会解析 SQL 查询，生成内部解析树。</li>
+<li>优化器会重写查询、选择表的读取顺序、选择合适索引。</li>
+<li>用户可以通过关键字（如 <code>STRAIGHT_JOIN</code>、<code>FORCE INDEX</code>）提示优化器，影响决策。</li>
+</ul>
+</li>
+<li><strong>查询缓存（已废弃）</strong><ul>
+<li>5.6 默认关闭（<code>query_cache_type=0</code>），8.0 已删除。</li>
+<li>查询缓存问题：<ul>
+<li>受到单个全局互斥锁 <code>query_cache_lock</code> 保护，高并发下成为瓶颈。</li>
+<li>写操作（INSERT&#x2F;UPDATE&#x2F;DELETE&#x2F;DDL）会使相关缓存失效，持有全局锁阻塞其他操作。</li>
+</ul>
+</li>
+<li>高并发场景下，缓存反而会导致性能下降。</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="2-MySQL-行存储"><a href="#2-MySQL-行存储" class="headerlink" title="2. MySQL 行存储"></a>2. MySQL 行存储</h2><h3 id="2-1-数据库文件存放位置"><a href="#2-1-数据库文件存放位置" class="headerlink" title="2.1 数据库文件存放位置"></a>2.1 数据库文件存放位置</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SHOW</span> VARIABLES <span class="keyword">LIKE</span> <span class="string">&#x27;datadir&#x27;</span>;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>默认路径：<code>/var/lib/mysql/</code></li>
+<li>每个数据库会生成一个目录，存放该数据库的表结构和数据：<ol>
+<li><strong>db.opt</strong>：存储数据库默认字符集和校验规则</li>
+<li><strong>t_order.frm</strong>：保存表结构（元数据）</li>
+<li><strong>t_order.ibd</strong>：保存表数据（InnoDB 表空间）</li>
+</ol>
+</li>
+</ul>
+<h3 id="2-2-表空间结构"><a href="#2-2-表空间结构" class="headerlink" title="2.2 表空间结构"></a>2.2 表空间结构</h3><ul>
+<li>InnoDB 表空间逻辑结构：<ul>
+<li><strong>段（Segment）</strong> → <strong>区（Extent）</strong> → <strong>页（Page）</strong> → <strong>行（Row）</strong></li>
+</ul>
+</li>
+</ul>
+<p><img src="https://leslieyedoc.oss-cn-shanghai.aliyuncs.com/img/20250909-161705-image-20250909161703090.png" alt="InnoDB存储结构"></p>
+<h3 id="2-3-NULL-值存储"><a href="#2-3-NULL-值存储" class="headerlink" title="2.3 NULL 值存储"></a>2.3 NULL 值存储</h3><ul>
+<li>Compact 行格式中使用「NULL 值列表」标记 NULL 列。</li>
+<li>NULL 值不占行数据实际空间，仅占用 1 字节。</li>
+<li>所有字段为 <code>NOT NULL</code> 时，省掉 1 字节空间。</li>
+</ul>
+<h3 id="2-4-VARCHAR-实际占用"><a href="#2-4-VARCHAR-实际占用" class="headerlink" title="2.4 VARCHAR 实际占用"></a>2.4 VARCHAR 实际占用</h3><ul>
+<li>通过「变长字段长度列表」记录实际占用大小。</li>
+<li>最大值：<code>65535</code>，需减去其他字段长度、变长字段长度列表及 NULL 列表空间。</li>
+</ul>
+<h3 id="2-5-行溢出处理"><a href="#2-5-行溢出处理" class="headerlink" title="2.5 行溢出处理"></a>2.5 行溢出处理</h3><ul>
+<li><a target="_blank" rel="noopener" href="https://www.cnblogs.com/ZhuChangwu/p/14035330.html">参考文章</a></li>
+</ul>
+<hr>
+<h2 id="3-MySQL-分页优化"><a href="#3-MySQL-分页优化" class="headerlink" title="3. MySQL 分页优化"></a>3. MySQL 分页优化</h2><ul>
+<li>原因：当页数大时，<code>LIMIT offset, size</code> 会丢弃大量行，并可能回表。</li>
+</ul>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 深度分页示例（慢）</span></span><br><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> page <span class="keyword">ORDER</span> <span class="keyword">BY</span> id LIMIT <span class="number">6000000</span>, <span class="number">10</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 优化方案</span></span><br><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> </span><br><span class="line"><span class="keyword">FROM</span> page </span><br><span class="line"><span class="keyword">WHERE</span> id <span class="operator">&gt;=</span> (</span><br><span class="line">    <span class="keyword">SELECT</span> id </span><br><span class="line">    <span class="keyword">FROM</span> page </span><br><span class="line">    <span class="keyword">ORDER</span> <span class="keyword">BY</span> id </span><br><span class="line">    LIMIT <span class="number">6000000</span>, <span class="number">1</span></span><br><span class="line">)</span><br><span class="line"><span class="keyword">ORDER</span> <span class="keyword">BY</span> id </span><br><span class="line">LIMIT <span class="number">10</span>;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>原理：<ul>
+<li>优化后只拷贝必要字段（如 <code>id</code>），减少 Server 层内存消耗。</li>
+</ul>
+</li>
+<li>非主键索引分页优化：</li>
+</ul>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> page <span class="keyword">ORDER</span> <span class="keyword">BY</span> user_name LIMIT <span class="number">0</span>, <span class="number">10</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> </span><br><span class="line"><span class="keyword">FROM</span> page t1, (</span><br><span class="line">    <span class="keyword">SELECT</span> id </span><br><span class="line">    <span class="keyword">FROM</span> page </span><br><span class="line">    <span class="keyword">ORDER</span> <span class="keyword">BY</span> user_name </span><br><span class="line">    LIMIT <span class="number">6000000</span>, <span class="number">100</span></span><br><span class="line">) t2  </span><br><span class="line"><span class="keyword">WHERE</span> t1.id <span class="operator">=</span> t2.id;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>深度分页建议：<ul>
+<li>避免用户翻到十几万页，通常设计只提供上一页&#x2F;下一页。</li>
+<li>或使用 <code>start_id</code> + 瀑布流方式遍历。</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="4-MySQL-单表容量"><a href="#4-MySQL-单表容量" class="headerlink" title="4. MySQL 单表容量"></a>4. MySQL 单表容量</h2><ul>
+<li>单表行数是否超过 2000 万？<ul>
+<li><a target="_blank" rel="noopener" href="https://xiaolincoding.com/mysql/index/2000w.html#%E5%AE%9E%E9%AA%8C">参考实验</a></li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="5-MySQL-索引"><a href="#5-MySQL-索引" class="headerlink" title="5. MySQL 索引"></a>5. MySQL 索引</h2><h3 id="5-1-B-树索引原因"><a href="#5-1-B-树索引原因" class="headerlink" title="5.1 B+ 树索引原因"></a>5.1 B+ 树索引原因</h3><ul>
+<li>支持范围查询和排序</li>
+<li>叶子节点形成链表，方便顺序访问</li>
+<li>层级较低、IO 少，适合磁盘存储</li>
+</ul>
+<p><a target="_blank" rel="noopener" href="https://xiaolincoding.com/mysql/index/2000w.html#%E5%AE%9E%E9%AA%8C">参考</a></p>
+<h3 id="5-2-COUNT-性能分析"><a href="#5-2-COUNT-性能分析" class="headerlink" title="5.2 COUNT 性能分析"></a>5.2 COUNT 性能分析</h3><table>
+<thead>
+<tr>
+<th>方式</th>
+<th>说明</th>
+<th>性能</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>count(*)</code></td>
+<td>统计所有行，无论 NULL</td>
+<td>高</td>
+</tr>
+<tr>
+<td><code>count(1)</code></td>
+<td>类似 <code>count(*)</code>，不判断列</td>
+<td>高</td>
+</tr>
+<tr>
+<td><code>count(主键字段)</code></td>
+<td>只统计主键列</td>
+<td>较高</td>
+</tr>
+<tr>
+<td><code>count(字段)</code></td>
+<td>统计字段不为 NULL 的记录</td>
+<td>低（全表扫描）</td>
+</tr>
+</tbody></table>
+<ul>
+<li>执行过程：<ul>
+<li><code>count(*)</code> 会转化参数为 <code>0</code>，InnoDB 处理与 <code>count(1)</code> 相同，无性能差异。</li>
+</ul>
+</li>
+<li>优化建议：<ul>
+<li>对大表频繁统计，可：<ol>
+<li>使用 <code>EXPLAIN</code> 返回近似行数</li>
+<li>维护计数表</li>
+</ol>
+</li>
+<li>尽量使用二级索引统计，提高 IO 性能。</li>
+</ul>
+</li>
+</ul>
+<p><a target="_blank" rel="noopener" href="https://www.xiaolincoding.com/mysql/index/count.html#%E5%93%AA%E7%A7%8D-count-%E6%80%A7%E8%83%BD%E6%9C%80%E5%A5%BD">参考</a></p>
+<hr>
+<h2 id="6-MySQL-优化实践"><a href="#6-MySQL-优化实践" class="headerlink" title="6. MySQL 优化实践"></a>6. MySQL 优化实践</h2><h3 id="6-1-优化原因"><a href="#6-1-优化原因" class="headerlink" title="6.1 优化原因"></a>6.1 优化原因</h3><ul>
+<li>数据库访问速度决定系统吞吐量</li>
+<li>数据量增大，磁盘读写瓶颈明显</li>
+<li>SQL 优化收效有限，需要多层次优化</li>
+</ul>
+<h3 id="6-2-优化策略"><a href="#6-2-优化策略" class="headerlink" title="6.2 优化策略"></a>6.2 优化策略</h3><ol>
+<li><strong>数据库设计</strong><ul>
+<li>表结构、字段类型、存储引擎选择</li>
+</ul>
+</li>
+<li><strong>索引利用</strong></li>
+<li><strong>横向扩展</strong><ul>
+<li>MySQL 集群</li>
+<li>读写分离</li>
+<li>负载均衡</li>
+</ul>
+</li>
+<li><strong>SQL 优化</strong><ul>
+<li>精简字段</li>
+<li>避免全表扫描</li>
+</ul>
+</li>
+</ol>
+<h3 id="6-3-字段设计建议"><a href="#6-3-字段设计建议" class="headerlink" title="6.3 字段设计建议"></a>6.3 字段设计建议</h3><table>
+<thead>
+<tr>
+<th>类型</th>
+<th>建议</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>整型表示状态</td>
+<td>用整型代替字符串</td>
+<td>如 IP、状态码</td>
+</tr>
+<tr>
+<td>IP</td>
+<td><code>INET_ATON</code>&#x2F;<code>INET_NTOA</code></td>
+<td>查询性能高、索引小</td>
+</tr>
+<tr>
+<td>枚举&#x2F;集合</td>
+<td>使用关联表代替 MySQL 枚举</td>
+<td>维护成本低</td>
+</tr>
+<tr>
+<td>小数&#x2F;金额</td>
+<td>使用 <code>DECIMAL</code> 定点数</td>
+<td>精度高</td>
+</tr>
+<tr>
+<td>字符串</td>
+<td>定长 CHAR &#x2F; 非定长 VARCHAR &#x2F; TEXT</td>
+<td>注意最大长度、长度存储消耗</td>
+</tr>
+</tbody></table>
+<h3 id="6-4-IP-存整型的优势"><a href="#6-4-IP-存整型的优势" class="headerlink" title="6.4 IP 存整型的优势"></a>6.4 IP 存整型的优势</h3><ul>
+<li><strong>查询性能</strong>：<ul>
+<li>等值查询快 10–100 倍</li>
+<li>范围查询快 1000 倍以上</li>
+</ul>
+</li>
+<li><strong>索引效率</strong>：<ul>
+<li>索引体积小 3–4 倍</li>
+<li>B+ 树高度低，减少磁盘 I&#x2F;O</li>
+</ul>
+</li>
+<li><strong>数据一致性</strong>：<ul>
+<li>杜绝前导零、空格、大小写问题</li>
+<li>外键关联查询快 5–10 倍</li>
+</ul>
+</li>
+<li><strong>可扩展性</strong>：<ul>
+<li>支持 IPv6，使用 <code>VARBINARY(16)</code> 扩展</li>
+</ul>
+</li>
+<li><strong>实测数据</strong>（基于 MySQL 8.0 + InnoDB）</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>场景</th>
+<th>VARCHAR (字符串)</th>
+<th>INT UNSIGNED (整型)</th>
+<th>性能差距</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>等值查询 (1000万行)</td>
+<td>120 ms</td>
+<td>0.5 ms</td>
+<td>快 240 倍</td>
+</tr>
+<tr>
+<td>IP 段查询 (BETWEEN)</td>
+<td>4200 ms</td>
+<td>2 ms</td>
+<td>快 2100 倍</td>
+</tr>
+<tr>
+<td>索引大小</td>
+<td>220 MB</td>
+<td>70 MB</td>
+<td>缩小 70%</td>
+</tr>
+</tbody></table>
+<ul>
+<li><strong>结论</strong>：<ul>
+<li>核心价值：查询性能提升、索引效率提升、数据一致性强</li>
+<li>实施成本低：写入时 <code>INET_ATON()</code>，查询时 <code>INET_NTOA()</code>，业务无感知</li>
+</ul>
+</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Mysql/" rel="tag"># Mysql</a>
+          </div>
+
+        
+  <div class="post-widgets">
+    <div class="wp_rating">
+      <div id="wpac-rating"></div>
+    </div>
+  </div>
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2025/11/22/mysql/mysql--11.%E9%9D%A2%E8%AF%95%E9%A2%98(b%E7%AB%99%E6%95%B4%E7%90%86)/" rel="prev" title="MySQL场景面试题汇总">
+      <i class="fa fa-chevron-left"></i> MySQL场景面试题汇总
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2025/11/23/mysql/mysql--%E5%8A%9B%E6%89%A3--4%E5%88%86%E6%95%B0%E6%8E%92%E5%90%8D/" rel="next" title="力扣-Mysql-分数排名 （Medium）">
+      力扣-Mysql-分数排名 （Medium） <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+
+
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    
+  <div class="comments">
+    <div id="lv-container" data-id="city" data-uid="MTAyMC82MDk4Ni8zNzQ1Ng=="></div>
+  </div>
+  
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#MySQL-%E7%9F%A5%E8%AF%86%E6%95%B4%E7%90%86"><span class="nav-text">MySQL 知识整理</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-MySQL-%E6%89%A7%E8%A1%8C%E6%B5%81%E7%A8%8B"><span class="nav-text">1. MySQL 执行流程</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-1-%E6%89%A7%E8%A1%8C%E6%B5%81%E7%A8%8B%E7%A4%BA%E6%84%8F"><span class="nav-text">1.1 执行流程示意</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-2-MySQL-%E9%80%BB%E8%BE%91%E6%9E%B6%E6%9E%84"><span class="nav-text">1.2 MySQL 逻辑架构</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-3-%E4%BC%98%E5%8C%96%E5%92%8C%E6%89%A7%E8%A1%8C"><span class="nav-text">1.3 优化和执行</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-MySQL-%E8%A1%8C%E5%AD%98%E5%82%A8"><span class="nav-text">2. MySQL 行存储</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-%E6%95%B0%E6%8D%AE%E5%BA%93%E6%96%87%E4%BB%B6%E5%AD%98%E6%94%BE%E4%BD%8D%E7%BD%AE"><span class="nav-text">2.1 数据库文件存放位置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-%E8%A1%A8%E7%A9%BA%E9%97%B4%E7%BB%93%E6%9E%84"><span class="nav-text">2.2 表空间结构</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-3-NULL-%E5%80%BC%E5%AD%98%E5%82%A8"><span class="nav-text">2.3 NULL 值存储</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-4-VARCHAR-%E5%AE%9E%E9%99%85%E5%8D%A0%E7%94%A8"><span class="nav-text">2.4 VARCHAR 实际占用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-5-%E8%A1%8C%E6%BA%A2%E5%87%BA%E5%A4%84%E7%90%86"><span class="nav-text">2.5 行溢出处理</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-MySQL-%E5%88%86%E9%A1%B5%E4%BC%98%E5%8C%96"><span class="nav-text">3. MySQL 分页优化</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-MySQL-%E5%8D%95%E8%A1%A8%E5%AE%B9%E9%87%8F"><span class="nav-text">4. MySQL 单表容量</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-MySQL-%E7%B4%A2%E5%BC%95"><span class="nav-text">5. MySQL 索引</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#5-1-B-%E6%A0%91%E7%B4%A2%E5%BC%95%E5%8E%9F%E5%9B%A0"><span class="nav-text">5.1 B+ 树索引原因</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-2-COUNT-%E6%80%A7%E8%83%BD%E5%88%86%E6%9E%90"><span class="nav-text">5.2 COUNT 性能分析</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-MySQL-%E4%BC%98%E5%8C%96%E5%AE%9E%E8%B7%B5"><span class="nav-text">6. MySQL 优化实践</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#6-1-%E4%BC%98%E5%8C%96%E5%8E%9F%E5%9B%A0"><span class="nav-text">6.1 优化原因</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-2-%E4%BC%98%E5%8C%96%E7%AD%96%E7%95%A5"><span class="nav-text">6.2 优化策略</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-3-%E5%AD%97%E6%AE%B5%E8%AE%BE%E8%AE%A1%E5%BB%BA%E8%AE%AE"><span class="nav-text">6.3 字段设计建议</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-4-IP-%E5%AD%98%E6%95%B4%E5%9E%8B%E7%9A%84%E4%BC%98%E5%8A%BF"><span class="nav-text">6.4 IP 存整型的优势</span></a></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">YeChengfeng</p>
+  <div class="site-description" itemprop="description">Make Learning and Organizing a Habit!</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">204</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">43</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">55</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">YeChengfeng</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="站点总字数">435k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">6:35</span>
+</div>
+
+        
+
+
+
+
+
+
+<script>
+  (function() {
+    function leancloudSelector(url) {
+      url = encodeURI(url);
+      return document.getElementById(url).querySelector('.leancloud-visitors-count');
+    }
+
+    function addCount(Counter) {
+      var visitors = document.querySelector('.leancloud_visitors');
+      var url = decodeURI(visitors.id);
+      var title = visitors.dataset.flagTitle;
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          if (results.length > 0) {
+            var counter = results[0];
+            leancloudSelector(url).innerText = counter.time + 1;
+            Counter('put', '/classes/Counter/' + counter.objectId, { time: { '__op': 'Increment', 'amount': 1 } })
+              .catch(error => {
+                console.error('Failed to save visitor count', error);
+              });
+          } else {
+              Counter('post', '/classes/Counter', { title, url, time: 1 })
+                .then(response => response.json())
+                .then(() => {
+                  leancloudSelector(url).innerText = 1;
+                })
+                .catch(error => {
+                  console.error('Failed to create', error);
+                });
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    function showTime(Counter) {
+      var visitors = document.querySelectorAll('.leancloud_visitors');
+      var entries = [...visitors].map(element => {
+        return decodeURI(element.id);
+      });
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url: { '$in': entries } })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          for (let url of entries) {
+            let target = results.find(item => item.url === url);
+            leancloudSelector(url).innerText = target ? target.time : 0;
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    let { app_id, app_key, server_url } = {"enable":true,"app_id":"h7vZITYMXKA8TGvtiJFms589-MdYXbMMI","app_key":"TcCRmGMIrnp7A76AiTj67XKC","security":false};
+    function fetchData(api_server) {
+      var Counter = (method, url, data) => {
+        return fetch(`${api_server}/1.1${url}`, {
+          method,
+          headers: {
+            'X-LC-Id'     : app_id,
+            'X-LC-Key'    : app_key,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data)
+        });
+      };
+      if (CONFIG.page.isPost) {
+        if (CONFIG.hostname !== location.hostname) return;
+        addCount(Counter);
+      } else if (document.querySelectorAll('.post-title-link').length >= 1) {
+        showTime(Counter);
+      }
+    }
+
+    let api_server = app_id.slice(-9) !== '-MdYXbMMI' ? server_url : `https://${app_id.slice(0, 8).toLowerCase()}.api.lncldglobal.com`;
+
+    if (api_server) {
+      fetchData(api_server);
+    } else {
+      fetch('https://app-router.leancloud.cn/2/route?appId=' + app_id)
+        .then(response => response.json())
+        .then(({ api_server }) => {
+          fetchData('https://' + api_server);
+        });
+    }
+  })();
+</script>
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+  <script>
+  if (CONFIG.page.isPost) {
+    wpac_init = window.wpac_init || [];
+    wpac_init.push({
+      widget: 'Rating',
+      id    : h7vZITYMXKA8TGvtiJFms589-MdYXbMMI,
+      el    : 'wpac-rating',
+      color : 'fc6423'
+    });
+    (function() {
+      if ('WIDGETPACK_LOADED' in window) return;
+      WIDGETPACK_LOADED = true;
+      var mc = document.createElement('script');
+      mc.type = 'text/javascript';
+      mc.async = true;
+      mc.src = '//embed.widgetpack.com/widget.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(mc, s.nextSibling);
+    })();
+  }
+  </script>
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+<script>
+NexT.utils.loadComments(document.querySelector('#lv-container'), () => {
+  window.livereOptions = {
+    refer: location.pathname.replace(CONFIG.root, '').replace('index.html', '')
+  };
+  (function(d, s) {
+    var j, e = d.getElementsByTagName(s)[0];
+    if (typeof LivereTower === 'function') { return; }
+    j = d.createElement(s);
+    j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+    j.async = true;
+    e.parentNode.insertBefore(j, e);
+  })(document, 'script');
+});
+</script>
+
+</body>
+</html>

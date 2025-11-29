@@ -1,0 +1,865 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <script>
+    (function () {
+        if ('') {
+            if (prompt('请输入文章密码') !== '') {
+                alert('密码错误！');
+                if (history.length === 1) {
+                    location.replace("http://xxxxxxx.xxx"); // 这里替换成你的首页
+                } else {
+                    history.back();
+                }
+            }    
+        }
+    })();
+</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 8.1.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css">
+  <script src="/lib/pace/pace.min.js"></script>
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"leslie-shell.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"always","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":true,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.json"};
+  </script>
+
+  <meta name="description" content="MySQL 锁机制与事务整理">
+<meta property="og:type" content="article">
+<meta property="og:title" content="MySQL 锁机制与事务整理">
+<meta property="og:url" content="https://leslie-shell.github.io/2025/11/22/mysql/mysql--15%E9%94%81%E6%9C%BA%E5%88%B6-1/index.html">
+<meta property="og:site_name" content="随笔">
+<meta property="og:description" content="MySQL 锁机制与事务整理">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2025-11-22T14:20:32.803Z">
+<meta property="article:modified_time" content="2025-11-29T15:19:08.969Z">
+<meta property="article:author" content="YeChengfeng">
+<meta property="article:tag" content="Mysql">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://leslie-shell.github.io/2025/11/22/mysql/mysql--15%E9%94%81%E6%9C%BA%E5%88%B6-1/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>MySQL 锁机制与事务整理 | 随笔</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">随笔</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-rank">
+
+    <a href="/rank/" rel="section"><i class="fa fa-fire fa-fw"></i>热度</a>
+
+  </li>
+        <li class="menu-item menu-item-recommended">
+
+    <a href="/recommended/" rel="section"><i class="fa fa-flag fa-fw"></i>推荐</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://leslie-shell.github.io/2025/11/22/mysql/mysql--15%E9%94%81%E6%9C%BA%E5%88%B6-1/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="YeChengfeng">
+      <meta itemprop="description" content="Make Learning and Organizing a Habit!">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="随笔">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          MySQL 锁机制与事务整理
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2025-11-22 22:20:32" itemprop="dateCreated datePublished" datetime="2025-11-22T22:20:32+08:00">2025-11-22</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2025-11-29 23:19:08" itemprop="dateModified" datetime="2025-11-29T23:19:08+08:00">2025-11-29</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Mysql/" itemprop="url" rel="index"><span itemprop="name">Mysql</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/2025/11/22/mysql/mysql--15%E9%94%81%E6%9C%BA%E5%88%B6-1/" class="post-meta-item leancloud_visitors" data-flag-title="MySQL 锁机制与事务整理" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>2.4k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>2 分钟</span>
+            </span>
+            <div class="post-description">MySQL 锁机制与事务整理</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>参考:</p>
+<ul>
+<li><p><a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s/MhzRamB1nzJe9xA7HO-Wfg">https://mp.weixin.qq.com/s/MhzRamB1nzJe9xA7HO-Wfg</a>】</p>
+</li>
+<li><p><a target="_blank" rel="noopener" href="https://www.stutuer.tech/posts/mysql-transaction-isolation">https://www.stutuer.tech/posts/mysql-transaction-isolation</a></p>
+</li>
+</ul>
+<h1 id="MySQL-锁机制与事务整理"><a href="#MySQL-锁机制与事务整理" class="headerlink" title="MySQL 锁机制与事务整理"></a>MySQL 锁机制与事务整理</h1><h2 id="1-锁分类"><a href="#1-锁分类" class="headerlink" title="1. 锁分类"></a>1. 锁分类</h2><h3 id="1-1-全局锁（Global-Lock）"><a href="#1-1-全局锁（Global-Lock）" class="headerlink" title="1.1 全局锁（Global Lock）"></a>1.1 全局锁（Global Lock）</h3><ul>
+<li><p><strong>flush tables with read lock</strong></p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">FLUSH TABLES <span class="keyword">WITH</span> READ LOCK;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>执行后整个数据库处于只读状态</li>
+<li>阻塞操作：<ul>
+<li>数据增删改操作（INSERT、DELETE、UPDATE 等）</li>
+<li>表结构变更（ALTER TABLE、DROP TABLE 等）</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p><strong>释放全局锁</strong></p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">UNLOCK TABLES;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>自动释放：会话断开时自动释放</p>
+</li>
+<li><p>备份数据库时：</p>
+<ul>
+<li>对事务性存储引擎（InnoDB），可用 <code>mysqldump --single-transaction</code>，利用 MVCC 不阻塞业务</li>
+<li>对 MyISAM（非事务性），仍需全局锁</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h3 id="1-2-表级锁（Table-Lock）"><a href="#1-2-表级锁（Table-Lock）" class="headerlink" title="1.2 表级锁（Table Lock）"></a>1.2 表级锁（Table Lock）</h3><ul>
+<li><p><strong>读锁（共享锁）</strong></p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">LOCK TABLES t_student READ;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>当前会话可读取表</li>
+<li>阻止其他会话写操作</li>
+</ul>
+</li>
+<li><p><strong>写锁（独占锁）</strong></p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">LOCK TABLES t_student WRITE;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>当前会话可读写表</li>
+<li>阻止其他会话任何操作</li>
+</ul>
+</li>
+<li><p><strong>释放锁</strong></p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">UNLOCK TABLES;</span><br></pre></td></tr></table></figure></li>
+</ul>
+<hr>
+<h3 id="1-3-元数据锁（MDL，Metadata-Lock）"><a href="#1-3-元数据锁（MDL，Metadata-Lock）" class="headerlink" title="1.3 元数据锁（MDL，Metadata Lock）"></a>1.3 元数据锁（MDL，Metadata Lock）</h3><ul>
+<li>自动加锁，不需要显示声明</li>
+<li><strong>作用</strong>：<ul>
+<li>防止在 CRUD 操作时表结构被修改</li>
+<li>事务提交后释放</li>
+</ul>
+</li>
+<li><strong>示例场景（长事务阻塞）</strong><ol>
+<li>线程 A 开启事务并执行 SELECT -&gt; 加 MDL 读锁</li>
+<li>线程 B 执行 SELECT -&gt; 不阻塞</li>
+<li>线程 C 执行 ALTER TABLE -&gt; 阻塞，等待 MDL 写锁</li>
+<li>后续所有 SELECT&#x2F;UPDATE 也被阻塞，因为 MDL 写锁优先</li>
+</ol>
+</li>
+<li>⚠ 注意：DDL 操作前需检查长事务，必要时可 kill 长事务</li>
+</ul>
+<hr>
+<h3 id="1-4-意向锁（Intention-Lock）"><a href="#1-4-意向锁（Intention-Lock）" class="headerlink" title="1.4 意向锁（Intention Lock）"></a>1.4 意向锁（Intention Lock）</h3><ul>
+<li>目的：快速判断表中是否有记录被加锁</li>
+<li>作用：<ul>
+<li>协助行级锁判断冲突，减少锁冲突检查开销</li>
+</ul>
+</li>
+<li>类型：<ul>
+<li>意向共享锁（IS）</li>
+<li>意向排他锁（IX）</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h3 id="1-5-AUTO-INCREMENT-锁"><a href="#1-5-AUTO-INCREMENT-锁" class="headerlink" title="1.5 AUTO_INCREMENT 锁"></a>1.5 AUTO_INCREMENT 锁</h3><ul>
+<li>用于自增主键字段</li>
+<li><strong>特性</strong>：<ul>
+<li>锁不是事务提交后释放，而是插入语句执行完释放</li>
+<li>大量插入时可能影响性能</li>
+</ul>
+</li>
+<li><strong>InnoDB 优化</strong>：<ul>
+<li>5.1.22 后使用轻量级 AUTO-INC 锁</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h3 id="1-6-行级锁（Row-Lock）"><a href="#1-6-行级锁（Row-Lock）" class="headerlink" title="1.6 行级锁（Row Lock）"></a>1.6 行级锁（Row Lock）</h3><ul>
+<li>仅 InnoDB 支持</li>
+<li>支持高并发，但锁开销大</li>
+<li>只在存储引擎层实现，MySQL 服务器层不了解</li>
+</ul>
+<hr>
+<h2 id="2-事务"><a href="#2-事务" class="headerlink" title="2. 事务"></a>2. 事务</h2><h3 id="2-1-基本操作"><a href="#2-1-基本操作" class="headerlink" title="2.1 基本操作"></a>2.1 基本操作</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">START</span> TRANSACTION;</span><br><span class="line"><span class="comment">-- SQL操作</span></span><br><span class="line"><span class="keyword">COMMIT</span>;</span><br><span class="line"><span class="keyword">ROLLBACK</span>;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>ACID：<ul>
+<li><strong>原子性</strong>：操作要么全部成功，要么全部失败</li>
+<li><strong>一致性</strong>：事务前后数据保持一致</li>
+<li><strong>隔离性</strong>：事务互不干扰</li>
+<li><strong>持久性</strong>：事务提交后数据持久化</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h3 id="2-2-隔离级别"><a href="#2-2-隔离级别" class="headerlink" title="2.2 隔离级别"></a>2.2 隔离级别</h3><table>
+<thead>
+<tr>
+<th>隔离级别</th>
+<th>特点</th>
+<th>问题</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>读未提交</td>
+<td>可读到未提交数据</td>
+<td>脏读</td>
+</tr>
+<tr>
+<td>读已提交</td>
+<td>只能读到已提交数据</td>
+<td>不可重复读</td>
+</tr>
+<tr>
+<td>可重复读</td>
+<td>同一事务多次读取结果一致</td>
+<td>幻读（InnoDB用MVCC解决）</td>
+</tr>
+<tr>
+<td>串行化</td>
+<td>强制事务串行执行</td>
+<td>性能低，几乎不用</td>
+</tr>
+</tbody></table>
+<hr>
+<h3 id="2-3-死锁"><a href="#2-3-死锁" class="headerlink" title="2.3 死锁"></a>2.3 死锁</h3><ul>
+<li>两个或多个事务相互占用对方资源，形成恶性循环</li>
+<li><strong>InnoDB 处理方式</strong>：<ul>
+<li>检测死锁</li>
+<li>回滚持有最少行级排他锁的事务</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h3 id="2-4-事务日志"><a href="#2-4-事务日志" class="headerlink" title="2.4 事务日志"></a>2.4 事务日志</h3><ul>
+<li><strong>预写式日志（Write-Ahead Logging）</strong><ul>
+<li>内存中修改数据的副本</li>
+<li>记录修改操作到持久化日志（顺序 IO）</li>
+<li>数据刷回磁盘时才更新实际表</li>
+<li>写两次磁盘（日志 + 数据）提高效率</li>
+</ul>
+</li>
+<li>崩溃恢复：日志持久化后，数据可自动恢复</li>
+</ul>
+<hr>
+<h3 id="2-5-MySQL-中事务特性"><a href="#2-5-MySQL-中事务特性" class="headerlink" title="2.5 MySQL 中事务特性"></a>2.5 MySQL 中事务特性</h3><ul>
+<li><p><strong>自动提交</strong></p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SET</span> AUTOCOMMIT<span class="operator">=</span><span class="number">0</span>; <span class="comment">-- 关闭自动提交</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>存储引擎混合</strong></p>
+<ul>
+<li>MySQL 服务器不管理事务，依赖存储引擎</li>
+<li>混合事务表可能导致回滚问题</li>
+</ul>
+</li>
+<li><p><strong>隐式&#x2F;显式锁</strong></p>
+<ul>
+<li>InnoDB 使用 <strong>两阶段锁定协议（2PL）</strong><ul>
+<li>事务开始后只能加锁，锁在提交时释放</li>
+</ul>
+</li>
+<li><code>LOCK TABLES</code> &#x2F; <code>UNLOCK TABLES</code> 是服务器层锁，不建议 InnoDB 使用</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="3-多版本并发控制（MVCC）"><a href="#3-多版本并发控制（MVCC）" class="headerlink" title="3. 多版本并发控制（MVCC）"></a>3. 多版本并发控制（MVCC）</h2><ul>
+<li>行级锁变种，避免加锁操作，开销低</li>
+<li>通过快照实现：<ul>
+<li>不同事务同时读取同一张表，可看到不同快照</li>
+</ul>
+</li>
+<li><strong>实现机制（InnoDB）</strong><ul>
+<li>每个事务分配唯一事务 ID（trx_id）</li>
+<li>修改数据写入 Undo 日志，指向回滚指针</li>
+<li>读取时比较事务 ID 与 read_view 判断可见性</li>
+<li>删除记录在 info flags 设置 deleted 位，同时写入 Undo + redo 日志</li>
+</ul>
+</li>
+<li><strong>适用隔离级别</strong>：<ul>
+<li>仅可重复读（REPEATABLE READ）和读未提交（READ UNCOMMITTED）</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="4-示例代码"><a href="#4-示例代码" class="headerlink" title="4. 示例代码"></a>4. 示例代码</h2><h3 id="4-1-表级锁"><a href="#4-1-表级锁" class="headerlink" title="4.1 表级锁"></a>4.1 表级锁</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 共享锁</span></span><br><span class="line">LOCK TABLES t_student READ;</span><br><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> t_student;</span><br><span class="line">UNLOCK TABLES;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 独占锁</span></span><br><span class="line">LOCK TABLES t_student WRITE;</span><br><span class="line"><span class="keyword">UPDATE</span> t_student <span class="keyword">SET</span> score<span class="operator">=</span>score<span class="operator">+</span><span class="number">10</span>;</span><br><span class="line">UNLOCK TABLES;</span><br></pre></td></tr></table></figure>
+
+<h3 id="4-2-事务"><a href="#4-2-事务" class="headerlink" title="4.2 事务"></a>4.2 事务</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SET</span> AUTOCOMMIT<span class="operator">=</span><span class="number">0</span>;</span><br><span class="line"><span class="keyword">START</span> TRANSACTION;</span><br><span class="line"></span><br><span class="line"><span class="keyword">UPDATE</span> account <span class="keyword">SET</span> balance <span class="operator">=</span> balance <span class="operator">-</span> <span class="number">100</span> <span class="keyword">WHERE</span> user_id <span class="operator">=</span> <span class="number">1</span>;</span><br><span class="line"><span class="keyword">UPDATE</span> account <span class="keyword">SET</span> balance <span class="operator">=</span> balance <span class="operator">+</span> <span class="number">100</span> <span class="keyword">WHERE</span> user_id <span class="operator">=</span> <span class="number">2</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">COMMIT</span>;</span><br></pre></td></tr></table></figure>
+
+<h3 id="4-3-MVCC-快照读取"><a href="#4-3-MVCC-快照读取" class="headerlink" title="4.3 MVCC 快照读取"></a>4.3 MVCC 快照读取</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 会话 A</span></span><br><span class="line"><span class="keyword">START</span> TRANSACTION;</span><br><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> orders <span class="keyword">WHERE</span> user_id<span class="operator">=</span><span class="number">1</span>; <span class="comment">-- 读取快照</span></span><br><span class="line"></span><br><span class="line"><span class="comment">-- 会话 B</span></span><br><span class="line"><span class="keyword">START</span> TRANSACTION;</span><br><span class="line"><span class="keyword">UPDATE</span> orders <span class="keyword">SET</span> amount<span class="operator">=</span><span class="number">200</span> <span class="keyword">WHERE</span> order_id<span class="operator">=</span><span class="number">101</span>;</span><br><span class="line"><span class="keyword">COMMIT</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 会话 A 再次查询，看到的仍是事务开始时的快照</span></span><br><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> orders <span class="keyword">WHERE</span> user_id<span class="operator">=</span><span class="number">1</span>;</span><br><span class="line"><span class="keyword">COMMIT</span>;</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="5-总结"><a href="#5-总结" class="headerlink" title="5. 总结"></a>5. 总结</h2><ul>
+<li>MySQL 锁机制多层次：<ul>
+<li>全局锁、表级锁、行级锁、意向锁、MDL、AUTO-INCREMENT 锁</li>
+</ul>
+</li>
+<li>InnoDB 支持事务、行级锁、MVCC</li>
+<li>事务日志提高写效率，支持崩溃恢复</li>
+<li>长事务 + MDL 写锁可能阻塞其他操作</li>
+<li>备份策略应结合事务隔离和存储引擎特性</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Mysql/" rel="tag"># Mysql</a>
+          </div>
+
+        
+  <div class="post-widgets">
+    <div class="wp_rating">
+      <div id="wpac-rating"></div>
+    </div>
+  </div>
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2025/11/22/mysql/mysql--9.%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0--%E9%AB%98%E6%80%A7%E8%83%BDmysql-1/" rel="prev" title="MySQL高性能mysql读书笔记">
+      <i class="fa fa-chevron-left"></i> MySQL高性能mysql读书笔记
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2025/11/22/mysql/mysql--14%E9%94%81-2/" rel="next" title="MySQL 锁机制总结">
+      MySQL 锁机制总结 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+
+
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    
+  <div class="comments">
+    <div id="lv-container" data-id="city" data-uid="MTAyMC82MDk4Ni8zNzQ1Ng=="></div>
+  </div>
+  
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#MySQL-%E9%94%81%E6%9C%BA%E5%88%B6%E4%B8%8E%E4%BA%8B%E5%8A%A1%E6%95%B4%E7%90%86"><span class="nav-text">MySQL 锁机制与事务整理</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-%E9%94%81%E5%88%86%E7%B1%BB"><span class="nav-text">1. 锁分类</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-1-%E5%85%A8%E5%B1%80%E9%94%81%EF%BC%88Global-Lock%EF%BC%89"><span class="nav-text">1.1 全局锁（Global Lock）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-2-%E8%A1%A8%E7%BA%A7%E9%94%81%EF%BC%88Table-Lock%EF%BC%89"><span class="nav-text">1.2 表级锁（Table Lock）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-3-%E5%85%83%E6%95%B0%E6%8D%AE%E9%94%81%EF%BC%88MDL%EF%BC%8CMetadata-Lock%EF%BC%89"><span class="nav-text">1.3 元数据锁（MDL，Metadata Lock）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-4-%E6%84%8F%E5%90%91%E9%94%81%EF%BC%88Intention-Lock%EF%BC%89"><span class="nav-text">1.4 意向锁（Intention Lock）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-5-AUTO-INCREMENT-%E9%94%81"><span class="nav-text">1.5 AUTO_INCREMENT 锁</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-6-%E8%A1%8C%E7%BA%A7%E9%94%81%EF%BC%88Row-Lock%EF%BC%89"><span class="nav-text">1.6 行级锁（Row Lock）</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-%E4%BA%8B%E5%8A%A1"><span class="nav-text">2. 事务</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-%E5%9F%BA%E6%9C%AC%E6%93%8D%E4%BD%9C"><span class="nav-text">2.1 基本操作</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-%E9%9A%94%E7%A6%BB%E7%BA%A7%E5%88%AB"><span class="nav-text">2.2 隔离级别</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-3-%E6%AD%BB%E9%94%81"><span class="nav-text">2.3 死锁</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-4-%E4%BA%8B%E5%8A%A1%E6%97%A5%E5%BF%97"><span class="nav-text">2.4 事务日志</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-5-MySQL-%E4%B8%AD%E4%BA%8B%E5%8A%A1%E7%89%B9%E6%80%A7"><span class="nav-text">2.5 MySQL 中事务特性</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-%E5%A4%9A%E7%89%88%E6%9C%AC%E5%B9%B6%E5%8F%91%E6%8E%A7%E5%88%B6%EF%BC%88MVCC%EF%BC%89"><span class="nav-text">3. 多版本并发控制（MVCC）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-%E7%A4%BA%E4%BE%8B%E4%BB%A3%E7%A0%81"><span class="nav-text">4. 示例代码</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#4-1-%E8%A1%A8%E7%BA%A7%E9%94%81"><span class="nav-text">4.1 表级锁</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-2-%E4%BA%8B%E5%8A%A1"><span class="nav-text">4.2 事务</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-3-MVCC-%E5%BF%AB%E7%85%A7%E8%AF%BB%E5%8F%96"><span class="nav-text">4.3 MVCC 快照读取</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-%E6%80%BB%E7%BB%93"><span class="nav-text">5. 总结</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">YeChengfeng</p>
+  <div class="site-description" itemprop="description">Make Learning and Organizing a Habit!</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">204</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">43</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">55</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">YeChengfeng</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="站点总字数">435k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">6:35</span>
+</div>
+
+        
+
+
+
+
+
+
+<script>
+  (function() {
+    function leancloudSelector(url) {
+      url = encodeURI(url);
+      return document.getElementById(url).querySelector('.leancloud-visitors-count');
+    }
+
+    function addCount(Counter) {
+      var visitors = document.querySelector('.leancloud_visitors');
+      var url = decodeURI(visitors.id);
+      var title = visitors.dataset.flagTitle;
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          if (results.length > 0) {
+            var counter = results[0];
+            leancloudSelector(url).innerText = counter.time + 1;
+            Counter('put', '/classes/Counter/' + counter.objectId, { time: { '__op': 'Increment', 'amount': 1 } })
+              .catch(error => {
+                console.error('Failed to save visitor count', error);
+              });
+          } else {
+              Counter('post', '/classes/Counter', { title, url, time: 1 })
+                .then(response => response.json())
+                .then(() => {
+                  leancloudSelector(url).innerText = 1;
+                })
+                .catch(error => {
+                  console.error('Failed to create', error);
+                });
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    function showTime(Counter) {
+      var visitors = document.querySelectorAll('.leancloud_visitors');
+      var entries = [...visitors].map(element => {
+        return decodeURI(element.id);
+      });
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url: { '$in': entries } })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          for (let url of entries) {
+            let target = results.find(item => item.url === url);
+            leancloudSelector(url).innerText = target ? target.time : 0;
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    let { app_id, app_key, server_url } = {"enable":true,"app_id":"h7vZITYMXKA8TGvtiJFms589-MdYXbMMI","app_key":"TcCRmGMIrnp7A76AiTj67XKC","security":false};
+    function fetchData(api_server) {
+      var Counter = (method, url, data) => {
+        return fetch(`${api_server}/1.1${url}`, {
+          method,
+          headers: {
+            'X-LC-Id'     : app_id,
+            'X-LC-Key'    : app_key,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data)
+        });
+      };
+      if (CONFIG.page.isPost) {
+        if (CONFIG.hostname !== location.hostname) return;
+        addCount(Counter);
+      } else if (document.querySelectorAll('.post-title-link').length >= 1) {
+        showTime(Counter);
+      }
+    }
+
+    let api_server = app_id.slice(-9) !== '-MdYXbMMI' ? server_url : `https://${app_id.slice(0, 8).toLowerCase()}.api.lncldglobal.com`;
+
+    if (api_server) {
+      fetchData(api_server);
+    } else {
+      fetch('https://app-router.leancloud.cn/2/route?appId=' + app_id)
+        .then(response => response.json())
+        .then(({ api_server }) => {
+          fetchData('https://' + api_server);
+        });
+    }
+  })();
+</script>
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+  <script>
+  if (CONFIG.page.isPost) {
+    wpac_init = window.wpac_init || [];
+    wpac_init.push({
+      widget: 'Rating',
+      id    : h7vZITYMXKA8TGvtiJFms589-MdYXbMMI,
+      el    : 'wpac-rating',
+      color : 'fc6423'
+    });
+    (function() {
+      if ('WIDGETPACK_LOADED' in window) return;
+      WIDGETPACK_LOADED = true;
+      var mc = document.createElement('script');
+      mc.type = 'text/javascript';
+      mc.async = true;
+      mc.src = '//embed.widgetpack.com/widget.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(mc, s.nextSibling);
+    })();
+  }
+  </script>
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+<script>
+NexT.utils.loadComments(document.querySelector('#lv-container'), () => {
+  window.livereOptions = {
+    refer: location.pathname.replace(CONFIG.root, '').replace('index.html', '')
+  };
+  (function(d, s) {
+    var j, e = d.getElementsByTagName(s)[0];
+    if (typeof LivereTower === 'function') { return; }
+    j = d.createElement(s);
+    j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+    j.async = true;
+    e.parentNode.insertBefore(j, e);
+  })(document, 'script');
+});
+</script>
+
+</body>
+</html>

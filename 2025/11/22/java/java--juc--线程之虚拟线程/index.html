@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <script>
+    (function () {
+        if ('') {
+            if (prompt('请输入文章密码') !== '') {
+                alert('密码错误！');
+                if (history.length === 1) {
+                    location.replace("http://xxxxxxx.xxx"); // 这里替换成你的首页
+                } else {
+                    history.back();
+                }
+            }    
+        }
+    })();
+</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 8.1.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css">
+  <script src="/lib/pace/pace.min.js"></script>
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"leslie-shell.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"always","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":true,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.json"};
+  </script>
+
+  <meta name="description" content="参考：https:&#x2F;&#x2F;javadoop.com&#x2F;post&#x2F;virtual-thread Java 虚拟线程（Virtual Threads1. 概述虚拟线程（Virtual Thread）是 Java Project Loom 提供的一种轻量级线程。它由 JVM 调度，而不是由操作系统调度，因此可以创建海量线程，适合 I&#x2F;O 密集型任务。 传统线程 &#x3D; OS 线程虚拟线程 &amp;#">
+<meta property="og:type" content="article">
+<meta property="og:title" content="java虚拟线程">
+<meta property="og:url" content="https://leslie-shell.github.io/2025/11/22/java/java--juc--%E7%BA%BF%E7%A8%8B%E4%B9%8B%E8%99%9A%E6%8B%9F%E7%BA%BF%E7%A8%8B/index.html">
+<meta property="og:site_name" content="随笔">
+<meta property="og:description" content="参考：https:&#x2F;&#x2F;javadoop.com&#x2F;post&#x2F;virtual-thread Java 虚拟线程（Virtual Threads1. 概述虚拟线程（Virtual Thread）是 Java Project Loom 提供的一种轻量级线程。它由 JVM 调度，而不是由操作系统调度，因此可以创建海量线程，适合 I&#x2F;O 密集型任务。 传统线程 &#x3D; OS 线程虚拟线程 &amp;#">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2025-11-22T07:12:51.645Z">
+<meta property="article:modified_time" content="2025-11-29T15:22:28.637Z">
+<meta property="article:author" content="YeChengfeng">
+<meta property="article:tag" content="Thread">
+<meta property="article:tag" content="虚拟线程">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://leslie-shell.github.io/2025/11/22/java/java--juc--%E7%BA%BF%E7%A8%8B%E4%B9%8B%E8%99%9A%E6%8B%9F%E7%BA%BF%E7%A8%8B/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>java虚拟线程 | 随笔</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">随笔</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-rank">
+
+    <a href="/rank/" rel="section"><i class="fa fa-fire fa-fw"></i>热度</a>
+
+  </li>
+        <li class="menu-item menu-item-recommended">
+
+    <a href="/recommended/" rel="section"><i class="fa fa-flag fa-fw"></i>推荐</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://leslie-shell.github.io/2025/11/22/java/java--juc--%E7%BA%BF%E7%A8%8B%E4%B9%8B%E8%99%9A%E6%8B%9F%E7%BA%BF%E7%A8%8B/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="YeChengfeng">
+      <meta itemprop="description" content="Make Learning and Organizing a Habit!">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="随笔">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          java虚拟线程
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2025-11-22 15:12:51" itemprop="dateCreated datePublished" datetime="2025-11-22T15:12:51+08:00">2025-11-22</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2025-11-29 23:22:28" itemprop="dateModified" datetime="2025-11-29T23:22:28+08:00">2025-11-29</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Java/" itemprop="url" rel="index"><span itemprop="name">Java</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Java/Thread/" itemprop="url" rel="index"><span itemprop="name">Thread</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/2025/11/22/java/java--juc--%E7%BA%BF%E7%A8%8B%E4%B9%8B%E8%99%9A%E6%8B%9F%E7%BA%BF%E7%A8%8B/" class="post-meta-item leancloud_visitors" data-flag-title="java虚拟线程" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>1.8k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>2 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>参考：<a target="_blank" rel="noopener" href="https://javadoop.com/post/virtual-thread">https://javadoop.com/post/virtual-thread</a></p>
+<h1 id="Java-虚拟线程（Virtual-Threads"><a href="#Java-虚拟线程（Virtual-Threads" class="headerlink" title="Java 虚拟线程（Virtual Threads"></a>Java 虚拟线程（Virtual Threads</h1><h2 id="1-概述"><a href="#1-概述" class="headerlink" title="1. 概述"></a>1. 概述</h2><p>虚拟线程（Virtual Thread）是 Java Project Loom 提供的一种轻量级线程。<br>它由 JVM 调度，而不是由操作系统调度，因此可以创建海量线程，适合 I&#x2F;O 密集型任务。</p>
+<p>传统线程 &#x3D; OS 线程<br>虚拟线程 &#x3D; JVM 管理的轻量线程（类似 goroutine &#x2F; coroutine）</p>
+<hr>
+<h2 id="2-虚拟线程解决了什么问题"><a href="#2-虚拟线程解决了什么问题" class="headerlink" title="2. 虚拟线程解决了什么问题"></a>2. 虚拟线程解决了什么问题</h2><h3 id="2-1-阻塞-I-O-导致资源浪费"><a href="#2-1-阻塞-I-O-导致资源浪费" class="headerlink" title="2.1 阻塞 I&#x2F;O 导致资源浪费"></a>2.1 阻塞 I&#x2F;O 导致资源浪费</h3><p>传统线程在执行 I&#x2F;O（数据库、网络、文件）时会阻塞 OS 线程，导致：</p>
+<ul>
+<li>线程占着内核资源却在等待</li>
+<li>大量线程导致上下文切换开销大</li>
+<li>系统可承载并发有限（几千级）</li>
+</ul>
+<p>虚拟线程遇到阻塞时：</p>
+<ul>
+<li>只是挂起虚拟线程自身</li>
+<li>OS 线程立即解放去执行其他任务</li>
+</ul>
+<p>因此系统可以轻松支持 <strong>百万级并发</strong>。</p>
+<hr>
+<h2 id="3-核心原理（非常重要）"><a href="#3-核心原理（非常重要）" class="headerlink" title="3. 核心原理（非常重要）"></a>3. 核心原理（非常重要）</h2><h3 id="3-1-Virtual-Thread-遇到-I-O-阻塞时"><a href="#3-1-Virtual-Thread-遇到-I-O-阻塞时" class="headerlink" title="3.1 Virtual Thread 遇到 I&#x2F;O 阻塞时"></a>3.1 Virtual Thread 遇到 I&#x2F;O 阻塞时</h3><ol>
+<li>虚拟线程被 park（挂起）</li>
+<li>栈帧保存到 JVM 的堆内存</li>
+<li>Carrier Thread（OS 线程）被释放</li>
+<li>I&#x2F;O 完成后，虚拟线程被 unpark（恢复）</li>
+</ol>
+<p>所有调度动作发生在 JVM 内，而不是 OS。</p>
+<h3 id="3-2-调度特性"><a href="#3-2-调度特性" class="headerlink" title="3.2 调度特性"></a>3.2 调度特性</h3><ul>
+<li>切换速度远高于 OS 线程</li>
+<li>没有复杂的内核态开销</li>
+<li>可以创建大量线程而不导致崩溃</li>
+</ul>
+<hr>
+<h2 id="4-虚拟线程的关键优势"><a href="#4-虚拟线程的关键优势" class="headerlink" title="4. 虚拟线程的关键优势"></a>4. 虚拟线程的关键优势</h2><h3 id="4-1-适合-I-O-密集型任务"><a href="#4-1-适合-I-O-密集型任务" class="headerlink" title="4.1 适合 I&#x2F;O 密集型任务"></a>4.1 适合 I&#x2F;O 密集型任务</h3><ul>
+<li>网络 I&#x2F;O</li>
+<li>文件 I&#x2F;O</li>
+<li>RPC 调用</li>
+<li>数据库操作</li>
+</ul>
+<p>阻塞不会导致 OS 线程浪费，因此吞吐量更高。</p>
+<h3 id="4-2-创建成本极低"><a href="#4-2-创建成本极低" class="headerlink" title="4.2 创建成本极低"></a>4.2 创建成本极低</h3><p>传统线程需要：</p>
+<ul>
+<li>1MB 栈空间</li>
+<li>OS 调度  </li>
+<li>昂贵的上下文切换</li>
+</ul>
+<p>虚拟线程：</p>
+<ul>
+<li>栈按需增长</li>
+<li>JVM 调度</li>
+<li>切换成本极低</li>
+</ul>
+<h3 id="4-3-保持同步代码风格"><a href="#4-3-保持同步代码风格" class="headerlink" title="4.3 保持同步代码风格"></a>4.3 保持同步代码风格</h3><p>不像 Reactor、CompletableFuture 那样复杂。<br>虚拟线程让你写同步代码，却获得异步性能。</p>
+<hr>
+<h2 id="5-基本使用方式"><a href="#5-基本使用方式" class="headerlink" title="5. 基本使用方式"></a>5. 基本使用方式</h2><h3 id="5-1-创建虚拟线程"><a href="#5-1-创建虚拟线程" class="headerlink" title="5.1 创建虚拟线程"></a>5.1 创建虚拟线程</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Thread.startVirtualThread(() -&gt; &#123;</span><br><span class="line">    System.out.println(<span class="string">&quot;Hello Virtual Thread&quot;</span>);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<h3 id="5-2-虚拟线程池（每任务一个线程）"><a href="#5-2-虚拟线程池（每任务一个线程）" class="headerlink" title="5.2 虚拟线程池（每任务一个线程）"></a>5.2 虚拟线程池（每任务一个线程）</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">ExecutorService</span> <span class="variable">executor</span> <span class="operator">=</span> Executors.newVirtualThreadPerTaskExecutor();</span><br><span class="line"></span><br><span class="line">executor.submit(() -&gt; &#123;</span><br><span class="line">    Thread.sleep(<span class="number">1000</span>);</span><br><span class="line">    <span class="keyword">return</span> <span class="string">&quot;done&quot;</span>;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<h3 id="5-3-与普通线程对比"><a href="#5-3-与普通线程对比" class="headerlink" title="5.3 与普通线程对比"></a>5.3 与普通线程对比</h3><table>
+<thead>
+<tr>
+<th>项目</th>
+<th>平台线程（OS 线程）</th>
+<th>虚拟线程</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>创建成本</td>
+<td>高</td>
+<td>极低</td>
+</tr>
+<tr>
+<td>调度方</td>
+<td>OS 内核</td>
+<td>JVM</td>
+</tr>
+<tr>
+<td>阻塞效果</td>
+<td>阻塞 OS 线程</td>
+<td>不阻塞 OS 线程</td>
+</tr>
+<tr>
+<td>适用场景</td>
+<td>CPU 密集</td>
+<td>I&#x2F;O 密集</td>
+</tr>
+<tr>
+<td>并发能力</td>
+<td>几千</td>
+<td>上百万</td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="6-与-CPU-密集型任务"><a href="#6-与-CPU-密集型任务" class="headerlink" title="6. 与 CPU 密集型任务"></a>6. 与 CPU 密集型任务</h2><p>虚拟线程 <strong>不能提升 CPU 性能</strong>。</p>
+<p>CPU 密集型仍然由 OS 限制在 CPU 核心数上，适合使用固定线程池。</p>
+<hr>
+<h2 id="7-Pinning（固定）问题（虚拟线程被强制绑死在一个-OS-线程上，不能释放，不能切换。）"><a href="#7-Pinning（固定）问题（虚拟线程被强制绑死在一个-OS-线程上，不能释放，不能切换。）" class="headerlink" title="7. Pinning（固定）问题（虚拟线程被强制绑死在一个 OS 线程上，不能释放，不能切换。）"></a>7. Pinning（固定）问题（虚拟线程被强制绑死在一个 OS 线程上，不能释放，不能切换。）</h2><p>一些操作会导致虚拟线程无法释放 OS 线程：</p>
+<h3 id="会导致-Pin-的场景："><a href="#会导致-Pin-的场景：" class="headerlink" title="会导致 Pin 的场景："></a>会导致 Pin 的场景：</h3><ul>
+<li><code>synchronized</code> 阻塞</li>
+<li>JNI 调用阻塞</li>
+<li>部分未优化的文件 I&#x2F;O</li>
+</ul>
+<p>JDK 正在持续优化以减少 pinning。</p>
+<hr>
+<h2 id="8-常见使用场景"><a href="#8-常见使用场景" class="headerlink" title="8. 常见使用场景"></a>8. 常见使用场景</h2><h3 id="强力推荐（I-O-密集）"><a href="#强力推荐（I-O-密集）" class="headerlink" title="强力推荐（I&#x2F;O 密集）"></a>强力推荐（I&#x2F;O 密集）</h3><ul>
+<li>Web 请求处理</li>
+<li>微服务下游调用</li>
+<li>数据库访问</li>
+<li>Redis 调用</li>
+<li>HttpClient、大量并发任务</li>
+<li>Web Crawler</li>
+<li>整合阻塞型 API 的系统</li>
+</ul>
+<h3 id="不推荐（CPU-密集）"><a href="#不推荐（CPU-密集）" class="headerlink" title="不推荐（CPU 密集）"></a>不推荐（CPU 密集）</h3><ul>
+<li>大量计算任务</li>
+<li>视频编码、图像处理</li>
+</ul>
+<hr>
+<h2 id="9-一个最简单的例子：100-万并发任务"><a href="#9-一个最简单的例子：100-万并发任务" class="headerlink" title="9. 一个最简单的例子：100 万并发任务"></a>9. 一个最简单的例子：100 万并发任务</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">ExecutorService</span> <span class="variable">executor</span> <span class="operator">=</span> Executors.newVirtualThreadPerTaskExecutor();</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; i &lt; <span class="number">1_000_000</span>; i++) &#123;</span><br><span class="line">    executor.submit(() -&gt; &#123;</span><br><span class="line">        Thread.sleep(<span class="number">1000</span>); <span class="comment">// 模拟IO</span></span><br><span class="line">        <span class="keyword">return</span> <span class="literal">null</span>;</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>传统线程：直接崩<br> 虚拟线程：轻松运行</p>
+<hr>
+<h2 id="10-总结"><a href="#10-总结" class="headerlink" title="10. 总结"></a>10. 总结</h2><ol>
+<li>虚拟线程是 JVM 调度的轻量线程，不是 OS 线程</li>
+<li>阻塞不会浪费 OS 线程，是 I&#x2F;O 密集型业务的终极方案</li>
+<li>可以轻松承载百万级线程</li>
+<li>保持同步编程模型，简单易读</li>
+<li>不会提高 CPU 密集性能</li>
+<li>未来 Java 并发模型的主流方向</li>
+</ol>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Thread/" rel="tag"># Thread</a>
+              <a href="/tags/%E8%99%9A%E6%8B%9F%E7%BA%BF%E7%A8%8B/" rel="tag"># 虚拟线程</a>
+          </div>
+
+        
+  <div class="post-widgets">
+    <div class="wp_rating">
+      <div id="wpac-rating"></div>
+    </div>
+  </div>
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2025/11/22/Tech--%E4%B8%80%E4%BA%9B%E6%AF%94%E8%BE%83%E4%B8%8D%E9%94%99%E7%9A%84%E6%8A%80%E6%9C%AF%E9%93%BE%E6%8E%A5/" rel="prev" title="一些比较不错的技术链接整理">
+      <i class="fa fa-chevron-left"></i> 一些比较不错的技术链接整理
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2025/11/22/%E5%88%86%E5%B8%83%E5%BC%8F--consul/" rel="next" title="Consul 优势与应用场景">
+      Consul 优势与应用场景 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+
+
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    
+  <div class="comments">
+    <div id="lv-container" data-id="city" data-uid="MTAyMC82MDk4Ni8zNzQ1Ng=="></div>
+  </div>
+  
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Java-%E8%99%9A%E6%8B%9F%E7%BA%BF%E7%A8%8B%EF%BC%88Virtual-Threads"><span class="nav-text">Java 虚拟线程（Virtual Threads</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-%E6%A6%82%E8%BF%B0"><span class="nav-text">1. 概述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-%E8%99%9A%E6%8B%9F%E7%BA%BF%E7%A8%8B%E8%A7%A3%E5%86%B3%E4%BA%86%E4%BB%80%E4%B9%88%E9%97%AE%E9%A2%98"><span class="nav-text">2. 虚拟线程解决了什么问题</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-%E9%98%BB%E5%A1%9E-I-O-%E5%AF%BC%E8%87%B4%E8%B5%84%E6%BA%90%E6%B5%AA%E8%B4%B9"><span class="nav-text">2.1 阻塞 I&#x2F;O 导致资源浪费</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-%E6%A0%B8%E5%BF%83%E5%8E%9F%E7%90%86%EF%BC%88%E9%9D%9E%E5%B8%B8%E9%87%8D%E8%A6%81%EF%BC%89"><span class="nav-text">3. 核心原理（非常重要）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-Virtual-Thread-%E9%81%87%E5%88%B0-I-O-%E9%98%BB%E5%A1%9E%E6%97%B6"><span class="nav-text">3.1 Virtual Thread 遇到 I&#x2F;O 阻塞时</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-2-%E8%B0%83%E5%BA%A6%E7%89%B9%E6%80%A7"><span class="nav-text">3.2 调度特性</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-%E8%99%9A%E6%8B%9F%E7%BA%BF%E7%A8%8B%E7%9A%84%E5%85%B3%E9%94%AE%E4%BC%98%E5%8A%BF"><span class="nav-text">4. 虚拟线程的关键优势</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#4-1-%E9%80%82%E5%90%88-I-O-%E5%AF%86%E9%9B%86%E5%9E%8B%E4%BB%BB%E5%8A%A1"><span class="nav-text">4.1 适合 I&#x2F;O 密集型任务</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-2-%E5%88%9B%E5%BB%BA%E6%88%90%E6%9C%AC%E6%9E%81%E4%BD%8E"><span class="nav-text">4.2 创建成本极低</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-3-%E4%BF%9D%E6%8C%81%E5%90%8C%E6%AD%A5%E4%BB%A3%E7%A0%81%E9%A3%8E%E6%A0%BC"><span class="nav-text">4.3 保持同步代码风格</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-%E5%9F%BA%E6%9C%AC%E4%BD%BF%E7%94%A8%E6%96%B9%E5%BC%8F"><span class="nav-text">5. 基本使用方式</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#5-1-%E5%88%9B%E5%BB%BA%E8%99%9A%E6%8B%9F%E7%BA%BF%E7%A8%8B"><span class="nav-text">5.1 创建虚拟线程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-2-%E8%99%9A%E6%8B%9F%E7%BA%BF%E7%A8%8B%E6%B1%A0%EF%BC%88%E6%AF%8F%E4%BB%BB%E5%8A%A1%E4%B8%80%E4%B8%AA%E7%BA%BF%E7%A8%8B%EF%BC%89"><span class="nav-text">5.2 虚拟线程池（每任务一个线程）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-3-%E4%B8%8E%E6%99%AE%E9%80%9A%E7%BA%BF%E7%A8%8B%E5%AF%B9%E6%AF%94"><span class="nav-text">5.3 与普通线程对比</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-%E4%B8%8E-CPU-%E5%AF%86%E9%9B%86%E5%9E%8B%E4%BB%BB%E5%8A%A1"><span class="nav-text">6. 与 CPU 密集型任务</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#7-Pinning%EF%BC%88%E5%9B%BA%E5%AE%9A%EF%BC%89%E9%97%AE%E9%A2%98%EF%BC%88%E8%99%9A%E6%8B%9F%E7%BA%BF%E7%A8%8B%E8%A2%AB%E5%BC%BA%E5%88%B6%E7%BB%91%E6%AD%BB%E5%9C%A8%E4%B8%80%E4%B8%AA-OS-%E7%BA%BF%E7%A8%8B%E4%B8%8A%EF%BC%8C%E4%B8%8D%E8%83%BD%E9%87%8A%E6%94%BE%EF%BC%8C%E4%B8%8D%E8%83%BD%E5%88%87%E6%8D%A2%E3%80%82%EF%BC%89"><span class="nav-text">7. Pinning（固定）问题（虚拟线程被强制绑死在一个 OS 线程上，不能释放，不能切换。）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BC%9A%E5%AF%BC%E8%87%B4-Pin-%E7%9A%84%E5%9C%BA%E6%99%AF%EF%BC%9A"><span class="nav-text">会导致 Pin 的场景：</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#8-%E5%B8%B8%E8%A7%81%E4%BD%BF%E7%94%A8%E5%9C%BA%E6%99%AF"><span class="nav-text">8. 常见使用场景</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%BC%BA%E5%8A%9B%E6%8E%A8%E8%8D%90%EF%BC%88I-O-%E5%AF%86%E9%9B%86%EF%BC%89"><span class="nav-text">强力推荐（I&#x2F;O 密集）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%8D%E6%8E%A8%E8%8D%90%EF%BC%88CPU-%E5%AF%86%E9%9B%86%EF%BC%89"><span class="nav-text">不推荐（CPU 密集）</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#9-%E4%B8%80%E4%B8%AA%E6%9C%80%E7%AE%80%E5%8D%95%E7%9A%84%E4%BE%8B%E5%AD%90%EF%BC%9A100-%E4%B8%87%E5%B9%B6%E5%8F%91%E4%BB%BB%E5%8A%A1"><span class="nav-text">9. 一个最简单的例子：100 万并发任务</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#10-%E6%80%BB%E7%BB%93"><span class="nav-text">10. 总结</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">YeChengfeng</p>
+  <div class="site-description" itemprop="description">Make Learning and Organizing a Habit!</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">204</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">43</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">55</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">YeChengfeng</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="站点总字数">435k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">6:35</span>
+</div>
+
+        
+
+
+
+
+
+
+<script>
+  (function() {
+    function leancloudSelector(url) {
+      url = encodeURI(url);
+      return document.getElementById(url).querySelector('.leancloud-visitors-count');
+    }
+
+    function addCount(Counter) {
+      var visitors = document.querySelector('.leancloud_visitors');
+      var url = decodeURI(visitors.id);
+      var title = visitors.dataset.flagTitle;
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          if (results.length > 0) {
+            var counter = results[0];
+            leancloudSelector(url).innerText = counter.time + 1;
+            Counter('put', '/classes/Counter/' + counter.objectId, { time: { '__op': 'Increment', 'amount': 1 } })
+              .catch(error => {
+                console.error('Failed to save visitor count', error);
+              });
+          } else {
+              Counter('post', '/classes/Counter', { title, url, time: 1 })
+                .then(response => response.json())
+                .then(() => {
+                  leancloudSelector(url).innerText = 1;
+                })
+                .catch(error => {
+                  console.error('Failed to create', error);
+                });
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    function showTime(Counter) {
+      var visitors = document.querySelectorAll('.leancloud_visitors');
+      var entries = [...visitors].map(element => {
+        return decodeURI(element.id);
+      });
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url: { '$in': entries } })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          for (let url of entries) {
+            let target = results.find(item => item.url === url);
+            leancloudSelector(url).innerText = target ? target.time : 0;
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    let { app_id, app_key, server_url } = {"enable":true,"app_id":"h7vZITYMXKA8TGvtiJFms589-MdYXbMMI","app_key":"TcCRmGMIrnp7A76AiTj67XKC","security":false};
+    function fetchData(api_server) {
+      var Counter = (method, url, data) => {
+        return fetch(`${api_server}/1.1${url}`, {
+          method,
+          headers: {
+            'X-LC-Id'     : app_id,
+            'X-LC-Key'    : app_key,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data)
+        });
+      };
+      if (CONFIG.page.isPost) {
+        if (CONFIG.hostname !== location.hostname) return;
+        addCount(Counter);
+      } else if (document.querySelectorAll('.post-title-link').length >= 1) {
+        showTime(Counter);
+      }
+    }
+
+    let api_server = app_id.slice(-9) !== '-MdYXbMMI' ? server_url : `https://${app_id.slice(0, 8).toLowerCase()}.api.lncldglobal.com`;
+
+    if (api_server) {
+      fetchData(api_server);
+    } else {
+      fetch('https://app-router.leancloud.cn/2/route?appId=' + app_id)
+        .then(response => response.json())
+        .then(({ api_server }) => {
+          fetchData('https://' + api_server);
+        });
+    }
+  })();
+</script>
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+  <script>
+  if (CONFIG.page.isPost) {
+    wpac_init = window.wpac_init || [];
+    wpac_init.push({
+      widget: 'Rating',
+      id    : h7vZITYMXKA8TGvtiJFms589-MdYXbMMI,
+      el    : 'wpac-rating',
+      color : 'fc6423'
+    });
+    (function() {
+      if ('WIDGETPACK_LOADED' in window) return;
+      WIDGETPACK_LOADED = true;
+      var mc = document.createElement('script');
+      mc.type = 'text/javascript';
+      mc.async = true;
+      mc.src = '//embed.widgetpack.com/widget.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(mc, s.nextSibling);
+    })();
+  }
+  </script>
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+<script>
+NexT.utils.loadComments(document.querySelector('#lv-container'), () => {
+  window.livereOptions = {
+    refer: location.pathname.replace(CONFIG.root, '').replace('index.html', '')
+  };
+  (function(d, s) {
+    var j, e = d.getElementsByTagName(s)[0];
+    if (typeof LivereTower === 'function') { return; }
+    j = d.createElement(s);
+    j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+    j.async = true;
+    e.parentNode.insertBefore(j, e);
+  })(document, 'script');
+});
+</script>
+
+</body>
+</html>

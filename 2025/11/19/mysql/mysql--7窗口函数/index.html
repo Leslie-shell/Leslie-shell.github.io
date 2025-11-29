@@ -1,0 +1,825 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <script>
+    (function () {
+        if ('') {
+            if (prompt('请输入文章密码') !== '') {
+                alert('密码错误！');
+                if (history.length === 1) {
+                    location.replace("http://xxxxxxx.xxx"); // 这里替换成你的首页
+                } else {
+                    history.back();
+                }
+            }    
+        }
+    })();
+</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 8.1.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css">
+  <script src="/lib/pace/pace.min.js"></script>
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"leslie-shell.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"always","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":true,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.json"};
+  </script>
+
+  <meta name="description" content="参考:  https:&#x2F;&#x2F;www.cnblogs.com&#x2F;shoshana-kong&#x2F;p&#x2F;16621254.html https:&#x2F;&#x2F;www.51cto.com&#x2F;article&#x2F;759300.html   什么是窗口函数？一句话：  窗口函数 &#x3D; 在不分组的情况下，对某一范围（窗口）内的多行数据做计算，并把结果“附加”到每一行上。  它不会把多行合并为一行（不像 GROUP BY）。 它">
+<meta property="og:type" content="article">
+<meta property="og:title" content="mysql窗口函数">
+<meta property="og:url" content="https://leslie-shell.github.io/2025/11/19/mysql/mysql--7%E7%AA%97%E5%8F%A3%E5%87%BD%E6%95%B0/index.html">
+<meta property="og:site_name" content="随笔">
+<meta property="og:description" content="参考:  https:&#x2F;&#x2F;www.cnblogs.com&#x2F;shoshana-kong&#x2F;p&#x2F;16621254.html https:&#x2F;&#x2F;www.51cto.com&#x2F;article&#x2F;759300.html   什么是窗口函数？一句话：  窗口函数 &#x3D; 在不分组的情况下，对某一范围（窗口）内的多行数据做计算，并把结果“附加”到每一行上。  它不会把多行合并为一行（不像 GROUP BY）。 它">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2025-11-19T15:33:34.827Z">
+<meta property="article:modified_time" content="2025-11-29T15:19:36.048Z">
+<meta property="article:author" content="YeChengfeng">
+<meta property="article:tag" content="Mysql">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://leslie-shell.github.io/2025/11/19/mysql/mysql--7%E7%AA%97%E5%8F%A3%E5%87%BD%E6%95%B0/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>mysql窗口函数 | 随笔</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">随笔</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-rank">
+
+    <a href="/rank/" rel="section"><i class="fa fa-fire fa-fw"></i>热度</a>
+
+  </li>
+        <li class="menu-item menu-item-recommended">
+
+    <a href="/recommended/" rel="section"><i class="fa fa-flag fa-fw"></i>推荐</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://leslie-shell.github.io/2025/11/19/mysql/mysql--7%E7%AA%97%E5%8F%A3%E5%87%BD%E6%95%B0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="YeChengfeng">
+      <meta itemprop="description" content="Make Learning and Organizing a Habit!">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="随笔">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          mysql窗口函数
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2025-11-19 23:33:34" itemprop="dateCreated datePublished" datetime="2025-11-19T23:33:34+08:00">2025-11-19</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2025-11-29 23:19:36" itemprop="dateModified" datetime="2025-11-29T23:19:36+08:00">2025-11-29</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Mysql/" itemprop="url" rel="index"><span itemprop="name">Mysql</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/2025/11/19/mysql/mysql--7%E7%AA%97%E5%8F%A3%E5%87%BD%E6%95%B0/" class="post-meta-item leancloud_visitors" data-flag-title="mysql窗口函数" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>1.9k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>2 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>参考:</p>
+<ol>
+<li><a target="_blank" rel="noopener" href="https://www.cnblogs.com/shoshana-kong/p/16621254.html">https://www.cnblogs.com/shoshana-kong/p/16621254.html</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.51cto.com/article/759300.html">https://www.51cto.com/article/759300.html</a></li>
+</ol>
+<hr>
+<h1 id="什么是窗口函数？"><a href="#什么是窗口函数？" class="headerlink" title="什么是窗口函数？"></a>什么是窗口函数？</h1><p>一句话：</p>
+<blockquote>
+<p><strong>窗口函数 &#x3D; 在不分组的情况下，对某一范围（窗口）内的多行数据做计算，并把结果“附加”到每一行上。</strong></p>
+</blockquote>
+<p>它不会把多行合并为一行（不像 GROUP BY）。<br> 它只是“看一下周围的行”，然后计算。</p>
+<h1 id="为什么需要窗口函数？（直觉理解）"><a href="#为什么需要窗口函数？（直觉理解）" class="headerlink" title="为什么需要窗口函数？（直觉理解）"></a>为什么需要窗口函数？（直觉理解）</h1><p>假设你有工资表：</p>
+<table>
+<thead>
+<tr>
+<th>id</th>
+<th>name</th>
+<th>dept</th>
+<th>salary</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td>张三</td>
+<td>A</td>
+<td>8000</td>
+</tr>
+<tr>
+<td>2</td>
+<td>李四</td>
+<td>A</td>
+<td>9000</td>
+</tr>
+<tr>
+<td>3</td>
+<td>王五</td>
+<td>A</td>
+<td>10000</td>
+</tr>
+</tbody></table>
+<p>你想：</p>
+<ul>
+<li>找出每个人的部门排名？</li>
+<li>每个人薪资占部门总薪资的百分比？</li>
+<li>每个人比上一个月多赚多少？</li>
+</ul>
+<p><strong>用 GROUP BY 做不到（因为 GROUP BY 会变成 1 行）。<br> 用子查询也能做，但很难写、效率低。<br> 窗口函数一条语句就搞定。</strong></p>
+<hr>
+<h1 id="窗口函数的组成"><a href="#窗口函数的组成" class="headerlink" title="窗口函数的组成"></a>窗口函数的组成</h1><p>格式：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">函数() <span class="keyword">OVER</span>( <span class="keyword">PARTITION</span> <span class="keyword">BY</span> ... <span class="keyword">ORDER</span> <span class="keyword">BY</span> ... )</span><br></pre></td></tr></table></figure>
+
+<p>可以理解为：</p>
+<ul>
+<li><code>PARTITION BY</code> &#x3D; 类似 GROUP BY（按什么分组）</li>
+<li><code>ORDER BY</code> &#x3D; 在分组内排序</li>
+<li><code>OVER()</code> &#x3D; 对窗口内的数据做计算，不合并行</li>
+</ul>
+<hr>
+<h1 id="常见窗口函数-最通俗例子"><a href="#常见窗口函数-最通俗例子" class="headerlink" title="常见窗口函数 + 最通俗例子"></a>常见窗口函数 + 最通俗例子</h1><h2 id="1-排名函数：ROW-NUMBER-RANK-DENSE-RANK"><a href="#1-排名函数：ROW-NUMBER-RANK-DENSE-RANK" class="headerlink" title="1. 排名函数：ROW_NUMBER &#x2F; RANK &#x2F; DENSE_RANK"></a>1. 排名函数：ROW_NUMBER &#x2F; RANK &#x2F; DENSE_RANK</h2><h3 id="例子：部门内按工资排名"><a href="#例子：部门内按工资排名" class="headerlink" title="例子：部门内按工资排名"></a>例子：部门内按工资排名</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span></span><br><span class="line">    name,</span><br><span class="line">    dept,</span><br><span class="line">    salary,</span><br><span class="line">    <span class="built_in">ROW_NUMBER</span>() <span class="keyword">OVER</span>(<span class="keyword">PARTITION</span> <span class="keyword">BY</span> dept <span class="keyword">ORDER</span> <span class="keyword">BY</span> salary <span class="keyword">DESC</span>) <span class="keyword">AS</span> rn,</span><br><span class="line">    <span class="built_in">RANK</span>()       <span class="keyword">OVER</span>(<span class="keyword">PARTITION</span> <span class="keyword">BY</span> dept <span class="keyword">ORDER</span> <span class="keyword">BY</span> salary <span class="keyword">DESC</span>) <span class="keyword">AS</span> rnk,</span><br><span class="line">    <span class="built_in">DENSE_RANK</span>() <span class="keyword">OVER</span>(<span class="keyword">PARTITION</span> <span class="keyword">BY</span> dept <span class="keyword">ORDER</span> <span class="keyword">BY</span> salary <span class="keyword">DESC</span>) <span class="keyword">AS</span> drnk</span><br><span class="line"><span class="keyword">FROM</span> employee;</span><br></pre></td></tr></table></figure>
+
+<p>区别：</p>
+<table>
+<thead>
+<tr>
+<th>函数</th>
+<th>是否有并列</th>
+<th>后续名次跳不跳</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>ROW_NUMBER</td>
+<td>不允许并列</td>
+<td>不跳号</td>
+</tr>
+<tr>
+<td>RANK</td>
+<td>允许并列</td>
+<td>会跳号</td>
+</tr>
+<tr>
+<td>DENSE_RANK</td>
+<td>允许并列</td>
+<td>不跳号</td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="2-累积值：SUM-AVG-COUNT（作为窗口函数使用）"><a href="#2-累积值：SUM-AVG-COUNT（作为窗口函数使用）" class="headerlink" title="2. 累积值：SUM &#x2F; AVG &#x2F; COUNT（作为窗口函数使用）"></a>2. 累积值：SUM &#x2F; AVG &#x2F; COUNT（作为窗口函数使用）</h2><h3 id="例子：计算销售的“累计销售额”"><a href="#例子：计算销售的“累计销售额”" class="headerlink" title="例子：计算销售的“累计销售额”"></a>例子：计算销售的“累计销售额”</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span></span><br><span class="line">    name,</span><br><span class="line">    sale_amount,</span><br><span class="line">    <span class="built_in">SUM</span>(sale_amount) <span class="keyword">OVER</span>(<span class="keyword">ORDER</span> <span class="keyword">BY</span> id) <span class="keyword">AS</span> cum_amount</span><br><span class="line"><span class="keyword">FROM</span> sales;</span><br></pre></td></tr></table></figure>
+
+<p>结果示意：</p>
+<table>
+<thead>
+<tr>
+<th>name</th>
+<th>sale</th>
+<th>cum_amount</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>A</td>
+<td>100</td>
+<td>100</td>
+</tr>
+<tr>
+<td>B</td>
+<td>200</td>
+<td>300</td>
+</tr>
+<tr>
+<td>C</td>
+<td>150</td>
+<td>450</td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="3-LAG-LEAD（取上一行-or-下一行）"><a href="#3-LAG-LEAD（取上一行-or-下一行）" class="headerlink" title="3. LAG &#x2F; LEAD（取上一行 or 下一行）"></a>3. LAG &#x2F; LEAD（取上一行 or 下一行）</h2><h3 id="例子：算每个月的销售增长"><a href="#例子：算每个月的销售增长" class="headerlink" title="例子：算每个月的销售增长"></a>例子：算每个月的销售增长</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span></span><br><span class="line">    <span class="keyword">month</span>,</span><br><span class="line">    sale,</span><br><span class="line">    sale <span class="operator">-</span> <span class="built_in">LAG</span>(sale, <span class="number">1</span>) <span class="keyword">OVER</span>(<span class="keyword">ORDER</span> <span class="keyword">BY</span> <span class="keyword">month</span>) <span class="keyword">AS</span> diff</span><br><span class="line"><span class="keyword">FROM</span> monthly_sale;</span><br></pre></td></tr></table></figure>
+
+<p>效果：</p>
+<table>
+<thead>
+<tr>
+<th>月份</th>
+<th>销售额</th>
+<th>比上月多</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td>100</td>
+<td>null</td>
+</tr>
+<tr>
+<td>2</td>
+<td>150</td>
+<td>50</td>
+</tr>
+<tr>
+<td>3</td>
+<td>120</td>
+<td>-30</td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="4-FIRST-VALUE-LAST-VALUE"><a href="#4-FIRST-VALUE-LAST-VALUE" class="headerlink" title="4. FIRST_VALUE &#x2F; LAST_VALUE"></a>4. FIRST_VALUE &#x2F; LAST_VALUE</h2><h3 id="例子：取每个部门最高工资（但每行都显示）"><a href="#例子：取每个部门最高工资（但每行都显示）" class="headerlink" title="例子：取每个部门最高工资（但每行都显示）"></a>例子：取每个部门最高工资（但每行都显示）</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span></span><br><span class="line">    name,</span><br><span class="line">    dept,</span><br><span class="line">    salary,</span><br><span class="line">    <span class="built_in">FIRST_VALUE</span>(salary) <span class="keyword">OVER</span> (<span class="keyword">PARTITION</span> <span class="keyword">BY</span> dept <span class="keyword">ORDER</span> <span class="keyword">BY</span> salary <span class="keyword">DESC</span>) <span class="keyword">AS</span> top_salary</span><br><span class="line"><span class="keyword">FROM</span> employee;</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h1 id="为什么窗口函数这么强？"><a href="#为什么窗口函数这么强？" class="headerlink" title="为什么窗口函数这么强？"></a>为什么窗口函数这么强？</h1><h3 id="✔-不会减少行数"><a href="#✔-不会减少行数" class="headerlink" title="✔ 不会减少行数"></a>✔ 不会减少行数</h3><p>不像 GROUP BY。</p>
+<h3 id="✔-可以对“当前行附近的数据”做任何分析"><a href="#✔-可以对“当前行附近的数据”做任何分析" class="headerlink" title="✔ 可以对“当前行附近的数据”做任何分析"></a>✔ 可以对“当前行附近的数据”做任何分析</h3><p>排名、累积、同比、环比，全能。</p>
+<h3 id="✔-代码更易读，不用嵌套子查询"><a href="#✔-代码更易读，不用嵌套子查询" class="headerlink" title="✔ 代码更易读，不用嵌套子查询"></a>✔ 代码更易读，不用嵌套子查询</h3><hr>
+<h1 id="把-GROUP-BY-和-窗口函数-对比理解"><a href="#把-GROUP-BY-和-窗口函数-对比理解" class="headerlink" title="把 GROUP BY 和 窗口函数 对比理解"></a>把 GROUP BY 和 窗口函数 对比理解</h1><h3 id="❌-GROUP-BY（按部门求平均工资）"><a href="#❌-GROUP-BY（按部门求平均工资）" class="headerlink" title="❌ GROUP BY（按部门求平均工资）"></a>❌ GROUP BY（按部门求平均工资）</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> dept, <span class="built_in">AVG</span>(salary)</span><br><span class="line"><span class="keyword">FROM</span> employee</span><br><span class="line"><span class="keyword">GROUP</span> <span class="keyword">BY</span> dept;</span><br></pre></td></tr></table></figure>
+
+<p>只有每个部门 1 行。</p>
+<hr>
+<h3 id="✔-窗口函数（每个人都显示部门平均工资）"><a href="#✔-窗口函数（每个人都显示部门平均工资）" class="headerlink" title="✔ 窗口函数（每个人都显示部门平均工资）"></a>✔ 窗口函数（每个人都显示部门平均工资）</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span></span><br><span class="line">    name,</span><br><span class="line">    dept,</span><br><span class="line">    salary,</span><br><span class="line">    <span class="built_in">AVG</span>(salary) <span class="keyword">OVER</span>(<span class="keyword">PARTITION</span> <span class="keyword">BY</span> dept) <span class="keyword">AS</span> dept_avg_salary</span><br><span class="line"><span class="keyword">FROM</span> employee;</span><br></pre></td></tr></table></figure>
+
+<p>你的输出是：</p>
+<table>
+<thead>
+<tr>
+<th>name</th>
+<th>dept</th>
+<th>salary</th>
+<th>dept_avg_salary</th>
+</tr>
+</thead>
+<tbody><tr>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody></table>
+<p>而非 3 行。</p>
+<hr>
+<h1 id="最常用"><a href="#最常用" class="headerlink" title="最常用"></a>最常用</h1><h3 id="部门排名"><a href="#部门排名" class="headerlink" title="部门排名"></a>部门排名</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">ROW_NUMBER</span>() <span class="keyword">OVER</span>(<span class="keyword">PARTITION</span> <span class="keyword">BY</span> dept <span class="keyword">ORDER</span> <span class="keyword">BY</span> salary <span class="keyword">DESC</span>)</span><br></pre></td></tr></table></figure>
+
+<h3 id="累积计算"><a href="#累积计算" class="headerlink" title="累积计算"></a>累积计算</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">SUM</span>(amount) <span class="keyword">OVER</span>(<span class="keyword">ORDER</span> <span class="keyword">BY</span> <span class="type">date</span>)</span><br></pre></td></tr></table></figure>
+
+<h3 id="同比-环比"><a href="#同比-环比" class="headerlink" title="同比&#x2F;环比"></a>同比&#x2F;环比</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">value</span> <span class="operator">-</span> <span class="built_in">LAG</span>(<span class="keyword">value</span>) <span class="keyword">OVER</span>(<span class="keyword">ORDER</span> <span class="keyword">BY</span> <span class="type">date</span>)</span><br></pre></td></tr></table></figure>
+
+<h3 id="部门总数或总和"><a href="#部门总数或总和" class="headerlink" title="部门总数或总和"></a>部门总数或总和</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">SUM</span>(salary) <span class="keyword">OVER</span>(<span class="keyword">PARTITION</span> <span class="keyword">BY</span> dept)</span><br></pre></td></tr></table></figure>
+
+<h3 id="部门平均"><a href="#部门平均" class="headerlink" title="部门平均"></a>部门平均</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">AVG</span>(salary) <span class="keyword">OVER</span>(<span class="keyword">PARTITION</span> <span class="keyword">BY</span> dept)</span><br></pre></td></tr></table></figure>
+
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Mysql/" rel="tag"># Mysql</a>
+          </div>
+
+        
+  <div class="post-widgets">
+    <div class="wp_rating">
+      <div id="wpac-rating"></div>
+    </div>
+  </div>
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2025/11/19/mysql/mysql--4%E6%9C%80%E5%B8%B8%E7%94%A8%E7%9A%84%E5%87%BD%E6%95%B0/" rel="prev" title="mysql最常用函数合集">
+      <i class="fa fa-chevron-left"></i> mysql最常用函数合集
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2025/11/19/mysql/mysql--8.%E5%87%BD%E6%95%B0%E5%92%8C%E5%AD%98%E5%82%A8%E8%BF%87%E7%A8%8B/" rel="next" title="mysql函数和存储过程">
+      mysql函数和存储过程 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+
+
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    
+  <div class="comments">
+    <div id="lv-container" data-id="city" data-uid="MTAyMC82MDk4Ni8zNzQ1Ng=="></div>
+  </div>
+  
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF%E7%AA%97%E5%8F%A3%E5%87%BD%E6%95%B0%EF%BC%9F"><span class="nav-text">什么是窗口函数？</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E9%9C%80%E8%A6%81%E7%AA%97%E5%8F%A3%E5%87%BD%E6%95%B0%EF%BC%9F%EF%BC%88%E7%9B%B4%E8%A7%89%E7%90%86%E8%A7%A3%EF%BC%89"><span class="nav-text">为什么需要窗口函数？（直觉理解）</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%AA%97%E5%8F%A3%E5%87%BD%E6%95%B0%E7%9A%84%E7%BB%84%E6%88%90"><span class="nav-text">窗口函数的组成</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%B8%B8%E8%A7%81%E7%AA%97%E5%8F%A3%E5%87%BD%E6%95%B0-%E6%9C%80%E9%80%9A%E4%BF%97%E4%BE%8B%E5%AD%90"><span class="nav-text">常见窗口函数 + 最通俗例子</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-%E6%8E%92%E5%90%8D%E5%87%BD%E6%95%B0%EF%BC%9AROW-NUMBER-RANK-DENSE-RANK"><span class="nav-text">1. 排名函数：ROW_NUMBER &#x2F; RANK &#x2F; DENSE_RANK</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BE%8B%E5%AD%90%EF%BC%9A%E9%83%A8%E9%97%A8%E5%86%85%E6%8C%89%E5%B7%A5%E8%B5%84%E6%8E%92%E5%90%8D"><span class="nav-text">例子：部门内按工资排名</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-%E7%B4%AF%E7%A7%AF%E5%80%BC%EF%BC%9ASUM-AVG-COUNT%EF%BC%88%E4%BD%9C%E4%B8%BA%E7%AA%97%E5%8F%A3%E5%87%BD%E6%95%B0%E4%BD%BF%E7%94%A8%EF%BC%89"><span class="nav-text">2. 累积值：SUM &#x2F; AVG &#x2F; COUNT（作为窗口函数使用）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BE%8B%E5%AD%90%EF%BC%9A%E8%AE%A1%E7%AE%97%E9%94%80%E5%94%AE%E7%9A%84%E2%80%9C%E7%B4%AF%E8%AE%A1%E9%94%80%E5%94%AE%E9%A2%9D%E2%80%9D"><span class="nav-text">例子：计算销售的“累计销售额”</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-LAG-LEAD%EF%BC%88%E5%8F%96%E4%B8%8A%E4%B8%80%E8%A1%8C-or-%E4%B8%8B%E4%B8%80%E8%A1%8C%EF%BC%89"><span class="nav-text">3. LAG &#x2F; LEAD（取上一行 or 下一行）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BE%8B%E5%AD%90%EF%BC%9A%E7%AE%97%E6%AF%8F%E4%B8%AA%E6%9C%88%E7%9A%84%E9%94%80%E5%94%AE%E5%A2%9E%E9%95%BF"><span class="nav-text">例子：算每个月的销售增长</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-FIRST-VALUE-LAST-VALUE"><span class="nav-text">4. FIRST_VALUE &#x2F; LAST_VALUE</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BE%8B%E5%AD%90%EF%BC%9A%E5%8F%96%E6%AF%8F%E4%B8%AA%E9%83%A8%E9%97%A8%E6%9C%80%E9%AB%98%E5%B7%A5%E8%B5%84%EF%BC%88%E4%BD%86%E6%AF%8F%E8%A1%8C%E9%83%BD%E6%98%BE%E7%A4%BA%EF%BC%89"><span class="nav-text">例子：取每个部门最高工资（但每行都显示）</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E7%AA%97%E5%8F%A3%E5%87%BD%E6%95%B0%E8%BF%99%E4%B9%88%E5%BC%BA%EF%BC%9F"><span class="nav-text">为什么窗口函数这么强？</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E2%9C%94-%E4%B8%8D%E4%BC%9A%E5%87%8F%E5%B0%91%E8%A1%8C%E6%95%B0"><span class="nav-text">✔ 不会减少行数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E2%9C%94-%E5%8F%AF%E4%BB%A5%E5%AF%B9%E2%80%9C%E5%BD%93%E5%89%8D%E8%A1%8C%E9%99%84%E8%BF%91%E7%9A%84%E6%95%B0%E6%8D%AE%E2%80%9D%E5%81%9A%E4%BB%BB%E4%BD%95%E5%88%86%E6%9E%90"><span class="nav-text">✔ 可以对“当前行附近的数据”做任何分析</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E2%9C%94-%E4%BB%A3%E7%A0%81%E6%9B%B4%E6%98%93%E8%AF%BB%EF%BC%8C%E4%B8%8D%E7%94%A8%E5%B5%8C%E5%A5%97%E5%AD%90%E6%9F%A5%E8%AF%A2"><span class="nav-text">✔ 代码更易读，不用嵌套子查询</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%8A%8A-GROUP-BY-%E5%92%8C-%E7%AA%97%E5%8F%A3%E5%87%BD%E6%95%B0-%E5%AF%B9%E6%AF%94%E7%90%86%E8%A7%A3"><span class="nav-text">把 GROUP BY 和 窗口函数 对比理解</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E2%9D%8C-GROUP-BY%EF%BC%88%E6%8C%89%E9%83%A8%E9%97%A8%E6%B1%82%E5%B9%B3%E5%9D%87%E5%B7%A5%E8%B5%84%EF%BC%89"><span class="nav-text">❌ GROUP BY（按部门求平均工资）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E2%9C%94-%E7%AA%97%E5%8F%A3%E5%87%BD%E6%95%B0%EF%BC%88%E6%AF%8F%E4%B8%AA%E4%BA%BA%E9%83%BD%E6%98%BE%E7%A4%BA%E9%83%A8%E9%97%A8%E5%B9%B3%E5%9D%87%E5%B7%A5%E8%B5%84%EF%BC%89"><span class="nav-text">✔ 窗口函数（每个人都显示部门平均工资）</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%9C%80%E5%B8%B8%E7%94%A8"><span class="nav-text">最常用</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%83%A8%E9%97%A8%E6%8E%92%E5%90%8D"><span class="nav-text">部门排名</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%B4%AF%E7%A7%AF%E8%AE%A1%E7%AE%97"><span class="nav-text">累积计算</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%90%8C%E6%AF%94-%E7%8E%AF%E6%AF%94"><span class="nav-text">同比&#x2F;环比</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%83%A8%E9%97%A8%E6%80%BB%E6%95%B0%E6%88%96%E6%80%BB%E5%92%8C"><span class="nav-text">部门总数或总和</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%83%A8%E9%97%A8%E5%B9%B3%E5%9D%87"><span class="nav-text">部门平均</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">YeChengfeng</p>
+  <div class="site-description" itemprop="description">Make Learning and Organizing a Habit!</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">204</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">43</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">55</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">YeChengfeng</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="站点总字数">435k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">6:35</span>
+</div>
+
+        
+
+
+
+
+
+
+<script>
+  (function() {
+    function leancloudSelector(url) {
+      url = encodeURI(url);
+      return document.getElementById(url).querySelector('.leancloud-visitors-count');
+    }
+
+    function addCount(Counter) {
+      var visitors = document.querySelector('.leancloud_visitors');
+      var url = decodeURI(visitors.id);
+      var title = visitors.dataset.flagTitle;
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          if (results.length > 0) {
+            var counter = results[0];
+            leancloudSelector(url).innerText = counter.time + 1;
+            Counter('put', '/classes/Counter/' + counter.objectId, { time: { '__op': 'Increment', 'amount': 1 } })
+              .catch(error => {
+                console.error('Failed to save visitor count', error);
+              });
+          } else {
+              Counter('post', '/classes/Counter', { title, url, time: 1 })
+                .then(response => response.json())
+                .then(() => {
+                  leancloudSelector(url).innerText = 1;
+                })
+                .catch(error => {
+                  console.error('Failed to create', error);
+                });
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    function showTime(Counter) {
+      var visitors = document.querySelectorAll('.leancloud_visitors');
+      var entries = [...visitors].map(element => {
+        return decodeURI(element.id);
+      });
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url: { '$in': entries } })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          for (let url of entries) {
+            let target = results.find(item => item.url === url);
+            leancloudSelector(url).innerText = target ? target.time : 0;
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    let { app_id, app_key, server_url } = {"enable":true,"app_id":"h7vZITYMXKA8TGvtiJFms589-MdYXbMMI","app_key":"TcCRmGMIrnp7A76AiTj67XKC","security":false};
+    function fetchData(api_server) {
+      var Counter = (method, url, data) => {
+        return fetch(`${api_server}/1.1${url}`, {
+          method,
+          headers: {
+            'X-LC-Id'     : app_id,
+            'X-LC-Key'    : app_key,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data)
+        });
+      };
+      if (CONFIG.page.isPost) {
+        if (CONFIG.hostname !== location.hostname) return;
+        addCount(Counter);
+      } else if (document.querySelectorAll('.post-title-link').length >= 1) {
+        showTime(Counter);
+      }
+    }
+
+    let api_server = app_id.slice(-9) !== '-MdYXbMMI' ? server_url : `https://${app_id.slice(0, 8).toLowerCase()}.api.lncldglobal.com`;
+
+    if (api_server) {
+      fetchData(api_server);
+    } else {
+      fetch('https://app-router.leancloud.cn/2/route?appId=' + app_id)
+        .then(response => response.json())
+        .then(({ api_server }) => {
+          fetchData('https://' + api_server);
+        });
+    }
+  })();
+</script>
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+  <script>
+  if (CONFIG.page.isPost) {
+    wpac_init = window.wpac_init || [];
+    wpac_init.push({
+      widget: 'Rating',
+      id    : h7vZITYMXKA8TGvtiJFms589-MdYXbMMI,
+      el    : 'wpac-rating',
+      color : 'fc6423'
+    });
+    (function() {
+      if ('WIDGETPACK_LOADED' in window) return;
+      WIDGETPACK_LOADED = true;
+      var mc = document.createElement('script');
+      mc.type = 'text/javascript';
+      mc.async = true;
+      mc.src = '//embed.widgetpack.com/widget.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(mc, s.nextSibling);
+    })();
+  }
+  </script>
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+<script>
+NexT.utils.loadComments(document.querySelector('#lv-container'), () => {
+  window.livereOptions = {
+    refer: location.pathname.replace(CONFIG.root, '').replace('index.html', '')
+  };
+  (function(d, s) {
+    var j, e = d.getElementsByTagName(s)[0];
+    if (typeof LivereTower === 'function') { return; }
+    j = d.createElement(s);
+    j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+    j.async = true;
+    e.parentNode.insertBefore(j, e);
+  })(document, 'script');
+});
+</script>
+
+</body>
+</html>

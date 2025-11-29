@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <script>
+    (function () {
+        if ('') {
+            if (prompt('请输入文章密码') !== '') {
+                alert('密码错误！');
+                if (history.length === 1) {
+                    location.replace("http://xxxxxxx.xxx"); // 这里替换成你的首页
+                } else {
+                    history.back();
+                }
+            }    
+        }
+    })();
+</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 8.1.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css">
+  <script src="/lib/pace/pace.min.js"></script>
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"leslie-shell.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"always","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":true,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.json"};
+  </script>
+
+  <meta name="description" content="MySQL 常用函数与实践总结">
+<meta property="og:type" content="article">
+<meta property="og:title" content="MySQL 常用函数与实践总结">
+<meta property="og:url" content="https://leslie-shell.github.io/2025/11/22/mysql/mysql--0%E7%9F%A5%E8%AF%86%E5%85%A8%E6%99%AF%E5%9B%BE/index.html">
+<meta property="og:site_name" content="随笔">
+<meta property="og:description" content="MySQL 常用函数与实践总结">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2025-11-22T13:53:13.510Z">
+<meta property="article:modified_time" content="2025-11-29T15:18:01.466Z">
+<meta property="article:author" content="YeChengfeng">
+<meta property="article:tag" content="Mysql">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://leslie-shell.github.io/2025/11/22/mysql/mysql--0%E7%9F%A5%E8%AF%86%E5%85%A8%E6%99%AF%E5%9B%BE/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>MySQL 常用函数与实践总结 | 随笔</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">随笔</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-rank">
+
+    <a href="/rank/" rel="section"><i class="fa fa-fire fa-fw"></i>热度</a>
+
+  </li>
+        <li class="menu-item menu-item-recommended">
+
+    <a href="/recommended/" rel="section"><i class="fa fa-flag fa-fw"></i>推荐</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://leslie-shell.github.io/2025/11/22/mysql/mysql--0%E7%9F%A5%E8%AF%86%E5%85%A8%E6%99%AF%E5%9B%BE/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="YeChengfeng">
+      <meta itemprop="description" content="Make Learning and Organizing a Habit!">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="随笔">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          MySQL 常用函数与实践总结
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2025-11-22 21:53:13" itemprop="dateCreated datePublished" datetime="2025-11-22T21:53:13+08:00">2025-11-22</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2025-11-29 23:18:01" itemprop="dateModified" datetime="2025-11-29T23:18:01+08:00">2025-11-29</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Mysql/" itemprop="url" rel="index"><span itemprop="name">Mysql</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/2025/11/22/mysql/mysql--0%E7%9F%A5%E8%AF%86%E5%85%A8%E6%99%AF%E5%9B%BE/" class="post-meta-item leancloud_visitors" data-flag-title="MySQL 常用函数与实践总结" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>3.4k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>3 分钟</span>
+            </span>
+            <div class="post-description">MySQL 常用函数与实践总结</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="MySQL-常用函数与实践总结"><a href="#MySQL-常用函数与实践总结" class="headerlink" title="MySQL 常用函数与实践总结"></a>MySQL 常用函数与实践总结</h1><hr>
+<h2 id="1-文本处理函数"><a href="#1-文本处理函数" class="headerlink" title="1. 文本处理函数"></a>1. 文本处理函数</h2><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 字符串长度</span></span><br><span class="line"><span class="keyword">SELECT</span> LENGTH(<span class="string">&#x27;Hello&#x27;</span>);         <span class="comment">-- 字节数</span></span><br><span class="line"><span class="keyword">SELECT</span> <span class="keyword">CHAR_LENGTH</span>(<span class="string">&#x27;Hello&#x27;</span>);    <span class="comment">-- 字符数</span></span><br><span class="line"></span><br><span class="line"><span class="comment">-- 字符串拼接</span></span><br><span class="line"><span class="keyword">SELECT</span> CONCAT(<span class="string">&#x27;Hello&#x27;</span>, <span class="string">&#x27; &#x27;</span>, <span class="string">&#x27;World&#x27;</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 大小写转换</span></span><br><span class="line"><span class="keyword">SELECT</span> <span class="built_in">UPPER</span>(<span class="string">&#x27;abc&#x27;</span>), <span class="built_in">LOWER</span>(<span class="string">&#x27;ABC&#x27;</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 查找位置</span></span><br><span class="line"><span class="keyword">SELECT</span> LOCATE(<span class="string">&#x27;b&#x27;</span>, <span class="string">&#x27;abcabc&#x27;</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 截取字符串</span></span><br><span class="line"><span class="keyword">SELECT</span> <span class="built_in">SUBSTRING</span>(<span class="string">&#x27;Hello World&#x27;</span>, <span class="number">1</span>, <span class="number">5</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 去空格</span></span><br><span class="line"><span class="keyword">SELECT</span> <span class="built_in">TRIM</span>(<span class="string">&#x27;  hello  &#x27;</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 替换</span></span><br><span class="line"><span class="keyword">SELECT</span> REPLACE(<span class="string">&#x27;abcabc&#x27;</span>,<span class="string">&#x27;a&#x27;</span>,<span class="string">&#x27;A&#x27;</span>);</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="2-数值处理函数"><a href="#2-数值处理函数" class="headerlink" title="2. 数值处理函数"></a>2. 数值处理函数</h2><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 四舍五入</span></span><br><span class="line"><span class="keyword">SELECT</span> ROUND(<span class="number">123.456</span>, <span class="number">2</span>);    <span class="comment">-- 123.46</span></span><br><span class="line"></span><br><span class="line"><span class="comment">-- 取整</span></span><br><span class="line"><span class="keyword">SELECT</span> <span class="built_in">FLOOR</span>(<span class="number">123.456</span>);        <span class="comment">-- 123</span></span><br><span class="line"><span class="keyword">SELECT</span> <span class="built_in">CEIL</span>(<span class="number">123.456</span>);         <span class="comment">-- 124</span></span><br><span class="line"></span><br><span class="line"><span class="comment">-- 最大最小</span></span><br><span class="line"><span class="keyword">SELECT</span> GREATEST(<span class="number">1</span>,<span class="number">5</span>,<span class="number">3</span>);</span><br><span class="line"><span class="keyword">SELECT</span> LEAST(<span class="number">1</span>,<span class="number">5</span>,<span class="number">3</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 求绝对值</span></span><br><span class="line"><span class="keyword">SELECT</span> <span class="built_in">ABS</span>(<span class="number">-123</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 求平方根</span></span><br><span class="line"><span class="keyword">SELECT</span> <span class="built_in">SQRT</span>(<span class="number">16</span>);</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="3-视图（View）"><a href="#3-视图（View）" class="headerlink" title="3. 视图（View）"></a>3. 视图（View）</h2><h3 id="为什么使用视图"><a href="#为什么使用视图" class="headerlink" title="为什么使用视图"></a>为什么使用视图</h3><ul>
+<li>提高查询重用性</li>
+<li>提供数据安全，只暴露必要字段</li>
+<li>简化复杂 SQL</li>
+</ul>
+<h3 id="创建视图"><a href="#创建视图" class="headerlink" title="创建视图"></a>创建视图</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> <span class="keyword">VIEW</span> view_users <span class="keyword">AS</span></span><br><span class="line"><span class="keyword">SELECT</span> id, username, email</span><br><span class="line"><span class="keyword">FROM</span> users</span><br><span class="line"><span class="keyword">WHERE</span> status <span class="operator">=</span> <span class="number">1</span>;</span><br></pre></td></tr></table></figure>
+
+<h3 id="更新视图"><a href="#更新视图" class="headerlink" title="更新视图"></a>更新视图</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">UPDATE</span> view_users</span><br><span class="line"><span class="keyword">SET</span> email <span class="operator">=</span> <span class="string">&#x27;new@mail.com&#x27;</span></span><br><span class="line"><span class="keyword">WHERE</span> id <span class="operator">=</span> <span class="number">1</span>;</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="4-存储过程（Stored-Procedure）"><a href="#4-存储过程（Stored-Procedure）" class="headerlink" title="4. 存储过程（Stored Procedure）"></a>4. 存储过程（Stored Procedure）</h2><h3 id="为什么使用存储过程"><a href="#为什么使用存储过程" class="headerlink" title="为什么使用存储过程"></a>为什么使用存储过程</h3><ul>
+<li>封装复杂逻辑</li>
+<li>减少网络传输，提高性能</li>
+<li>可重用</li>
+</ul>
+<h3 id="创建与执行存储过程"><a href="#创建与执行存储过程" class="headerlink" title="创建与执行存储过程"></a>创建与执行存储过程</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 创建</span></span><br><span class="line">DELIMITER $$</span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">PROCEDURE</span> sp_get_user(<span class="keyword">IN</span> userId <span class="type">INT</span>)</span><br><span class="line"><span class="keyword">BEGIN</span></span><br><span class="line">    <span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> users <span class="keyword">WHERE</span> id <span class="operator">=</span> userId;</span><br><span class="line"><span class="keyword">END</span>$$</span><br><span class="line">DELIMITER ;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 执行</span></span><br><span class="line"><span class="keyword">CALL</span> sp_get_user(<span class="number">1</span>);</span><br></pre></td></tr></table></figure>
+
+<h3 id="带参数存储过程"><a href="#带参数存储过程" class="headerlink" title="带参数存储过程"></a>带参数存储过程</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> <span class="keyword">PROCEDURE</span> sp_add_user(<span class="keyword">IN</span> username <span class="type">VARCHAR</span>(<span class="number">50</span>), <span class="keyword">IN</span> email <span class="type">VARCHAR</span>(<span class="number">100</span>))</span><br><span class="line"><span class="keyword">BEGIN</span></span><br><span class="line">    <span class="keyword">INSERT INTO</span> users(username, email) <span class="keyword">VALUES</span>(username, email);</span><br><span class="line"><span class="keyword">END</span>;</span><br></pre></td></tr></table></figure>
+
+<h3 id="带控制语句"><a href="#带控制语句" class="headerlink" title="带控制语句"></a>带控制语句</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> <span class="keyword">PROCEDURE</span> sp_user_status(<span class="keyword">IN</span> uid <span class="type">INT</span>, <span class="keyword">OUT</span> status <span class="type">VARCHAR</span>(<span class="number">10</span>))</span><br><span class="line"><span class="keyword">BEGIN</span></span><br><span class="line">    IF <span class="keyword">EXISTS</span>(<span class="keyword">SELECT</span> <span class="number">1</span> <span class="keyword">FROM</span> users <span class="keyword">WHERE</span> id <span class="operator">=</span> uid) <span class="keyword">THEN</span></span><br><span class="line">        <span class="keyword">SET</span> status <span class="operator">=</span> <span class="string">&#x27;exists&#x27;</span>;</span><br><span class="line">    <span class="keyword">ELSE</span></span><br><span class="line">        <span class="keyword">SET</span> status <span class="operator">=</span> <span class="string">&#x27;not found&#x27;</span>;</span><br><span class="line">    <span class="keyword">END</span> IF;</span><br><span class="line"><span class="keyword">END</span>;</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="5-触发器（Trigger）"><a href="#5-触发器（Trigger）" class="headerlink" title="5. 触发器（Trigger）"></a>5. 触发器（Trigger）</h2><h3 id="创建触发器"><a href="#创建触发器" class="headerlink" title="创建触发器"></a>创建触发器</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TRIGGER</span> trg_before_insert_user</span><br><span class="line">BEFORE <span class="keyword">INSERT</span> <span class="keyword">ON</span> users</span><br><span class="line"><span class="keyword">FOR</span> <span class="keyword">EACH</span> <span class="type">ROW</span></span><br><span class="line"><span class="keyword">SET</span> NEW.created_at <span class="operator">=</span> NOW();</span><br></pre></td></tr></table></figure>
+
+<h3 id="INSERT-触发器"><a href="#INSERT-触发器" class="headerlink" title="INSERT 触发器"></a>INSERT 触发器</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TRIGGER</span> trg_after_insert_log</span><br><span class="line">AFTER <span class="keyword">INSERT</span> <span class="keyword">ON</span> users</span><br><span class="line"><span class="keyword">FOR</span> <span class="keyword">EACH</span> <span class="type">ROW</span></span><br><span class="line"><span class="keyword">INSERT INTO</span> user_log(user_id, action) <span class="keyword">VALUES</span> (NEW.id, <span class="string">&#x27;inserted&#x27;</span>);</span><br></pre></td></tr></table></figure>
+
+<h3 id="DELETE-触发器"><a href="#DELETE-触发器" class="headerlink" title="DELETE 触发器"></a>DELETE 触发器</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TRIGGER</span> trg_before_delete_user</span><br><span class="line">BEFORE <span class="keyword">DELETE</span> <span class="keyword">ON</span> users</span><br><span class="line"><span class="keyword">FOR</span> <span class="keyword">EACH</span> <span class="type">ROW</span></span><br><span class="line"><span class="keyword">INSERT INTO</span> user_log(user_id, action) <span class="keyword">VALUES</span> (OLD.id, <span class="string">&#x27;deleted&#x27;</span>);</span><br></pre></td></tr></table></figure>
+
+<h3 id="UPDATE-触发器"><a href="#UPDATE-触发器" class="headerlink" title="UPDATE 触发器"></a>UPDATE 触发器</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TRIGGER</span> trg_after_update_user</span><br><span class="line">AFTER <span class="keyword">UPDATE</span> <span class="keyword">ON</span> users</span><br><span class="line"><span class="keyword">FOR</span> <span class="keyword">EACH</span> <span class="type">ROW</span></span><br><span class="line"><span class="keyword">INSERT INTO</span> user_log(user_id, action) <span class="keyword">VALUES</span> (NEW.id, <span class="string">&#x27;updated&#x27;</span>);</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="6-索引分类"><a href="#6-索引分类" class="headerlink" title="6. 索引分类"></a>6. 索引分类</h2><h3 id="从物理存储角度"><a href="#从物理存储角度" class="headerlink" title="从物理存储角度"></a>从物理存储角度</h3><ul>
+<li>聚簇索引（Clustered Index）</li>
+<li>非聚簇索引（Non-clustered Index）</li>
+</ul>
+<h3 id="从逻辑角度"><a href="#从逻辑角度" class="headerlink" title="从逻辑角度"></a>从逻辑角度</h3><ul>
+<li>主键索引</li>
+<li>唯一索引</li>
+<li>普通索引</li>
+<li>全文索引</li>
+</ul>
+<h3 id="特殊应用"><a href="#特殊应用" class="headerlink" title="特殊应用"></a>特殊应用</h3><h4 id="AUTO-INCREMENT"><a href="#AUTO-INCREMENT" class="headerlink" title="AUTO_INCREMENT"></a>AUTO_INCREMENT</h4><ul>
+<li>配置 <code>innodb_autoinc_lock_mode</code><ul>
+<li>1: 传统锁模式（安全但并发低）</li>
+<li>2: 自增步长模式（并发高，部分场景安全）</li>
+<li>3: 连续模式（高并发，自增值连续）</li>
+</ul>
+</li>
+</ul>
+<h4 id="索引覆盖"><a href="#索引覆盖" class="headerlink" title="索引覆盖"></a>索引覆盖</h4><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> id, username <span class="keyword">FROM</span> users <span class="keyword">WHERE</span> id <span class="operator">=</span> <span class="number">1</span>; <span class="comment">-- 可使用覆盖索引</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="使用索引排序"><a href="#使用索引排序" class="headerlink" title="使用索引排序"></a>使用索引排序</h4><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> users <span class="keyword">ORDER</span> <span class="keyword">BY</span> id; <span class="comment">-- 避免 filesort</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="冗余和重复索引"><a href="#冗余和重复索引" class="headerlink" title="冗余和重复索引"></a>冗余和重复索引</h3><ul>
+<li>避免重复创建索引，影响写入性能</li>
+</ul>
+<h3 id="索引重用"><a href="#索引重用" class="headerlink" title="索引重用"></a>索引重用</h3><ul>
+<li>避免多个范围条件导致索引失效</li>
+</ul>
+<h3 id="最佳左前缀法则"><a href="#最佳左前缀法则" class="headerlink" title="最佳左前缀法则"></a>最佳左前缀法则</h3><ul>
+<li>多列索引 <code>(a,b,c)</code> 查询必须从最左列开始使用才能走索引</li>
+</ul>
+<hr>
+<h2 id="7-索引失效常见场景"><a href="#7-索引失效常见场景" class="headerlink" title="7. 索引失效常见场景"></a>7. 索引失效常见场景</h2><ul>
+<li>在索引列上使用表达式</li>
+<li>使用不等于操作 <code>&lt;&gt;</code></li>
+<li><code>IS (NOT) NULL</code></li>
+<li><code>LIKE &#39;%abc&#39;</code>（通配符开头）</li>
+<li><code>OR</code> 导致索引失效</li>
+<li><code>VARCHAR</code> 不加单引号</li>
+</ul>
+<p>详见：<a target="_blank" rel="noopener" href="https://blog.csdn.net/qq_32331073/article/details/79041232">索引失效总结</a></p>
+<hr>
+<h2 id="8-MySQL-查询分析工具"><a href="#8-MySQL-查询分析工具" class="headerlink" title="8. MySQL 查询分析工具"></a>8. MySQL 查询分析工具</h2><h3 id="慢查询日志"><a href="#慢查询日志" class="headerlink" title="慢查询日志"></a>慢查询日志</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SET</span> <span class="keyword">GLOBAL</span> slow_query_log <span class="operator">=</span> <span class="string">&#x27;ON&#x27;</span>;</span><br><span class="line"><span class="keyword">SET</span> <span class="keyword">GLOBAL</span> long_query_time <span class="operator">=</span> <span class="number">2</span>; <span class="comment">-- 秒</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="EXPLAIN-分析"><a href="#EXPLAIN-分析" class="headerlink" title="EXPLAIN 分析"></a>EXPLAIN 分析</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">EXPLAIN <span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> users <span class="keyword">WHERE</span> id <span class="operator">=</span> <span class="number">1</span>;</span><br><span class="line"><span class="comment">-- type: ALL、range、ref、const等</span></span><br><span class="line"><span class="comment">-- extra: Using filesort、Using temporary</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="优化策略"><a href="#优化策略" class="headerlink" title="优化策略"></a>优化策略</h3><ul>
+<li>JOIN 优化：小表驱动大表</li>
+<li>ORDER BY：使用索引覆盖，遵循最佳左前缀</li>
+<li>避免 <code>SELECT *</code></li>
+<li>提高 <code>sort_buffer_size</code>、<code>max_length_for_sort_data</code></li>
+</ul>
+<hr>
+<h2 id="9-主从复制"><a href="#9-主从复制" class="headerlink" title="9. 主从复制"></a>9. 主从复制</h2><ul>
+<li>语句复制（Statement-Based Replication）</li>
+<li>行复制（Row-Based Replication）</li>
+<li>异步或半同步复制</li>
+</ul>
+<hr>
+<h2 id="10-备份方案"><a href="#10-备份方案" class="headerlink" title="10. 备份方案"></a>10. 备份方案</h2><ul>
+<li>在线备份 vs 离线备份</li>
+<li>逻辑备份（mysqldump） vs 物理备份（xtrabackup）</li>
+</ul>
+<hr>
+<h2 id="11-MySQL-底层实现"><a href="#11-MySQL-底层实现" class="headerlink" title="11. MySQL 底层实现"></a>11. MySQL 底层实现</h2><h3 id="事务日志"><a href="#事务日志" class="headerlink" title="事务日志"></a>事务日志</h3><ul>
+<li>redo log：保证事务持久化</li>
+<li>undo log：事务回滚</li>
+</ul>
+<h3 id="锁与事务"><a href="#锁与事务" class="headerlink" title="锁与事务"></a>锁与事务</h3><ul>
+<li>InnoDB 支持行锁、gap锁、next-key 锁</li>
+<li>事务隔离级别：<ul>
+<li>READ UNCOMMITTED &#x2F; READ COMMITTED &#x2F; REPEATABLE READ &#x2F; SERIALIZABLE</li>
+</ul>
+</li>
+</ul>
+<h3 id="MVCC"><a href="#MVCC" class="headerlink" title="MVCC"></a>MVCC</h3><ul>
+<li>保证事务原子性</li>
+<li>undo log + read_view</li>
+<li>不同隔离级别生成 read_view 的规则</li>
+<li>InnoDB MVCC vs 理想 MVCC 区别</li>
+</ul>
+<h3 id="InnoDB-锁分类"><a href="#InnoDB-锁分类" class="headerlink" title="InnoDB 锁分类"></a>InnoDB 锁分类</h3><ul>
+<li>record lock（行锁）</li>
+<li>gap lock（间隙锁）</li>
+<li>next-key lock（行+间隙锁）</li>
+</ul>
+<h3 id="binlog-与-redo-log-区别"><a href="#binlog-与-redo-log-区别" class="headerlink" title="binlog 与 redo log 区别"></a>binlog 与 redo log 区别</h3><ul>
+<li>binlog：记录逻辑操作，用于复制与恢复</li>
+<li>redo log：记录物理页修改，用于崩溃恢复</li>
+</ul>
+<hr>
+<h2 id="12-InnoDB-与-MyISAM-区别"><a href="#12-InnoDB-与-MyISAM-区别" class="headerlink" title="12. InnoDB 与 MyISAM 区别"></a>12. InnoDB 与 MyISAM 区别</h2><p>详见：<a target="_blank" rel="noopener" href="https://www.jianshu.com/p/a957b18ba40d">InnoDB vs MyISAM</a></p>
+<ul>
+<li>InnoDB 支持事务、行锁、外键</li>
+<li>MyISAM 不支持事务，表锁</li>
+</ul>
+<hr>
+<h2 id="13-COUNT-区别"><a href="#13-COUNT-区别" class="headerlink" title="13. COUNT 区别"></a>13. COUNT 区别</h2><ul>
+<li><code>COUNT(1)</code>、<code>COUNT(*)</code>、<code>COUNT(column)</code><br> 参考：<a target="_blank" rel="noopener" href="https://blog.csdn.net/iFuMI/article/details/77920767">COUNT执行区别</a></li>
+</ul>
+<hr>
+<h2 id="14-主键与唯一索引区别"><a href="#14-主键与唯一索引区别" class="headerlink" title="14. 主键与唯一索引区别"></a>14. 主键与唯一索引区别</h2><ol>
+<li>主键必创建唯一索引，但唯一索引不一定是主键</li>
+<li>主键不允许 NULL，唯一索引可允许 NULL</li>
+<li>表只能有一个主键，可有多个唯一索引</li>
+<li>主键可被外键引用，唯一索引不可</li>
+<li>主键是一种约束，唯一索引是一种索引</li>
+</ol>
+<hr>
+<h2 id="15-推荐书籍"><a href="#15-推荐书籍" class="headerlink" title="15. 推荐书籍"></a>15. 推荐书籍</h2><ul>
+<li>《数据库系统概念》</li>
+<li>《MySQL必知必会》</li>
+<li>《MySQL技术内幕: InnoDB存储引擎》</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Mysql/" rel="tag"># Mysql</a>
+          </div>
+
+        
+  <div class="post-widgets">
+    <div class="wp_rating">
+      <div id="wpac-rating"></div>
+    </div>
+  </div>
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2025/11/22/redis/redis%E5%B8%B8%E8%A7%81%E6%8A%80%E6%9C%AF%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/" rel="prev" title="Redis 场景问题汇总">
+      <i class="fa fa-chevron-left"></i> Redis 场景问题汇总
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2025/11/22/mysql/mysql--9.%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0--%E9%AB%98%E6%80%A7%E8%83%BDmysql-1/" rel="next" title="MySQL高性能mysql读书笔记">
+      MySQL高性能mysql读书笔记 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+
+
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    
+  <div class="comments">
+    <div id="lv-container" data-id="city" data-uid="MTAyMC82MDk4Ni8zNzQ1Ng=="></div>
+  </div>
+  
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#MySQL-%E5%B8%B8%E7%94%A8%E5%87%BD%E6%95%B0%E4%B8%8E%E5%AE%9E%E8%B7%B5%E6%80%BB%E7%BB%93"><span class="nav-text">MySQL 常用函数与实践总结</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-%E6%96%87%E6%9C%AC%E5%A4%84%E7%90%86%E5%87%BD%E6%95%B0"><span class="nav-text">1. 文本处理函数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-%E6%95%B0%E5%80%BC%E5%A4%84%E7%90%86%E5%87%BD%E6%95%B0"><span class="nav-text">2. 数值处理函数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-%E8%A7%86%E5%9B%BE%EF%BC%88View%EF%BC%89"><span class="nav-text">3. 视图（View）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E4%BD%BF%E7%94%A8%E8%A7%86%E5%9B%BE"><span class="nav-text">为什么使用视图</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%9B%E5%BB%BA%E8%A7%86%E5%9B%BE"><span class="nav-text">创建视图</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9B%B4%E6%96%B0%E8%A7%86%E5%9B%BE"><span class="nav-text">更新视图</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-%E5%AD%98%E5%82%A8%E8%BF%87%E7%A8%8B%EF%BC%88Stored-Procedure%EF%BC%89"><span class="nav-text">4. 存储过程（Stored Procedure）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E4%BD%BF%E7%94%A8%E5%AD%98%E5%82%A8%E8%BF%87%E7%A8%8B"><span class="nav-text">为什么使用存储过程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%9B%E5%BB%BA%E4%B8%8E%E6%89%A7%E8%A1%8C%E5%AD%98%E5%82%A8%E8%BF%87%E7%A8%8B"><span class="nav-text">创建与执行存储过程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B8%A6%E5%8F%82%E6%95%B0%E5%AD%98%E5%82%A8%E8%BF%87%E7%A8%8B"><span class="nav-text">带参数存储过程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B8%A6%E6%8E%A7%E5%88%B6%E8%AF%AD%E5%8F%A5"><span class="nav-text">带控制语句</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-%E8%A7%A6%E5%8F%91%E5%99%A8%EF%BC%88Trigger%EF%BC%89"><span class="nav-text">5. 触发器（Trigger）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%9B%E5%BB%BA%E8%A7%A6%E5%8F%91%E5%99%A8"><span class="nav-text">创建触发器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#INSERT-%E8%A7%A6%E5%8F%91%E5%99%A8"><span class="nav-text">INSERT 触发器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#DELETE-%E8%A7%A6%E5%8F%91%E5%99%A8"><span class="nav-text">DELETE 触发器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#UPDATE-%E8%A7%A6%E5%8F%91%E5%99%A8"><span class="nav-text">UPDATE 触发器</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-%E7%B4%A2%E5%BC%95%E5%88%86%E7%B1%BB"><span class="nav-text">6. 索引分类</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%8E%E7%89%A9%E7%90%86%E5%AD%98%E5%82%A8%E8%A7%92%E5%BA%A6"><span class="nav-text">从物理存储角度</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%8E%E9%80%BB%E8%BE%91%E8%A7%92%E5%BA%A6"><span class="nav-text">从逻辑角度</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%89%B9%E6%AE%8A%E5%BA%94%E7%94%A8"><span class="nav-text">特殊应用</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#AUTO-INCREMENT"><span class="nav-text">AUTO_INCREMENT</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%B4%A2%E5%BC%95%E8%A6%86%E7%9B%96"><span class="nav-text">索引覆盖</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E7%B4%A2%E5%BC%95%E6%8E%92%E5%BA%8F"><span class="nav-text">使用索引排序</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%86%97%E4%BD%99%E5%92%8C%E9%87%8D%E5%A4%8D%E7%B4%A2%E5%BC%95"><span class="nav-text">冗余和重复索引</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%B4%A2%E5%BC%95%E9%87%8D%E7%94%A8"><span class="nav-text">索引重用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9C%80%E4%BD%B3%E5%B7%A6%E5%89%8D%E7%BC%80%E6%B3%95%E5%88%99"><span class="nav-text">最佳左前缀法则</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#7-%E7%B4%A2%E5%BC%95%E5%A4%B1%E6%95%88%E5%B8%B8%E8%A7%81%E5%9C%BA%E6%99%AF"><span class="nav-text">7. 索引失效常见场景</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#8-MySQL-%E6%9F%A5%E8%AF%A2%E5%88%86%E6%9E%90%E5%B7%A5%E5%85%B7"><span class="nav-text">8. MySQL 查询分析工具</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%85%A2%E6%9F%A5%E8%AF%A2%E6%97%A5%E5%BF%97"><span class="nav-text">慢查询日志</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#EXPLAIN-%E5%88%86%E6%9E%90"><span class="nav-text">EXPLAIN 分析</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BC%98%E5%8C%96%E7%AD%96%E7%95%A5"><span class="nav-text">优化策略</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#9-%E4%B8%BB%E4%BB%8E%E5%A4%8D%E5%88%B6"><span class="nav-text">9. 主从复制</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#10-%E5%A4%87%E4%BB%BD%E6%96%B9%E6%A1%88"><span class="nav-text">10. 备份方案</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#11-MySQL-%E5%BA%95%E5%B1%82%E5%AE%9E%E7%8E%B0"><span class="nav-text">11. MySQL 底层实现</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BA%8B%E5%8A%A1%E6%97%A5%E5%BF%97"><span class="nav-text">事务日志</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%94%81%E4%B8%8E%E4%BA%8B%E5%8A%A1"><span class="nav-text">锁与事务</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#MVCC"><span class="nav-text">MVCC</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#InnoDB-%E9%94%81%E5%88%86%E7%B1%BB"><span class="nav-text">InnoDB 锁分类</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#binlog-%E4%B8%8E-redo-log-%E5%8C%BA%E5%88%AB"><span class="nav-text">binlog 与 redo log 区别</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#12-InnoDB-%E4%B8%8E-MyISAM-%E5%8C%BA%E5%88%AB"><span class="nav-text">12. InnoDB 与 MyISAM 区别</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#13-COUNT-%E5%8C%BA%E5%88%AB"><span class="nav-text">13. COUNT 区别</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#14-%E4%B8%BB%E9%94%AE%E4%B8%8E%E5%94%AF%E4%B8%80%E7%B4%A2%E5%BC%95%E5%8C%BA%E5%88%AB"><span class="nav-text">14. 主键与唯一索引区别</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#15-%E6%8E%A8%E8%8D%90%E4%B9%A6%E7%B1%8D"><span class="nav-text">15. 推荐书籍</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">YeChengfeng</p>
+  <div class="site-description" itemprop="description">Make Learning and Organizing a Habit!</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">204</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">43</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">55</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">YeChengfeng</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="站点总字数">435k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">6:35</span>
+</div>
+
+        
+
+
+
+
+
+
+<script>
+  (function() {
+    function leancloudSelector(url) {
+      url = encodeURI(url);
+      return document.getElementById(url).querySelector('.leancloud-visitors-count');
+    }
+
+    function addCount(Counter) {
+      var visitors = document.querySelector('.leancloud_visitors');
+      var url = decodeURI(visitors.id);
+      var title = visitors.dataset.flagTitle;
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          if (results.length > 0) {
+            var counter = results[0];
+            leancloudSelector(url).innerText = counter.time + 1;
+            Counter('put', '/classes/Counter/' + counter.objectId, { time: { '__op': 'Increment', 'amount': 1 } })
+              .catch(error => {
+                console.error('Failed to save visitor count', error);
+              });
+          } else {
+              Counter('post', '/classes/Counter', { title, url, time: 1 })
+                .then(response => response.json())
+                .then(() => {
+                  leancloudSelector(url).innerText = 1;
+                })
+                .catch(error => {
+                  console.error('Failed to create', error);
+                });
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    function showTime(Counter) {
+      var visitors = document.querySelectorAll('.leancloud_visitors');
+      var entries = [...visitors].map(element => {
+        return decodeURI(element.id);
+      });
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url: { '$in': entries } })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          for (let url of entries) {
+            let target = results.find(item => item.url === url);
+            leancloudSelector(url).innerText = target ? target.time : 0;
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    let { app_id, app_key, server_url } = {"enable":true,"app_id":"h7vZITYMXKA8TGvtiJFms589-MdYXbMMI","app_key":"TcCRmGMIrnp7A76AiTj67XKC","security":false};
+    function fetchData(api_server) {
+      var Counter = (method, url, data) => {
+        return fetch(`${api_server}/1.1${url}`, {
+          method,
+          headers: {
+            'X-LC-Id'     : app_id,
+            'X-LC-Key'    : app_key,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data)
+        });
+      };
+      if (CONFIG.page.isPost) {
+        if (CONFIG.hostname !== location.hostname) return;
+        addCount(Counter);
+      } else if (document.querySelectorAll('.post-title-link').length >= 1) {
+        showTime(Counter);
+      }
+    }
+
+    let api_server = app_id.slice(-9) !== '-MdYXbMMI' ? server_url : `https://${app_id.slice(0, 8).toLowerCase()}.api.lncldglobal.com`;
+
+    if (api_server) {
+      fetchData(api_server);
+    } else {
+      fetch('https://app-router.leancloud.cn/2/route?appId=' + app_id)
+        .then(response => response.json())
+        .then(({ api_server }) => {
+          fetchData('https://' + api_server);
+        });
+    }
+  })();
+</script>
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+  <script>
+  if (CONFIG.page.isPost) {
+    wpac_init = window.wpac_init || [];
+    wpac_init.push({
+      widget: 'Rating',
+      id    : h7vZITYMXKA8TGvtiJFms589-MdYXbMMI,
+      el    : 'wpac-rating',
+      color : 'fc6423'
+    });
+    (function() {
+      if ('WIDGETPACK_LOADED' in window) return;
+      WIDGETPACK_LOADED = true;
+      var mc = document.createElement('script');
+      mc.type = 'text/javascript';
+      mc.async = true;
+      mc.src = '//embed.widgetpack.com/widget.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(mc, s.nextSibling);
+    })();
+  }
+  </script>
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+<script>
+NexT.utils.loadComments(document.querySelector('#lv-container'), () => {
+  window.livereOptions = {
+    refer: location.pathname.replace(CONFIG.root, '').replace('index.html', '')
+  };
+  (function(d, s) {
+    var j, e = d.getElementsByTagName(s)[0];
+    if (typeof LivereTower === 'function') { return; }
+    j = d.createElement(s);
+    j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+    j.async = true;
+    e.parentNode.insertBefore(j, e);
+  })(document, 'script');
+});
+</script>
+
+</body>
+</html>

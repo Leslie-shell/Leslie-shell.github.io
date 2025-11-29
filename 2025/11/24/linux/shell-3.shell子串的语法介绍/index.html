@@ -1,0 +1,862 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <script>
+    (function () {
+        if ('') {
+            if (prompt('请输入文章密码') !== '') {
+                alert('密码错误！');
+                if (history.length === 1) {
+                    location.replace("http://xxxxxxx.xxx"); // 这里替换成你的首页
+                } else {
+                    history.back();
+                }
+            }    
+        }
+    })();
+</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 8.1.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css">
+  <script src="/lib/pace/pace.min.js"></script>
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"leslie-shell.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"always","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":true,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.json"};
+  </script>
+
+  <meta name="description" content="参考:https:&#x2F;&#x2F;www.bilibili.com&#x2F;video&#x2F;BV14L4y157Bv?spm_id_from&#x3D;333.788.videopod.episodes&amp;vd_source&#x3D;8db2bf2ffb3ab22965fccab48d4389ba&amp;p&#x3D;9 Shell 字符串与子串操作全攻略1. 基本概念在 Bash&#x2F;类 Shell 中，字符串操作主要依赖 参数扩展">
+<meta property="og:type" content="article">
+<meta property="og:title" content="SHELL 入门整理-2.子串的玩法">
+<meta property="og:url" content="https://leslie-shell.github.io/2025/11/24/linux/shell-3.shell%E5%AD%90%E4%B8%B2%E7%9A%84%E8%AF%AD%E6%B3%95%E4%BB%8B%E7%BB%8D/index.html">
+<meta property="og:site_name" content="随笔">
+<meta property="og:description" content="参考:https:&#x2F;&#x2F;www.bilibili.com&#x2F;video&#x2F;BV14L4y157Bv?spm_id_from&#x3D;333.788.videopod.episodes&amp;vd_source&#x3D;8db2bf2ffb3ab22965fccab48d4389ba&amp;p&#x3D;9 Shell 字符串与子串操作全攻略1. 基本概念在 Bash&#x2F;类 Shell 中，字符串操作主要依赖 参数扩展">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2025-11-24T15:52:14.404Z">
+<meta property="article:modified_time" content="2025-11-29T15:20:16.116Z">
+<meta property="article:author" content="YeChengfeng">
+<meta property="article:tag" content="Linux">
+<meta property="article:tag" content="Shell">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://leslie-shell.github.io/2025/11/24/linux/shell-3.shell%E5%AD%90%E4%B8%B2%E7%9A%84%E8%AF%AD%E6%B3%95%E4%BB%8B%E7%BB%8D/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>SHELL 入门整理-2.子串的玩法 | 随笔</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">随笔</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-rank">
+
+    <a href="/rank/" rel="section"><i class="fa fa-fire fa-fw"></i>热度</a>
+
+  </li>
+        <li class="menu-item menu-item-recommended">
+
+    <a href="/recommended/" rel="section"><i class="fa fa-flag fa-fw"></i>推荐</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://leslie-shell.github.io/2025/11/24/linux/shell-3.shell%E5%AD%90%E4%B8%B2%E7%9A%84%E8%AF%AD%E6%B3%95%E4%BB%8B%E7%BB%8D/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="YeChengfeng">
+      <meta itemprop="description" content="Make Learning and Organizing a Habit!">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="随笔">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          SHELL 入门整理-2.子串的玩法
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2025-11-24 23:52:14" itemprop="dateCreated datePublished" datetime="2025-11-24T23:52:14+08:00">2025-11-24</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2025-11-29 23:20:16" itemprop="dateModified" datetime="2025-11-29T23:20:16+08:00">2025-11-29</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Linux/" itemprop="url" rel="index"><span itemprop="name">Linux</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Linux/Shell/" itemprop="url" rel="index"><span itemprop="name">Shell</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/2025/11/24/linux/shell-3.shell%E5%AD%90%E4%B8%B2%E7%9A%84%E8%AF%AD%E6%B3%95%E4%BB%8B%E7%BB%8D/" class="post-meta-item leancloud_visitors" data-flag-title="SHELL 入门整理-2.子串的玩法" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>2.7k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>2 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>参考:<a target="_blank" rel="noopener" href="https://www.bilibili.com/video/BV14L4y157Bv?spm_id_from=333.788.videopod.episodes&vd_source=8db2bf2ffb3ab22965fccab48d4389ba&p=9">https://www.bilibili.com/video/BV14L4y157Bv?spm_id_from=333.788.videopod.episodes&amp;vd_source=8db2bf2ffb3ab22965fccab48d4389ba&amp;p=9</a></p>
+<h1 id="Shell-字符串与子串操作全攻略"><a href="#Shell-字符串与子串操作全攻略" class="headerlink" title="Shell 字符串与子串操作全攻略"></a>Shell 字符串与子串操作全攻略</h1><h2 id="1-基本概念"><a href="#1-基本概念" class="headerlink" title="1. 基本概念"></a>1. 基本概念</h2><p>在 Bash&#x2F;类 Shell 中，字符串操作主要依赖 <strong>参数扩展（Parameter Expansion）</strong>，可实现：</p>
+<ul>
+<li><strong>子串提取</strong></li>
+<li><strong>前缀&#x2F;后缀删除（去掉）</strong></li>
+<li><strong>字符串替换</strong></li>
+<li><strong>模式匹配过滤</strong></li>
+<li><strong>包含&#x2F;开头&#x2F;结尾判断</strong></li>
+</ul>
+<p>语法示例：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">$&#123;变量:起始位置:长度&#125;</span></span><br><span class="line"><span class="variable">$&#123;变量#模式&#125;</span>, <span class="variable">$&#123;变量##模式&#125;</span></span><br><span class="line"><span class="variable">$&#123;变量%模式&#125;</span>, <span class="variable">$&#123;变量%%模式&#125;</span></span><br><span class="line"><span class="variable">$&#123;变量/旧/新&#125;</span>, <span class="variable">$&#123;变量//旧/新&#125;</span></span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="2-子串提取"><a href="#2-子串提取" class="headerlink" title="2. 子串提取"></a>2. 子串提取</h2><h3 id="语法"><a href="#语法" class="headerlink" title="语法"></a>语法</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">$&#123;变量:起始位置:长度&#125;</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><strong>起始位置</strong>从 0 开始，负数表示从末尾开始。</li>
+<li><strong>长度</strong>可省略，表示从起始位置取到字符串末尾。</li>
+</ul>
+<h3 id="示例"><a href="#示例" class="headerlink" title="示例"></a>示例</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">str=<span class="string">&quot;HelloWorld&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">echo</span> <span class="variable">$&#123;str:0:5&#125;</span>   <span class="comment"># Hello</span></span><br><span class="line"><span class="built_in">echo</span> <span class="variable">$&#123;str:5&#125;</span>     <span class="comment"># World</span></span><br><span class="line"><span class="built_in">echo</span> <span class="variable">$&#123;str: -5&#125;</span>   <span class="comment"># World</span></span><br><span class="line"><span class="built_in">echo</span> <span class="variable">$&#123;str: -5:3&#125;</span> <span class="comment"># Wor</span></span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>⚠️ 注意：负数索引前要有空格 <code>${str: -5}</code>，否则会报错。</p>
+</blockquote>
+<hr>
+<h2 id="3-前缀-后缀删除（去掉）"><a href="#3-前缀-后缀删除（去掉）" class="headerlink" title="3. 前缀 &#x2F; 后缀删除（去掉）"></a>3. 前缀 &#x2F; 后缀删除（去掉）</h2><p>“去”就是 <strong>删除匹配部分</strong>，剩下未匹配的部分就是结果。</p>
+<table>
+<thead>
+<tr>
+<th>操作</th>
+<th>符号</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>去最短前缀</td>
+<td><code>#</code></td>
+<td>从开头删除 <strong>最短匹配</strong> 的模式</td>
+</tr>
+<tr>
+<td>去最长前缀</td>
+<td><code>##</code></td>
+<td>从开头删除 <strong>最长匹配</strong> 的模式</td>
+</tr>
+<tr>
+<td>去最短后缀</td>
+<td><code>%</code></td>
+<td>从末尾删除 <strong>最短匹配</strong> 的模式</td>
+</tr>
+<tr>
+<td>去最长后缀</td>
+<td><code>%%</code></td>
+<td>从末尾删除 <strong>最长匹配</strong> 的模式</td>
+</tr>
+</tbody></table>
+<h3 id="示例-1"><a href="#示例-1" class="headerlink" title="示例"></a>示例</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">file=<span class="string">&quot;report.tar.gz&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 去最短后缀</span></span><br><span class="line"><span class="built_in">echo</span> <span class="variable">$&#123;file%.*&#125;</span>   <span class="comment"># report.tar</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 去最长后缀</span></span><br><span class="line"><span class="built_in">echo</span> <span class="variable">$&#123;file%%.*&#125;</span>  <span class="comment"># report</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 去最短前缀</span></span><br><span class="line"><span class="built_in">echo</span> <span class="variable">$&#123;file#*.&#125;</span>   <span class="comment"># tar.gz</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 去最长前缀</span></span><br><span class="line"><span class="built_in">echo</span> <span class="variable">$&#123;file##*.&#125;</span>  <span class="comment"># gz</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="图示（直观理解“去最短-最长后缀”）"><a href="#图示（直观理解“去最短-最长后缀”）" class="headerlink" title="图示（直观理解“去最短&#x2F;最长后缀”）"></a>图示（直观理解“去最短&#x2F;最长后缀”）</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">原始字符串: report.tar.gz</span><br><span class="line">%.*   → 删除最短匹配: .gz      → 剩余: report.tar</span><br><span class="line">%%.*  → 删除最长匹配: .tar.gz  → 剩余: report</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="4-字符串替换"><a href="#4-字符串替换" class="headerlink" title="4. 字符串替换"></a>4. 字符串替换</h2><table>
+<thead>
+<tr>
+<th>操作</th>
+<th>语法</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>替换第一次出现</td>
+<td><code>${变量/旧/新}</code></td>
+<td>替换第一个匹配</td>
+</tr>
+<tr>
+<td>替换所有匹配</td>
+<td><code>${变量//旧/新}</code></td>
+<td>替换全部匹配</td>
+</tr>
+<tr>
+<td>开头匹配替换</td>
+<td><code>${变量/#旧/新}</code></td>
+<td>仅开头匹配时替换</td>
+</tr>
+<tr>
+<td>结尾匹配替换</td>
+<td><code>${变量/%旧/新}</code></td>
+<td>仅结尾匹配时替换</td>
+</tr>
+</tbody></table>
+<h3 id="示例-2"><a href="#示例-2" class="headerlink" title="示例"></a>示例</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">text=<span class="string">&quot;apple banana apple&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">echo</span> <span class="variable">$&#123;text/apple/orange&#125;</span>   <span class="comment"># orange banana apple</span></span><br><span class="line"><span class="built_in">echo</span> <span class="variable">$&#123;text//apple/orange&#125;</span>  <span class="comment"># orange banana orange</span></span><br><span class="line"></span><br><span class="line">str=<span class="string">&quot;file.txt&quot;</span></span><br><span class="line"><span class="built_in">echo</span> <span class="variable">$&#123;str/#file/newfile&#125;</span>   <span class="comment"># newfile.txt</span></span><br><span class="line"><span class="built_in">echo</span> <span class="variable">$&#123;str/%.txt/.md&#125;</span>       <span class="comment"># file.md</span></span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="5-模式提取-过滤"><a href="#5-模式提取-过滤" class="headerlink" title="5. 模式提取 &#x2F; 过滤"></a>5. 模式提取 &#x2F; 过滤</h2><ul>
+<li>保留数字：</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">var=<span class="string">&quot;abc123def456&quot;</span></span><br><span class="line"><span class="built_in">echo</span> <span class="variable">$&#123;var//[!0-9]/&#125;</span>  <span class="comment"># 123456</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>删除数字：</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">echo</span> <span class="variable">$&#123;var//[0-9]/&#125;</span>   <span class="comment"># abcdef</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>保留开头&#x2F;结尾特定模式：</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">url=<span class="string">&quot;https://example.com/page.html&quot;</span></span><br><span class="line"><span class="built_in">echo</span> <span class="variable">$&#123;url#https://&#125;</span>   <span class="comment"># example.com/page.html</span></span><br><span class="line"><span class="built_in">echo</span> <span class="variable">$&#123;url%%/*&#125;</span>         <span class="comment"># example.com</span></span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="6-子串判断"><a href="#6-子串判断" class="headerlink" title="6. 子串判断"></a>6. 子串判断</h2><ul>
+<li><strong>是否包含某字符串</strong>：</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">str=<span class="string">&quot;HelloWorld&quot;</span></span><br><span class="line"><span class="keyword">if</span> [[ <span class="variable">$str</span> == *World* ]]; <span class="keyword">then</span></span><br><span class="line">    <span class="built_in">echo</span> <span class="string">&quot;包含 World&quot;</span></span><br><span class="line"><span class="keyword">fi</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><strong>开头 &#x2F; 结尾判断</strong>：</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> [[ <span class="variable">$str</span> == Hello* ]]; <span class="keyword">then</span> <span class="built_in">echo</span> <span class="string">&quot;以 Hello 开头&quot;</span>; <span class="keyword">fi</span></span><br><span class="line"><span class="keyword">if</span> [[ <span class="variable">$str</span> == *World ]]; <span class="keyword">then</span> <span class="built_in">echo</span> <span class="string">&quot;以 World 结尾&quot;</span>; <span class="keyword">fi</span></span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="7-小技巧"><a href="#7-小技巧" class="headerlink" title="7. 小技巧"></a>7. 小技巧</h2><ol>
+<li><strong>截取 <code>@</code> 前后（邮箱拆分）</strong></li>
+</ol>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">email=<span class="string">&quot;user@example.com&quot;</span></span><br><span class="line"><span class="built_in">echo</span> <span class="variable">$&#123;email%@*&#125;</span>   <span class="comment"># user</span></span><br><span class="line"><span class="built_in">echo</span> <span class="variable">$&#123;email#*@&#125;</span>   <span class="comment"># example.com</span></span><br></pre></td></tr></table></figure>
+
+<ol>
+<li><strong>数组风格子串</strong></li>
+</ol>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">arr=(a b c d e)</span><br><span class="line"><span class="built_in">echo</span> <span class="variable">$&#123;arr[@]:1:3&#125;</span>   <span class="comment"># b c d</span></span><br></pre></td></tr></table></figure>
+
+<ol>
+<li><strong>反转字符串</strong></li>
+</ol>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">str=<span class="string">&quot;Hello&quot;</span></span><br><span class="line"><span class="built_in">echo</span> <span class="variable">$str</span> | rev   <span class="comment"># olleH</span></span><br></pre></td></tr></table></figure>
+
+<ol>
+<li><strong>去掉首尾空格</strong></li>
+</ol>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">str=<span class="string">&quot;  hello  &quot;</span></span><br><span class="line"><span class="built_in">echo</span> <span class="string">&quot;<span class="variable">$&#123;str## &#125;</span>&quot;</span>  <span class="comment"># 去掉开头空格</span></span><br><span class="line"><span class="built_in">echo</span> <span class="string">&quot;<span class="variable">$&#123;str%% &#125;</span>&quot;</span>  <span class="comment"># 去掉结尾空格</span></span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="8-速查表"><a href="#8-速查表" class="headerlink" title="8. 速查表"></a>8. 速查表</h2><table>
+<thead>
+<tr>
+<th>功能</th>
+<th>语法</th>
+<th>示例</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>提取子串</td>
+<td><code>${var:start:length}</code></td>
+<td><code>${str:0:5}</code></td>
+</tr>
+<tr>
+<td>去最短前缀</td>
+<td><code>${var#pattern}</code></td>
+<td><code>${file#*.}</code></td>
+</tr>
+<tr>
+<td>去最长前缀</td>
+<td><code>${var##pattern}</code></td>
+<td><code>${file##*.}</code></td>
+</tr>
+<tr>
+<td>去最短后缀</td>
+<td><code>${var%pattern}</code></td>
+<td><code>${file%.gz}</code></td>
+</tr>
+<tr>
+<td>去最长后缀</td>
+<td><code>${var%%pattern}</code></td>
+<td><code>${file%%.*}</code></td>
+</tr>
+<tr>
+<td>单次替换</td>
+<td><code>${var/old/new}</code></td>
+<td><code>${text/apple/orange}</code></td>
+</tr>
+<tr>
+<td>全部替换</td>
+<td><code>${var//old/new}</code></td>
+<td><code>${text//apple/orange}</code></td>
+</tr>
+<tr>
+<td>开头替换</td>
+<td><code>${var/#old/new}</code></td>
+<td><code>${str/#file/newfile}</code></td>
+</tr>
+<tr>
+<td>结尾替换</td>
+<td><code>${var/%old/new}</code></td>
+<td><code>${str/%.txt/.md}</code></td>
+</tr>
+<tr>
+<td>保留数字</td>
+<td><code>${var//[!0-9]/}</code></td>
+<td>123456</td>
+</tr>
+<tr>
+<td>删除数字</td>
+<td><code>${var//[0-9]/}</code></td>
+<td>abcdef</td>
+</tr>
+<tr>
+<td>包含判断</td>
+<td><code>[[ $var == *substr* ]]</code></td>
+<td><code>if [[ $str == *World* ]]</code></td>
+</tr>
+<tr>
+<td>开头&#x2F;结尾判断</td>
+<td><code>[[ $var == pattern* ]]</code></td>
+<td><code>if [[ $str == Hello* ]]</code></td>
+</tr>
+</tbody></table>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Linux/" rel="tag"># Linux</a>
+              <a href="/tags/Shell/" rel="tag"># Shell</a>
+          </div>
+
+        
+  <div class="post-widgets">
+    <div class="wp_rating">
+      <div id="wpac-rating"></div>
+    </div>
+  </div>
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2025/11/24/linux/shell-2/" rel="prev" title="SHELL 入门整理-2">
+      <i class="fa fa-chevron-left"></i> SHELL 入门整理-2
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2025/11/25/linux/shell-4.%E7%BB%9F%E8%AE%A1%E5%8F%98%E9%87%8F%EF%BC%8C%E5%AD%97%E7%AC%A6%E4%B8%B2%E9%95%BF%E5%BA%A6%EF%BC%8C%E4%BB%A5%E5%8F%8A%E6%89%B9%E9%87%8F%E4%BF%AE%E6%94%B9%E6%96%87%E4%BB%B6%E5%90%8D./" rel="next" title="SHELL 统计变量，字符串长度，以及批量修改文件名">
+      SHELL 统计变量，字符串长度，以及批量修改文件名 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+
+
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    
+  <div class="comments">
+    <div id="lv-container" data-id="city" data-uid="MTAyMC82MDk4Ni8zNzQ1Ng=="></div>
+  </div>
+  
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Shell-%E5%AD%97%E7%AC%A6%E4%B8%B2%E4%B8%8E%E5%AD%90%E4%B8%B2%E6%93%8D%E4%BD%9C%E5%85%A8%E6%94%BB%E7%95%A5"><span class="nav-text">Shell 字符串与子串操作全攻略</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5"><span class="nav-text">1. 基本概念</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-%E5%AD%90%E4%B8%B2%E6%8F%90%E5%8F%96"><span class="nav-text">2. 子串提取</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AF%AD%E6%B3%95"><span class="nav-text">语法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A4%BA%E4%BE%8B"><span class="nav-text">示例</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-%E5%89%8D%E7%BC%80-%E5%90%8E%E7%BC%80%E5%88%A0%E9%99%A4%EF%BC%88%E5%8E%BB%E6%8E%89%EF%BC%89"><span class="nav-text">3. 前缀 &#x2F; 后缀删除（去掉）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A4%BA%E4%BE%8B-1"><span class="nav-text">示例</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9B%BE%E7%A4%BA%EF%BC%88%E7%9B%B4%E8%A7%82%E7%90%86%E8%A7%A3%E2%80%9C%E5%8E%BB%E6%9C%80%E7%9F%AD-%E6%9C%80%E9%95%BF%E5%90%8E%E7%BC%80%E2%80%9D%EF%BC%89"><span class="nav-text">图示（直观理解“去最短&#x2F;最长后缀”）</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-%E5%AD%97%E7%AC%A6%E4%B8%B2%E6%9B%BF%E6%8D%A2"><span class="nav-text">4. 字符串替换</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A4%BA%E4%BE%8B-2"><span class="nav-text">示例</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-%E6%A8%A1%E5%BC%8F%E6%8F%90%E5%8F%96-%E8%BF%87%E6%BB%A4"><span class="nav-text">5. 模式提取 &#x2F; 过滤</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-%E5%AD%90%E4%B8%B2%E5%88%A4%E6%96%AD"><span class="nav-text">6. 子串判断</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#7-%E5%B0%8F%E6%8A%80%E5%B7%A7"><span class="nav-text">7. 小技巧</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#8-%E9%80%9F%E6%9F%A5%E8%A1%A8"><span class="nav-text">8. 速查表</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">YeChengfeng</p>
+  <div class="site-description" itemprop="description">Make Learning and Organizing a Habit!</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">204</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">43</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">55</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">YeChengfeng</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="站点总字数">435k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">6:35</span>
+</div>
+
+        
+
+
+
+
+
+
+<script>
+  (function() {
+    function leancloudSelector(url) {
+      url = encodeURI(url);
+      return document.getElementById(url).querySelector('.leancloud-visitors-count');
+    }
+
+    function addCount(Counter) {
+      var visitors = document.querySelector('.leancloud_visitors');
+      var url = decodeURI(visitors.id);
+      var title = visitors.dataset.flagTitle;
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          if (results.length > 0) {
+            var counter = results[0];
+            leancloudSelector(url).innerText = counter.time + 1;
+            Counter('put', '/classes/Counter/' + counter.objectId, { time: { '__op': 'Increment', 'amount': 1 } })
+              .catch(error => {
+                console.error('Failed to save visitor count', error);
+              });
+          } else {
+              Counter('post', '/classes/Counter', { title, url, time: 1 })
+                .then(response => response.json())
+                .then(() => {
+                  leancloudSelector(url).innerText = 1;
+                })
+                .catch(error => {
+                  console.error('Failed to create', error);
+                });
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    function showTime(Counter) {
+      var visitors = document.querySelectorAll('.leancloud_visitors');
+      var entries = [...visitors].map(element => {
+        return decodeURI(element.id);
+      });
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url: { '$in': entries } })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          for (let url of entries) {
+            let target = results.find(item => item.url === url);
+            leancloudSelector(url).innerText = target ? target.time : 0;
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    let { app_id, app_key, server_url } = {"enable":true,"app_id":"h7vZITYMXKA8TGvtiJFms589-MdYXbMMI","app_key":"TcCRmGMIrnp7A76AiTj67XKC","security":false};
+    function fetchData(api_server) {
+      var Counter = (method, url, data) => {
+        return fetch(`${api_server}/1.1${url}`, {
+          method,
+          headers: {
+            'X-LC-Id'     : app_id,
+            'X-LC-Key'    : app_key,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data)
+        });
+      };
+      if (CONFIG.page.isPost) {
+        if (CONFIG.hostname !== location.hostname) return;
+        addCount(Counter);
+      } else if (document.querySelectorAll('.post-title-link').length >= 1) {
+        showTime(Counter);
+      }
+    }
+
+    let api_server = app_id.slice(-9) !== '-MdYXbMMI' ? server_url : `https://${app_id.slice(0, 8).toLowerCase()}.api.lncldglobal.com`;
+
+    if (api_server) {
+      fetchData(api_server);
+    } else {
+      fetch('https://app-router.leancloud.cn/2/route?appId=' + app_id)
+        .then(response => response.json())
+        .then(({ api_server }) => {
+          fetchData('https://' + api_server);
+        });
+    }
+  })();
+</script>
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+  <script>
+  if (CONFIG.page.isPost) {
+    wpac_init = window.wpac_init || [];
+    wpac_init.push({
+      widget: 'Rating',
+      id    : h7vZITYMXKA8TGvtiJFms589-MdYXbMMI,
+      el    : 'wpac-rating',
+      color : 'fc6423'
+    });
+    (function() {
+      if ('WIDGETPACK_LOADED' in window) return;
+      WIDGETPACK_LOADED = true;
+      var mc = document.createElement('script');
+      mc.type = 'text/javascript';
+      mc.async = true;
+      mc.src = '//embed.widgetpack.com/widget.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(mc, s.nextSibling);
+    })();
+  }
+  </script>
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+<script>
+NexT.utils.loadComments(document.querySelector('#lv-container'), () => {
+  window.livereOptions = {
+    refer: location.pathname.replace(CONFIG.root, '').replace('index.html', '')
+  };
+  (function(d, s) {
+    var j, e = d.getElementsByTagName(s)[0];
+    if (typeof LivereTower === 'function') { return; }
+    j = d.createElement(s);
+    j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+    j.async = true;
+    e.parentNode.insertBefore(j, e);
+  })(document, 'script');
+});
+</script>
+
+</body>
+</html>

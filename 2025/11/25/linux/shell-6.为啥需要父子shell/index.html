@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <script>
+    (function () {
+        if ('') {
+            if (prompt('请输入文章密码') !== '') {
+                alert('密码错误！');
+                if (history.length === 1) {
+                    location.replace("http://xxxxxxx.xxx"); // 这里替换成你的首页
+                } else {
+                    history.back();
+                }
+            }    
+        }
+    })();
+</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 8.1.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css">
+  <script src="/lib/pace/pace.min.js"></script>
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"leslie-shell.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"always","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":true,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.json"};
+  </script>
+
+  <meta name="description" content="为啥需要父子shell，原因是 Shell 要在执行命令时能隔离环境修改，又能并发执行多个流程，而不破坏当前交互环境。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="shell为啥需要父子shell">
+<meta property="og:url" content="https://leslie-shell.github.io/2025/11/25/linux/shell-6.%E4%B8%BA%E5%95%A5%E9%9C%80%E8%A6%81%E7%88%B6%E5%AD%90shell/index.html">
+<meta property="og:site_name" content="随笔">
+<meta property="og:description" content="为啥需要父子shell，原因是 Shell 要在执行命令时能隔离环境修改，又能并发执行多个流程，而不破坏当前交互环境。">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2025-11-25T15:14:28.501Z">
+<meta property="article:modified_time" content="2025-11-29T15:21:36.232Z">
+<meta property="article:author" content="YeChengfeng">
+<meta property="article:tag" content="Linux">
+<meta property="article:tag" content="Shell">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://leslie-shell.github.io/2025/11/25/linux/shell-6.%E4%B8%BA%E5%95%A5%E9%9C%80%E8%A6%81%E7%88%B6%E5%AD%90shell/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>shell为啥需要父子shell | 随笔</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">随笔</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-rank">
+
+    <a href="/rank/" rel="section"><i class="fa fa-fire fa-fw"></i>热度</a>
+
+  </li>
+        <li class="menu-item menu-item-recommended">
+
+    <a href="/recommended/" rel="section"><i class="fa fa-flag fa-fw"></i>推荐</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://leslie-shell.github.io/2025/11/25/linux/shell-6.%E4%B8%BA%E5%95%A5%E9%9C%80%E8%A6%81%E7%88%B6%E5%AD%90shell/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="YeChengfeng">
+      <meta itemprop="description" content="Make Learning and Organizing a Habit!">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="随笔">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          shell为啥需要父子shell
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2025-11-25 23:14:28" itemprop="dateCreated datePublished" datetime="2025-11-25T23:14:28+08:00">2025-11-25</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2025-11-29 23:21:36" itemprop="dateModified" datetime="2025-11-29T23:21:36+08:00">2025-11-29</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Linux/" itemprop="url" rel="index"><span itemprop="name">Linux</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Linux/Shell/" itemprop="url" rel="index"><span itemprop="name">Shell</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/2025/11/25/linux/shell-6.%E4%B8%BA%E5%95%A5%E9%9C%80%E8%A6%81%E7%88%B6%E5%AD%90shell/" class="post-meta-item leancloud_visitors" data-flag-title="shell为啥需要父子shell" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>1.4k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>1 分钟</span>
+            </span>
+            <div class="post-description">为啥需要父子shell，原因是 Shell 要在执行命令时能隔离环境修改，又能并发执行多个流程，而不破坏当前交互环境。</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>需要父子 Shell 的根本原因：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Shell 要在执行命令时能隔离环境修改，</span><br><span class="line">又能并发执行多个流程，而不破坏当前交互环境。</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h1 id="二、没有子-shell-会发生什么？"><a href="#二、没有子-shell-会发生什么？" class="headerlink" title="二、没有子 shell 会发生什么？"></a>二、没有子 shell 会发生什么？</h1><p>假设 Shell 执行管道：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">echo 1 | cd /tmp</span><br></pre></td></tr></table></figure>
+
+<p>如果没有子 shell：</p>
+<ol>
+<li><code>cd /tmp</code> 会修改当前 Shell 的工作目录</li>
+<li>执行完后你就被强制切换目录</li>
+</ol>
+<p>你只要执行任何包含 <code>cd</code> 的管道，你的终端环境就乱套</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">ls | cd /var</span><br><span class="line">pwd   → /var ？？？</span><br></pre></td></tr></table></figure>
+
+<p>这显然不能接受</p>
+<hr>
+<h1 id="三、子-Shell-解决了两个关键问题"><a href="#三、子-Shell-解决了两个关键问题" class="headerlink" title="三、子 Shell 解决了两个关键问题"></a>三、子 Shell 解决了两个关键问题</h1><h2 id="1-环境隔离（environment-isolation）"><a href="#1-环境隔离（environment-isolation）" class="headerlink" title="1. 环境隔离（environment isolation）"></a>1. 环境隔离（environment isolation）</h2><p>举例：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">PATH=/tmp/test</span><br></pre></td></tr></table></figure>
+
+<p>如果管道产生环境污染：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">echo ok | PATH=/tmp xxx</span><br></pre></td></tr></table></figure>
+
+<p>执行一次之后你的 shell PATH 就变了</p>
+<p>整个系统命令都无法用</p>
+<p>子 shell 的存在保证：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">子 shell 里的变量、目录变化不会影响父 shell</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="2-并发执行"><a href="#2-并发执行" class="headerlink" title="2. 并发执行"></a>2. 并发执行</h2><p>管道：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">A | B | C</span><br></pre></td></tr></table></figure>
+
+<p>为什么能同时运行？</p>
+<p>答案：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">每个命令运行在独立进程（子 shell）</span><br><span class="line">stdin/stdout 通过 pipe 连接</span><br></pre></td></tr></table></figure>
+
+<p>如果全部在同一个 Shell 里：</p>
+<ul>
+<li>同时读写 stdin 会死锁</li>
+<li>无法一边输出一边接收</li>
+<li>管道根本无法工作</li>
+</ul>
+<hr>
+<h1 id="四、具体场景分析（非常关键）"><a href="#四、具体场景分析（非常关键）" class="headerlink" title="四、具体场景分析（非常关键）"></a>四、具体场景分析（非常关键）</h1><p>以下写法都会产生子 shell：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">(...)</span><br><span class="line">A | B</span><br><span class="line">命令替换 `...`</span><br><span class="line">命令替换 $(...)</span><br></pre></td></tr></table></figure>
+
+<p>逐个解释原因：</p>
+<hr>
+<h2 id="1-子-shell"><a href="#1-子-shell" class="headerlink" title="1. ( ) 子 shell"></a>1. <code>( )</code> 子 shell</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">(</span><br><span class="line">    cd /tmp</span><br><span class="line">    touch a</span><br><span class="line">)</span><br><span class="line">pwd</span><br></pre></td></tr></table></figure>
+
+<p>效果：</p>
+<ul>
+<li>在子 shell 中 <code>cd</code></li>
+<li>离开后父 shell 不受影响</li>
+</ul>
+<hr>
+<h2 id="2-管道必须产生子-shell"><a href="#2-管道必须产生子-shell" class="headerlink" title="2. 管道必须产生子 shell"></a>2. 管道必须产生子 shell</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ps | grep bash</span><br></pre></td></tr></table></figure>
+
+<p>原因：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">A 的 stdout 要成为 B 的 stdin</span><br><span class="line">必须并行执行</span><br></pre></td></tr></table></figure>
+
+<p>并行需要创建新进程</p>
+<hr>
+<h2 id="3-命令替换需要子-shell"><a href="#3-命令替换需要子-shell" class="headerlink" title="3. 命令替换需要子 shell"></a>3. 命令替换需要子 shell</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">name=$(hostname)</span><br></pre></td></tr></table></figure>
+
+<p>为什么？</p>
+<p>因为：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">shell 需要执行 hostname</span><br><span class="line">获取结果</span><br><span class="line">再继续解析主命令</span><br></pre></td></tr></table></figure>
+
+<p>需要单独执行环境，不能阻塞主解析流程</p>
+<hr>
+<h1 id="五、没有父子-Shell-会变成什么样？（最本质）"><a href="#五、没有父子-Shell-会变成什么样？（最本质）" class="headerlink" title="五、没有父子 Shell 会变成什么样？（最本质）"></a>五、没有父子 Shell 会变成什么样？（最本质）</h1><p>你的终端会变成这样：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">ls | cd /usr</span><br><span class="line">pwd → /usr</span><br><span class="line">echo abc | export PATH=/xxx</span><br><span class="line">PATH 永久改变</span><br><span class="line">$(cd /tmp)</span><br><span class="line">pwd → /tmp</span><br></pre></td></tr></table></figure>
+
+<p>任何脚本中环境变化都会污染交互 shell</p>
+<p>最终无法控制系统行为</p>
+<hr>
+<h1 id="六、操作系统层面原因"><a href="#六、操作系统层面原因" class="headerlink" title="六、操作系统层面原因"></a>六、操作系统层面原因</h1><p>更底层一点：</p>
+<p>Shell 只是一个进程，它执行命令需要：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">fork() 创建新进程</span><br><span class="line">exec() 执行命令</span><br></pre></td></tr></table></figure>
+
+<p>父子关系对应：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">父 shell → fork → 子 shell</span><br><span class="line">子 shell → exec → /bin/ls 等命令</span><br></pre></td></tr></table></figure>
+
+<p>为什么不用线程？</p>
+<ul>
+<li>线程共享内存</li>
+<li>会污染环境变量、cwd、文件描述符</li>
+<li>管道无法隔离</li>
+</ul>
+<hr>
+<h1 id="七、设计哲学原因（最深层）"><a href="#七、设计哲学原因（最深层）" class="headerlink" title="七、设计哲学原因（最深层）"></a>七、设计哲学原因（最深层）</h1><p>Unix 哲学：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Everything is a process</span><br></pre></td></tr></table></figure>
+
+<p>Shell 要达到：</p>
+<ol>
+<li>可组合（pipe）</li>
+<li>可替换（command substitution）</li>
+<li>不互相影响（environment isolation）</li>
+</ol>
+<p>父子 shell 正是实现这套能力的基础结构</p>
+<hr>
+<h1 id="八、总结整理一句话"><a href="#八、总结整理一句话" class="headerlink" title="八、总结整理一句话"></a>八、总结整理一句话</h1><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">需要父子 Shell 是为了在执行外部命令、管道、命令替换时</span><br><span class="line">既能并行处理数据，又不污染当前 Shell 的环境，</span><br><span class="line">实现 Unix 可组合命令的核心机制。</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h1 id="九、加深理解的关键例子（最经典）"><a href="#九、加深理解的关键例子（最经典）" class="headerlink" title="九、加深理解的关键例子（最经典）"></a>九、加深理解的关键例子（最经典）</h1><p>注意这个：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">var=1</span><br><span class="line">echo $var | read x</span><br><span class="line">echo $x</span><br></pre></td></tr></table></figure>
+
+<p>输出：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">(空)</span><br></pre></td></tr></table></figure>
+
+<p>原因：</p>
+<p><code>read</code> 在子 shell 中执行，赋值无法传回父 shell, 但是在mac中是可以的，<strong>原因如果使用zsh，zsh 好像默认最后一个管道命令在父 shell执行…</strong></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Linux/" rel="tag"># Linux</a>
+              <a href="/tags/Shell/" rel="tag"># Shell</a>
+          </div>
+
+        
+  <div class="post-widgets">
+    <div class="wp_rating">
+      <div id="wpac-rating"></div>
+    </div>
+  </div>
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2025/11/25/linux/shell-5.shell%E6%89%A9%E5%B1%95%E5%8F%98%E9%87%8F/" rel="prev" title="SHELL 的扩展变量">
+      <i class="fa fa-chevron-left"></i> SHELL 的扩展变量
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2025/11/25/linux/shell-7.shell%E5%86%85%E7%BD%AE%E5%91%BD%E4%BB%A4%E5%92%8C%E5%A4%96%E7%BD%AE%E5%91%BD%E4%BB%A4/" rel="next" title="Shell 内置命令和外置命令">
+      Shell 内置命令和外置命令 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+
+
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    
+  <div class="comments">
+    <div id="lv-container" data-id="city" data-uid="MTAyMC82MDk4Ni8zNzQ1Ng=="></div>
+  </div>
+  
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BA%8C%E3%80%81%E6%B2%A1%E6%9C%89%E5%AD%90-shell-%E4%BC%9A%E5%8F%91%E7%94%9F%E4%BB%80%E4%B9%88%EF%BC%9F"><span class="nav-text">二、没有子 shell 会发生什么？</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%B8%89%E3%80%81%E5%AD%90-Shell-%E8%A7%A3%E5%86%B3%E4%BA%86%E4%B8%A4%E4%B8%AA%E5%85%B3%E9%94%AE%E9%97%AE%E9%A2%98"><span class="nav-text">三、子 Shell 解决了两个关键问题</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-%E7%8E%AF%E5%A2%83%E9%9A%94%E7%A6%BB%EF%BC%88environment-isolation%EF%BC%89"><span class="nav-text">1. 环境隔离（environment isolation）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-%E5%B9%B6%E5%8F%91%E6%89%A7%E8%A1%8C"><span class="nav-text">2. 并发执行</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%9B%9B%E3%80%81%E5%85%B7%E4%BD%93%E5%9C%BA%E6%99%AF%E5%88%86%E6%9E%90%EF%BC%88%E9%9D%9E%E5%B8%B8%E5%85%B3%E9%94%AE%EF%BC%89"><span class="nav-text">四、具体场景分析（非常关键）</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-%E5%AD%90-shell"><span class="nav-text">1. ( ) 子 shell</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-%E7%AE%A1%E9%81%93%E5%BF%85%E9%A1%BB%E4%BA%A7%E7%94%9F%E5%AD%90-shell"><span class="nav-text">2. 管道必须产生子 shell</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-%E5%91%BD%E4%BB%A4%E6%9B%BF%E6%8D%A2%E9%9C%80%E8%A6%81%E5%AD%90-shell"><span class="nav-text">3. 命令替换需要子 shell</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BA%94%E3%80%81%E6%B2%A1%E6%9C%89%E7%88%B6%E5%AD%90-Shell-%E4%BC%9A%E5%8F%98%E6%88%90%E4%BB%80%E4%B9%88%E6%A0%B7%EF%BC%9F%EF%BC%88%E6%9C%80%E6%9C%AC%E8%B4%A8%EF%BC%89"><span class="nav-text">五、没有父子 Shell 会变成什么样？（最本质）</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%85%AD%E3%80%81%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E5%B1%82%E9%9D%A2%E5%8E%9F%E5%9B%A0"><span class="nav-text">六、操作系统层面原因</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%B8%83%E3%80%81%E8%AE%BE%E8%AE%A1%E5%93%B2%E5%AD%A6%E5%8E%9F%E5%9B%A0%EF%BC%88%E6%9C%80%E6%B7%B1%E5%B1%82%EF%BC%89"><span class="nav-text">七、设计哲学原因（最深层）</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%85%AB%E3%80%81%E6%80%BB%E7%BB%93%E6%95%B4%E7%90%86%E4%B8%80%E5%8F%A5%E8%AF%9D"><span class="nav-text">八、总结整理一句话</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%B9%9D%E3%80%81%E5%8A%A0%E6%B7%B1%E7%90%86%E8%A7%A3%E7%9A%84%E5%85%B3%E9%94%AE%E4%BE%8B%E5%AD%90%EF%BC%88%E6%9C%80%E7%BB%8F%E5%85%B8%EF%BC%89"><span class="nav-text">九、加深理解的关键例子（最经典）</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">YeChengfeng</p>
+  <div class="site-description" itemprop="description">Make Learning and Organizing a Habit!</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">204</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">43</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">55</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">YeChengfeng</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="站点总字数">435k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">6:35</span>
+</div>
+
+        
+
+
+
+
+
+
+<script>
+  (function() {
+    function leancloudSelector(url) {
+      url = encodeURI(url);
+      return document.getElementById(url).querySelector('.leancloud-visitors-count');
+    }
+
+    function addCount(Counter) {
+      var visitors = document.querySelector('.leancloud_visitors');
+      var url = decodeURI(visitors.id);
+      var title = visitors.dataset.flagTitle;
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          if (results.length > 0) {
+            var counter = results[0];
+            leancloudSelector(url).innerText = counter.time + 1;
+            Counter('put', '/classes/Counter/' + counter.objectId, { time: { '__op': 'Increment', 'amount': 1 } })
+              .catch(error => {
+                console.error('Failed to save visitor count', error);
+              });
+          } else {
+              Counter('post', '/classes/Counter', { title, url, time: 1 })
+                .then(response => response.json())
+                .then(() => {
+                  leancloudSelector(url).innerText = 1;
+                })
+                .catch(error => {
+                  console.error('Failed to create', error);
+                });
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    function showTime(Counter) {
+      var visitors = document.querySelectorAll('.leancloud_visitors');
+      var entries = [...visitors].map(element => {
+        return decodeURI(element.id);
+      });
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url: { '$in': entries } })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          for (let url of entries) {
+            let target = results.find(item => item.url === url);
+            leancloudSelector(url).innerText = target ? target.time : 0;
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    let { app_id, app_key, server_url } = {"enable":true,"app_id":"h7vZITYMXKA8TGvtiJFms589-MdYXbMMI","app_key":"TcCRmGMIrnp7A76AiTj67XKC","security":false};
+    function fetchData(api_server) {
+      var Counter = (method, url, data) => {
+        return fetch(`${api_server}/1.1${url}`, {
+          method,
+          headers: {
+            'X-LC-Id'     : app_id,
+            'X-LC-Key'    : app_key,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data)
+        });
+      };
+      if (CONFIG.page.isPost) {
+        if (CONFIG.hostname !== location.hostname) return;
+        addCount(Counter);
+      } else if (document.querySelectorAll('.post-title-link').length >= 1) {
+        showTime(Counter);
+      }
+    }
+
+    let api_server = app_id.slice(-9) !== '-MdYXbMMI' ? server_url : `https://${app_id.slice(0, 8).toLowerCase()}.api.lncldglobal.com`;
+
+    if (api_server) {
+      fetchData(api_server);
+    } else {
+      fetch('https://app-router.leancloud.cn/2/route?appId=' + app_id)
+        .then(response => response.json())
+        .then(({ api_server }) => {
+          fetchData('https://' + api_server);
+        });
+    }
+  })();
+</script>
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+  <script>
+  if (CONFIG.page.isPost) {
+    wpac_init = window.wpac_init || [];
+    wpac_init.push({
+      widget: 'Rating',
+      id    : h7vZITYMXKA8TGvtiJFms589-MdYXbMMI,
+      el    : 'wpac-rating',
+      color : 'fc6423'
+    });
+    (function() {
+      if ('WIDGETPACK_LOADED' in window) return;
+      WIDGETPACK_LOADED = true;
+      var mc = document.createElement('script');
+      mc.type = 'text/javascript';
+      mc.async = true;
+      mc.src = '//embed.widgetpack.com/widget.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(mc, s.nextSibling);
+    })();
+  }
+  </script>
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+<script>
+NexT.utils.loadComments(document.querySelector('#lv-container'), () => {
+  window.livereOptions = {
+    refer: location.pathname.replace(CONFIG.root, '').replace('index.html', '')
+  };
+  (function(d, s) {
+    var j, e = d.getElementsByTagName(s)[0];
+    if (typeof LivereTower === 'function') { return; }
+    j = d.createElement(s);
+    j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+    j.async = true;
+    e.parentNode.insertBefore(j, e);
+  })(document, 'script');
+});
+</script>
+
+</body>
+</html>
