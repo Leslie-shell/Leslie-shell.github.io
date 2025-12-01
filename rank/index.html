@@ -1252,7 +1252,7 @@ if (APP_ID && APP_KEY) {
 
   const PostView = AV.Object.extend('Counter');
   const query = new AV.Query(PostView);
-
+  query.limit(1000);
   query.find().then(results => {
     const listItems = Array.from(document.querySelectorAll('#rank-posts-list li'));
 
