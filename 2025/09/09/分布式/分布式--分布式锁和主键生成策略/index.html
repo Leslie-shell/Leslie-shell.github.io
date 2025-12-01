@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <script>
+    (function () {
+        if ('') {
+            if (prompt('请输入文章密码') !== '') {
+                alert('密码错误！');
+                if (history.length === 1) {
+                    location.replace("http://xxxxxxx.xxx"); // 这里替换成你的首页
+                } else {
+                    history.back();
+                }
+            }    
+        }
+    })();
+</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 8.1.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css">
+  <script src="/lib/pace/pace.min.js"></script>
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"leslie-shell.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"always","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":true,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.json"};
+  </script>
+
+  <meta name="description" content="分布式系统核心1. CAP 原则 CAP 原则告诉我们：在分布式系统中，一致性 (Consistency)、可用性 (Availability)、分区容错性 (Partition tolerance) 三者不可兼得。 参考文章： SegmentFault: CAP 原则 博客园：CAP 原则详解     2. 分布式锁要求 在分布式部署的应用中，同一个方法在同一时间只能被一台机器上的一个线程执行。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="分布式锁和主键生成策略">
+<meta property="og:url" content="https://leslie-shell.github.io/2025/09/09/%E5%88%86%E5%B8%83%E5%BC%8F/%E5%88%86%E5%B8%83%E5%BC%8F--%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81%E5%92%8C%E4%B8%BB%E9%94%AE%E7%94%9F%E6%88%90%E7%AD%96%E7%95%A5/index.html">
+<meta property="og:site_name" content="随笔">
+<meta property="og:description" content="分布式系统核心1. CAP 原则 CAP 原则告诉我们：在分布式系统中，一致性 (Consistency)、可用性 (Availability)、分区容错性 (Partition tolerance) 三者不可兼得。 参考文章： SegmentFault: CAP 原则 博客园：CAP 原则详解     2. 分布式锁要求 在分布式部署的应用中，同一个方法在同一时间只能被一台机器上的一个线程执行。">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2025-09-09T15:29:41.631Z">
+<meta property="article:modified_time" content="2025-11-29T15:11:57.126Z">
+<meta property="article:author" content="YeChengfeng">
+<meta property="article:tag" content="Java">
+<meta property="article:tag" content="分布式">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://leslie-shell.github.io/2025/09/09/%E5%88%86%E5%B8%83%E5%BC%8F/%E5%88%86%E5%B8%83%E5%BC%8F--%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81%E5%92%8C%E4%B8%BB%E9%94%AE%E7%94%9F%E6%88%90%E7%AD%96%E7%95%A5/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>分布式锁和主键生成策略 | 随笔</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">随笔</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-rank">
+
+    <a href="/rank/" rel="section"><i class="fa fa-fire fa-fw"></i>热度</a>
+
+  </li>
+        <li class="menu-item menu-item-recommended">
+
+    <a href="/recommended/" rel="section"><i class="fa fa-flag fa-fw"></i>推荐</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://leslie-shell.github.io/2025/09/09/%E5%88%86%E5%B8%83%E5%BC%8F/%E5%88%86%E5%B8%83%E5%BC%8F--%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81%E5%92%8C%E4%B8%BB%E9%94%AE%E7%94%9F%E6%88%90%E7%AD%96%E7%95%A5/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="YeChengfeng">
+      <meta itemprop="description" content="Make Learning and Organizing a Habit!">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="随笔">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          分布式锁和主键生成策略
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2025-09-09 23:29:41" itemprop="dateCreated datePublished" datetime="2025-09-09T23:29:41+08:00">2025-09-09</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2025-11-29 23:11:57" itemprop="dateModified" datetime="2025-11-29T23:11:57+08:00">2025-11-29</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Java/" itemprop="url" rel="index"><span itemprop="name">Java</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/2025/09/09/%E5%88%86%E5%B8%83%E5%BC%8F/%E5%88%86%E5%B8%83%E5%BC%8F--%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81%E5%92%8C%E4%B8%BB%E9%94%AE%E7%94%9F%E6%88%90%E7%AD%96%E7%95%A5/" class="post-meta-item leancloud_visitors" data-flag-title="分布式锁和主键生成策略" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>932</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>1 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="分布式系统核心"><a href="#分布式系统核心" class="headerlink" title="分布式系统核心"></a>分布式系统核心</h1><h2 id="1-CAP-原则"><a href="#1-CAP-原则" class="headerlink" title="1. CAP 原则"></a>1. CAP 原则</h2><ul>
+<li><strong>CAP 原则</strong>告诉我们：在分布式系统中，<strong>一致性 (Consistency)</strong>、<strong>可用性 (Availability)</strong>、<strong>分区容错性 (Partition tolerance)</strong> 三者不可兼得。</li>
+<li>参考文章：<ul>
+<li><a target="_blank" rel="noopener" href="https://segmentfault.com/a/1190000012919740">SegmentFault: CAP 原则</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.cnblogs.com/duanxz/p/5229352.html">博客园：CAP 原则详解</a></li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="2-分布式锁要求"><a href="#2-分布式锁要求" class="headerlink" title="2. 分布式锁要求"></a>2. 分布式锁要求</h2><ul>
+<li>在分布式部署的应用中，同一个方法在同一时间只能被一台机器上的一个线程执行。</li>
+<li>锁应具备：<ol>
+<li><strong>可重入</strong>：避免死锁  </li>
+<li><strong>阻塞锁</strong>（根据业务需求决定）  </li>
+<li><strong>高可用的获取锁与释放锁</strong>  </li>
+<li><strong>高性能</strong></li>
+</ol>
+</li>
+</ul>
+<hr>
+<h2 id="3-分布式锁实现方式"><a href="#3-分布式锁实现方式" class="headerlink" title="3. 分布式锁实现方式"></a>3. 分布式锁实现方式</h2><h3 id="3-1-数据库实现分布式锁"><a href="#3-1-数据库实现分布式锁" class="headerlink" title="3.1 数据库实现分布式锁"></a>3.1 数据库实现分布式锁</h3><h4 id="3-1-1-基于数据库表"><a href="#3-1-1-基于数据库表" class="headerlink" title="3.1.1 基于数据库表"></a>3.1.1 基于数据库表</h4><ul>
+<li>方法：<ul>
+<li>加锁时在表中插入一条记录  </li>
+<li>解锁时删除该记录</li>
+</ul>
+</li>
+<li>缺点：<ul>
+<li>数据库单点问题 → 可做双库同步和切换  </li>
+<li>无锁超时机制 → 可做定时任务清理超时记录  </li>
+<li>非阻塞 → 可使用循环等待 insert 成功  </li>
+<li>非重入 → 在表中记录机器和线程信息，允许同线程重复获取锁</li>
+</ul>
+</li>
+</ul>
+<h4 id="3-1-2-基于数据库排他锁"><a href="#3-1-2-基于数据库排他锁" class="headerlink" title="3.1.2 基于数据库排他锁"></a>3.1.2 基于数据库排他锁</h4><ul>
+<li>使用 <code>SELECT ... FOR UPDATE</code> 给行加锁  </li>
+<li>注意：<ul>
+<li>InnoDB 行级锁需通过索引查询  </li>
+<li>索引必须唯一，避免冲突  </li>
+<li>阻塞锁：查询失败时线程阻塞，直到成功  </li>
+<li>服务宕机 → 数据库会自动释放锁</li>
+</ul>
+</li>
+</ul>
+<p>参考文章：<a target="_blank" rel="noopener" href="https://blog.csdn.net/hou_ge/article/details/112754366">CSDN 详解</a></p>
+<hr>
+<h3 id="3-2-基于-Redis-缓存实现分布式锁"><a href="#3-2-基于-Redis-缓存实现分布式锁" class="headerlink" title="3.2 基于 Redis 缓存实现分布式锁"></a>3.2 基于 Redis 缓存实现分布式锁</h3><ul>
+<li>使用 <code>SETNX</code>（set if not exist）命令：<ul>
+<li>成功返回 1 → 获得锁  </li>
+<li>失败返回 0 → 未获得锁</li>
+</ul>
+</li>
+<li>使用 <code>DEL</code> 命令释放锁  </li>
+<li>可设置锁 <strong>超时时间</strong> → 避免服务宕机导致锁无法释放</li>
+</ul>
+<p>参考文章：<a target="_blank" rel="noopener" href="https://segmentfault.com/a/1190000012919740">SegmentFault Redis 分布式锁</a></p>
+<hr>
+<h3 id="3-3-基于-ZooKeeper-实现分布式锁"><a href="#3-3-基于-ZooKeeper-实现分布式锁" class="headerlink" title="3.3 基于 ZooKeeper 实现分布式锁"></a>3.3 基于 ZooKeeper 实现分布式锁</h3><ul>
+<li>思路：<ul>
+<li>客户端加锁时，在 ZooKeeper 上生成 <strong>瞬时有序节点</strong>  </li>
+<li>判断锁是否获取：节点序号最小的客户端获得锁  </li>
+<li>释放锁时删除节点</li>
+</ul>
+</li>
+<li>优势：<ul>
+<li>服务宕机自动释放锁  </li>
+<li>避免死锁问题</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="4-分布式数据库主键生成策略"><a href="#4-分布式数据库主键生成策略" class="headerlink" title="4. 分布式数据库主键生成策略"></a>4. 分布式数据库主键生成策略</h2><ul>
+<li>常用方式：<ul>
+<li>雪花算法（Snowflake）  </li>
+<li>Meituan Leaf 分布式 ID 生成</li>
+</ul>
+</li>
+<li>参考：<ul>
+<li><a target="_blank" rel="noopener" href="https://www.jianshu.com/p/a0a3aa888a49">简书：分布式主键生成</a>  </li>
+<li><a target="_blank" rel="noopener" href="https://tech.meituan.com/MT_Leaf.html">美团技术：MT_Leaf</a></li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="5-反向代理（Reverse-Proxy）"><a href="#5-反向代理（Reverse-Proxy）" class="headerlink" title="5. 反向代理（Reverse Proxy）"></a>5. 反向代理（Reverse Proxy）</h2><ul>
+<li>代理服务器接收客户端请求 → 转发给内部服务器 → 返回结果给客户端  </li>
+<li>客户端只看到代理 IP，不知道内部服务器存在</li>
+</ul>
+<hr>
+<h2 id="6-负载均衡（Load-Balancing）"><a href="#6-负载均衡（Load-Balancing）" class="headerlink" title="6. 负载均衡（Load Balancing）"></a>6. 负载均衡（Load Balancing）</h2><ul>
+<li>将请求或任务分配到多个服务器、CPU 或资源上，提高吞吐量与可靠性  </li>
+<li>目标：<ul>
+<li>最大化资源利用  </li>
+<li>最小化响应时间  </li>
+<li>避免单点过载</li>
+</ul>
+</li>
+<li>实现方式：<ul>
+<li>软件或硬件负载均衡  </li>
+<li>通过冗余提高可靠性</li>
+</ul>
+</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Java/" rel="tag"># Java</a>
+              <a href="/tags/%E5%88%86%E5%B8%83%E5%BC%8F/" rel="tag"># 分布式</a>
+          </div>
+
+        
+  <div class="post-widgets">
+    <div class="wp_rating">
+      <div id="wpac-rating"></div>
+    </div>
+  </div>
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2025/09/09/mysql/mysql--12.%E4%BA%8B%E5%8A%A1%E6%9C%BA%E5%88%B6/" rel="prev" title="MySQL事务">
+      <i class="fa fa-chevron-left"></i> MySQL事务
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2025/09/10/%E5%8D%9A%E5%AE%A2--%E7%94%A8%E6%88%B7%E9%87%8D%E5%A4%8D%E6%8F%90%E4%BA%A4%E9%97%AE%E9%A2%98/" rel="next" title="用户重复提交问题">
+      用户重复提交问题 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+
+
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    
+  <div class="comments">
+    <div id="lv-container" data-id="city" data-uid="MTAyMC82MDk4Ni8zNzQ1Ng=="></div>
+  </div>
+  
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%88%86%E5%B8%83%E5%BC%8F%E7%B3%BB%E7%BB%9F%E6%A0%B8%E5%BF%83"><span class="nav-text">分布式系统核心</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-CAP-%E5%8E%9F%E5%88%99"><span class="nav-text">1. CAP 原则</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81%E8%A6%81%E6%B1%82"><span class="nav-text">2. 分布式锁要求</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81%E5%AE%9E%E7%8E%B0%E6%96%B9%E5%BC%8F"><span class="nav-text">3. 分布式锁实现方式</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-%E6%95%B0%E6%8D%AE%E5%BA%93%E5%AE%9E%E7%8E%B0%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81"><span class="nav-text">3.1 数据库实现分布式锁</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#3-1-1-%E5%9F%BA%E4%BA%8E%E6%95%B0%E6%8D%AE%E5%BA%93%E8%A1%A8"><span class="nav-text">3.1.1 基于数据库表</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-1-2-%E5%9F%BA%E4%BA%8E%E6%95%B0%E6%8D%AE%E5%BA%93%E6%8E%92%E4%BB%96%E9%94%81"><span class="nav-text">3.1.2 基于数据库排他锁</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-2-%E5%9F%BA%E4%BA%8E-Redis-%E7%BC%93%E5%AD%98%E5%AE%9E%E7%8E%B0%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81"><span class="nav-text">3.2 基于 Redis 缓存实现分布式锁</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-3-%E5%9F%BA%E4%BA%8E-ZooKeeper-%E5%AE%9E%E7%8E%B0%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81"><span class="nav-text">3.3 基于 ZooKeeper 实现分布式锁</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-%E5%88%86%E5%B8%83%E5%BC%8F%E6%95%B0%E6%8D%AE%E5%BA%93%E4%B8%BB%E9%94%AE%E7%94%9F%E6%88%90%E7%AD%96%E7%95%A5"><span class="nav-text">4. 分布式数据库主键生成策略</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-%E5%8F%8D%E5%90%91%E4%BB%A3%E7%90%86%EF%BC%88Reverse-Proxy%EF%BC%89"><span class="nav-text">5. 反向代理（Reverse Proxy）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1%EF%BC%88Load-Balancing%EF%BC%89"><span class="nav-text">6. 负载均衡（Load Balancing）</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">YeChengfeng</p>
+  <div class="site-description" itemprop="description">Make Learning and Organizing a Habit!</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">209</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">45</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">56</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">YeChengfeng</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="站点总字数">455k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">6:53</span>
+</div>
+
+        
+
+
+
+
+
+
+<script>
+  (function() {
+    function leancloudSelector(url) {
+      url = encodeURI(url);
+      return document.getElementById(url).querySelector('.leancloud-visitors-count');
+    }
+
+    function addCount(Counter) {
+      var visitors = document.querySelector('.leancloud_visitors');
+      var url = decodeURI(visitors.id);
+      var title = visitors.dataset.flagTitle;
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          if (results.length > 0) {
+            var counter = results[0];
+            leancloudSelector(url).innerText = counter.time + 1;
+            Counter('put', '/classes/Counter/' + counter.objectId, { time: { '__op': 'Increment', 'amount': 1 } })
+              .catch(error => {
+                console.error('Failed to save visitor count', error);
+              });
+          } else {
+              Counter('post', '/classes/Counter', { title, url, time: 1 })
+                .then(response => response.json())
+                .then(() => {
+                  leancloudSelector(url).innerText = 1;
+                })
+                .catch(error => {
+                  console.error('Failed to create', error);
+                });
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    function showTime(Counter) {
+      var visitors = document.querySelectorAll('.leancloud_visitors');
+      var entries = [...visitors].map(element => {
+        return decodeURI(element.id);
+      });
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url: { '$in': entries } })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          for (let url of entries) {
+            let target = results.find(item => item.url === url);
+            leancloudSelector(url).innerText = target ? target.time : 0;
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    let { app_id, app_key, server_url } = {"enable":true,"app_id":"h7vZITYMXKA8TGvtiJFms589-MdYXbMMI","app_key":"TcCRmGMIrnp7A76AiTj67XKC","security":false};
+    function fetchData(api_server) {
+      var Counter = (method, url, data) => {
+        return fetch(`${api_server}/1.1${url}`, {
+          method,
+          headers: {
+            'X-LC-Id'     : app_id,
+            'X-LC-Key'    : app_key,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data)
+        });
+      };
+      if (CONFIG.page.isPost) {
+        if (CONFIG.hostname !== location.hostname) return;
+        addCount(Counter);
+      } else if (document.querySelectorAll('.post-title-link').length >= 1) {
+        showTime(Counter);
+      }
+    }
+
+    let api_server = app_id.slice(-9) !== '-MdYXbMMI' ? server_url : `https://${app_id.slice(0, 8).toLowerCase()}.api.lncldglobal.com`;
+
+    if (api_server) {
+      fetchData(api_server);
+    } else {
+      fetch('https://app-router.leancloud.cn/2/route?appId=' + app_id)
+        .then(response => response.json())
+        .then(({ api_server }) => {
+          fetchData('https://' + api_server);
+        });
+    }
+  })();
+</script>
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+  <script>
+  if (CONFIG.page.isPost) {
+    wpac_init = window.wpac_init || [];
+    wpac_init.push({
+      widget: 'Rating',
+      id    : h7vZITYMXKA8TGvtiJFms589-MdYXbMMI,
+      el    : 'wpac-rating',
+      color : 'fc6423'
+    });
+    (function() {
+      if ('WIDGETPACK_LOADED' in window) return;
+      WIDGETPACK_LOADED = true;
+      var mc = document.createElement('script');
+      mc.type = 'text/javascript';
+      mc.async = true;
+      mc.src = '//embed.widgetpack.com/widget.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(mc, s.nextSibling);
+    })();
+  }
+  </script>
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+<script>
+NexT.utils.loadComments(document.querySelector('#lv-container'), () => {
+  window.livereOptions = {
+    refer: location.pathname.replace(CONFIG.root, '').replace('index.html', '')
+  };
+  (function(d, s) {
+    var j, e = d.getElementsByTagName(s)[0];
+    if (typeof LivereTower === 'function') { return; }
+    j = d.createElement(s);
+    j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+    j.async = true;
+    e.parentNode.insertBefore(j, e);
+  })(document, 'script');
+});
+</script>
+
+</body>
+</html>

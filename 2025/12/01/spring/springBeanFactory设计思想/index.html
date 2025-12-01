@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <script>
+    (function () {
+        if ('') {
+            if (prompt('请输入文章密码') !== '') {
+                alert('密码错误！');
+                if (history.length === 1) {
+                    location.replace("http://xxxxxxx.xxx"); // 这里替换成你的首页
+                } else {
+                    history.back();
+                }
+            }    
+        }
+    })();
+</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 8.1.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css">
+  <script src="/lib/pace/pace.min.js"></script>
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"leslie-shell.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"always","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":true,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.json"};
+  </script>
+
+  <meta name="description" content="参考:https:&#x2F;&#x2F;javadoop.com&#x2F;post&#x2F;spring-ioc 核心接口层级关系图首先，我们通过一张图来直观地理解它们的层级关系（这是一个简化图，聚焦于你提到的这几个接口）： 123456789101112131415161718192021BeanFactory (顶级核心接口)|+-- ListableBeanFactory (接口，扩展BeanFactory,见名知意，提供枚">
+<meta property="og:type" content="article">
+<meta property="og:title" content="spring核心容器继承关系详解">
+<meta property="og:url" content="https://leslie-shell.github.io/2025/12/01/spring/springBeanFactory%E8%AE%BE%E8%AE%A1%E6%80%9D%E6%83%B3/index.html">
+<meta property="og:site_name" content="随笔">
+<meta property="og:description" content="参考:https:&#x2F;&#x2F;javadoop.com&#x2F;post&#x2F;spring-ioc 核心接口层级关系图首先，我们通过一张图来直观地理解它们的层级关系（这是一个简化图，聚焦于你提到的这几个接口）： 123456789101112131415161718192021BeanFactory (顶级核心接口)|+-- ListableBeanFactory (接口，扩展BeanFactory,见名知意，提供枚">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2025-12-01T13:41:06.200Z">
+<meta property="article:modified_time" content="2025-12-01T13:48:41.605Z">
+<meta property="article:author" content="YeChengfeng">
+<meta property="article:tag" content="Java">
+<meta property="article:tag" content="Spring">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://leslie-shell.github.io/2025/12/01/spring/springBeanFactory%E8%AE%BE%E8%AE%A1%E6%80%9D%E6%83%B3/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>spring核心容器继承关系详解 | 随笔</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">随笔</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-rank">
+
+    <a href="/rank/" rel="section"><i class="fa fa-fire fa-fw"></i>热度</a>
+
+  </li>
+        <li class="menu-item menu-item-recommended">
+
+    <a href="/recommended/" rel="section"><i class="fa fa-flag fa-fw"></i>推荐</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://leslie-shell.github.io/2025/12/01/spring/springBeanFactory%E8%AE%BE%E8%AE%A1%E6%80%9D%E6%83%B3/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="YeChengfeng">
+      <meta itemprop="description" content="Make Learning and Organizing a Habit!">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="随笔">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          spring核心容器继承关系详解
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2025-12-01 21:41:06 / 修改时间：21:48:41" itemprop="dateCreated datePublished" datetime="2025-12-01T21:41:06+08:00">2025-12-01</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Java/" itemprop="url" rel="index"><span itemprop="name">Java</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Java/Spring/" itemprop="url" rel="index"><span itemprop="name">Spring</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/2025/12/01/spring/springBeanFactory%E8%AE%BE%E8%AE%A1%E6%80%9D%E6%83%B3/" class="post-meta-item leancloud_visitors" data-flag-title="spring核心容器继承关系详解" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>4.5k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>4 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>参考:<a target="_blank" rel="noopener" href="https://javadoop.com/post/spring-ioc">https://javadoop.com/post/spring-ioc</a></p>
+<h3 id="核心接口层级关系图"><a href="#核心接口层级关系图" class="headerlink" title="核心接口层级关系图"></a>核心接口层级关系图</h3><p>首先，我们通过一张图来直观地理解它们的层级关系（这是一个简化图，聚焦于你提到的这几个接口）：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">BeanFactory (顶级核心接口)</span><br><span class="line">|</span><br><span class="line">+-- ListableBeanFactory (接口，扩展BeanFactory,见名知意，提供枚举所有bean实例的能力)</span><br><span class="line">|</span><br><span class="line">+-- HierarchicalBeanFactory (接口，扩展BeanFactory，给容器提供层级关系)</span><br><span class="line">|</span><br><span class="line">+-- AutowireCapableBeanFactory (接口，扩展BeanFactory ，提供了自动装配、创建和配置Bean)</span><br><span class="line">|</span><br><span class="line">+-- ConfigurableBeanFactory (接口，扩展HierarchicalBeanFactory, SingletonBeanRegistry)</span><br><span class="line">    |</span><br><span class="line">    +-- ConfigurableListableBeanFactory (接口，最终集大成者)</span><br><span class="line">        |</span><br><span class="line">        +-- (具体实现类，如：DefaultListableBeanFactory)</span><br><span class="line"></span><br><span class="line">ApplicationContext (顶级应用上下文接口)</span><br><span class="line">|</span><br><span class="line">+-- ConfigurableApplicationContext (接口)</span><br><span class="line">    |</span><br><span class="line">    +-- (具体实现类，如：AnnotationConfigApplicationContext, ClassPathXmlApplicationContext)</span><br><span class="line">    |</span><br><span class="line">    (ApplicationContext 的实现类内部通常持有一个 ConfigurableListableBeanFactory 的引用)</span><br></pre></td></tr></table></figure>
+
+<p><strong>关键点</strong>：</p>
+<ol>
+<li><code>BeanFactory</code> 是绝对的核心和顶层接口。</li>
+<li><code>ListableBeanFactory</code>, <code>HierarchicalBeanFactory</code>, <code>AutowireCapableBeanFactory</code> 是三个<strong>平行</strong>的接口，它们从不同维度扩展了 <code>BeanFactory</code> 的基础功能。</li>
+<li><code>ConfigurableBeanFactory</code> 进一步扩展了 <code>HierarchicalBeanFactory</code>，主要提供了<strong>配置</strong> BeanFactory 的能力。</li>
+<li><code>ConfigurableListableBeanFactory</code> 是 <strong>BeanFactory 体系的集大成者</strong>，它同时继承了上述三个重要接口（Listable, Hierarchical, AutowireCapable）以及 ConfigurableBeanFactory，成为一个功能最全面的 BeanFactory 类型。</li>
+<li><code>ApplicationContext</code> 是 <strong>BeanFactory 的超集</strong>。它不仅仅是一个BeanFactory，还集成了更多企业级功能（如国际化、事件发布、资源加载等）。在内部，它通常<strong>包含</strong>一个 <code>ConfigurableListableBeanFactory</code> 的实例来委托处理基础的Bean生命周期管理。</li>
+</ol>
+<hr>
+<h3 id="各接口职责与设计思路分析"><a href="#各接口职责与设计思路分析" class="headerlink" title="各接口职责与设计思路分析"></a>各接口职责与设计思路分析</h3><h4 id="1-BeanFactory-org-springframework-beans-factory"><a href="#1-BeanFactory-org-springframework-beans-factory" class="headerlink" title="1. BeanFactory (org.springframework.beans.factory)"></a>1. BeanFactory (org.springframework.beans.factory)</h4><ul>
+<li><strong>职责</strong>：定义了IoC容器最基础的功能。<ul>
+<li><code>getBean(String name)</code>：根据名称获取Bean实例。</li>
+<li><code>containsBean(String name)</code>：判断是否包含指定名称的Bean。</li>
+<li><code>isSingleton(String name)</code> &#x2F; <code>isPrototype(String name)</code>：判断Bean的作用域。</li>
+<li><code>getType(String name)</code>：获取Bean的类型。</li>
+</ul>
+</li>
+<li><strong>设计思路</strong>：这是<strong>最小化接口</strong>原则的体现。它只定义了作为一个“Bean工厂”必须提供的最核心方法——获取和管理Bean实例。这种设计使得我们可以有多种不同功能的BeanFactory实现，而不必被庞大的接口所束缚。</li>
+</ul>
+<h4 id="2-三大功能扩展接口-职责分离"><a href="#2-三大功能扩展接口-职责分离" class="headerlink" title="2. 三大功能扩展接口 (职责分离)"></a>2. 三大功能扩展接口 (职责分离)</h4><p>这三个接口的设计完美体现了 <strong>“接口隔离原则”</strong> 和 <strong>“单一职责原则”</strong>。它们各自为 <code>BeanFactory</code> 添加了一类特定的功能。</p>
+<ul>
+<li><p><strong>ListableBeanFactory</strong></p>
+<ul>
+<li><strong>职责</strong>：提供了<strong>枚举</strong>所有Bean实例的能力，而无需通过名称逐个查找。</li>
+<li><strong>核心方法</strong>：<code>getBeanDefinitionNames()</code>（获取所有Bean的定义名），<code>getBeansOfType(Class&lt;T&gt; type)</code>（获取某一类型的所有Bean实例），<code>getAnnotation(Class&lt;T&gt; annotation)</code>（查找带有特定注解的Bean）。</li>
+<li><strong>设计思路</strong>：对于需要批量操作或基于类型查找Bean的场景，这个接口非常高效。它将这种“列表式”的查询能力从基础的、按名查找的 <code>BeanFactory</code> 中分离出来。</li>
+</ul>
+</li>
+<li><p><strong>HierarchicalBeanFactory</strong></p>
+<ul>
+<li><strong>职责</strong>：提供了<strong>父子容器的机制</strong>。</li>
+<li><strong>核心方法</strong>：<code>getParentBeanFactory()</code>。</li>
+<li><strong>设计思路</strong>：允许存在多个BeanFactory，并建立父子层级关系。当子容器中找不到某个Bean时，可以委托给父容器去查找。这在模块化设计、多层级配置中非常有用（例如，在Spring MVC中，通常有一个父容器（Service层）和一个子容器（Web控制器层））。</li>
+</ul>
+</li>
+<li><p><strong>AutowireCapableBeanFactory</strong></p>
+<ul>
+<li><strong>职责</strong>：提供了<strong>自动装配</strong>、<strong>创建和配置Bean</strong> 的能力，甚至可以在容器外使用。</li>
+<li><strong>核心方法</strong>：<code>createBean(Class&lt;T&gt; beanClass)</code>，<code>autowireBean(Object existingBean)</code>，<code>configureBean(Object existingBean, String beanName)</code>。</li>
+<li><strong>设计思路</strong>：这个接口将Bean的<strong>创建和装配过程</strong>暴露出来。它不仅用于容器内部的Bean生命周期管理，还可以让你在容器外部手动地应用Spring的依赖注入逻辑。框架集成（如与Struts, Quartz集成）、单元测试等场景都会用到它。</li>
+</ul>
+</li>
+</ul>
+<h4 id="3-ConfigurableBeanFactory"><a href="#3-ConfigurableBeanFactory" class="headerlink" title="3. ConfigurableBeanFactory"></a>3. ConfigurableBeanFactory</h4><ul>
+<li><strong>职责</strong>：提供了大量<strong>配置</strong> BeanFactory 行为的方法。它是可配置BeanFactory的<strong>中枢</strong>。</li>
+<li><strong>核心方法</strong>：<ul>
+<li><code>setParentBeanFactory(HierarchicalBeanFactory parent)</code>：设置父容器。</li>
+<li><code>addBeanPostProcessor(BeanPostProcessor beanPostProcessor)</code>：添加Bean后置处理器，这是扩展Bean生命周期的关键。</li>
+<li><code>registerScope(String scopeName, Scope scope)</code>：注册自定义作用域。</li>
+<li><code>destroySingletons()</code>：销毁所有单例Bean。</li>
+<li>用于配置类型转换、EL解析器、ClassLoader等的方法。</li>
+</ul>
+</li>
+<li><strong>设计思路</strong>：它继承了 <code>HierarchicalBeanFactory</code> 和 <code>SingletonBeanRegistry</code>，意味着它本身就具备了父容器和单例管理的功能。它的主要价值在于，将那些在应用运行时不应该被修改的“配置”方法集中起来。在容器启动后，这些配置通常就被冻结了。这区分了 <strong>“配置阶段”</strong> 和 <strong>“使用阶段”</strong>。</li>
+</ul>
+<h4 id="4-ConfigurableListableBeanFactory"><a href="#4-ConfigurableListableBeanFactory" class="headerlink" title="4. ConfigurableListableBeanFactory"></a>4. ConfigurableListableBeanFactory</h4><ul>
+<li><strong>职责</strong>：BeanFactory体系的<strong>终极形态</strong>。它集成了所有关于Bean定义分析、预实例化单例、以及配置的能力。</li>
+<li><strong>核心方法</strong>：<code>preInstantiateSingletons()</code>（ eagerly初始化所有单例Bean），<code>getBeanDefinition(String beanName)</code>（获取Bean的定义元数据），<code>freezeConfiguration()</code>（冻结配置，使其不可修改）。</li>
+<li><strong>设计思路</strong>：作为 <code>ListableBeanFactory</code>, <code>AutowireCapableBeanFactory</code>, <code>ConfigurableBeanFactory</code> 的共同子接口，它在 <code>ConfigurableBeanFactory</code> 的基础上，又融合了“列表化”和“自动装配”的强大能力。Spring容器在<strong>启动和刷新</strong>阶段，主要就是通过这个接口类型来操作底层BeanFactory的。<code>DefaultListableBeanFactory</code> 是它的标准实现，也是Spring中最核心的类之一。</li>
+</ul>
+<h4 id="5-ApplicationContext-org-springframework-context"><a href="#5-ApplicationContext-org-springframework-context" class="headerlink" title="5. ApplicationContext (org.springframework.context)"></a>5. ApplicationContext (org.springframework.context)</h4><ul>
+<li><strong>职责</strong>：这是一个<strong>面向应用</strong>的、功能更全面的中央接口。它不仅仅是BeanFactory。</li>
+<li><strong>核心增强功能</strong>：<ul>
+<li><strong>MessageSource</strong>：支持国际化。</li>
+<li><strong>ApplicationEventPublisher</strong>：支持应用事件发布与监听机制。</li>
+<li><strong>ResourcePatternResolver</strong>：支持从多种来源（类路径、文件系统、网络等）加载资源。</li>
+<li><strong>EnvironmentCapable</strong>：提供了访问环境配置（Profiles, Properties）的能力。</li>
+</ul>
+</li>
+<li><strong>设计思路</strong>：这是 <strong>“组合优于继承”</strong> 和 <strong>“门面模式（Facade）”</strong> 的典范。<ul>
+<li><code>ApplicationContext</code> <strong>内部持有一个</strong> <code>ConfigurableListableBeanFactory</code>（通常是 <code>DefaultListableBeanFactory</code>）的实例。</li>
+<li>对于 <code>BeanFactory</code> 接口定义的方法（如 <code>getBean</code>），<code>ApplicationContext</code> 的实现通常是<strong>委托</strong>给内部这个BeanFactory去执行的。</li>
+<li>在此之上，它整合了上述各种企业级服务，为开发者提供了一个统一、便捷的API入口。所以，我们通常说 <code>ApplicationContext</code> 是Spring的“容器”，而 <code>BeanFactory</code> 是它的底层核心。</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h3 id="总结：为啥这样设计？"><a href="#总结：为啥这样设计？" class="headerlink" title="总结：为啥这样设计？"></a>总结：为啥这样设计？</h3><ol>
+<li><p><strong>单一职责与接口隔离</strong>：将庞大的功能分解到不同的接口中（如Listable, Hierarchical, AutowireCapable），使得每个接口的职责清晰、易于理解和维护。你可以依赖一个最小化的接口，而不必引入整个庞大的API。</p>
+</li>
+<li><p><strong>分层设计与可扩展性</strong>：从最基础的 <code>BeanFactory</code> 到功能完备的 <code>ConfigurableListableBeanFactory</code>，形成了一个清晰的层次结构。这种设计使得Spring可以轻松地提供不同级别的容器实现，也方便用户和第三方框架在适当的层级上进行扩展（例如，通过 <code>BeanPostProcessor</code>）。</p>
+</li>
+<li><p><strong>区分配置阶段与运行阶段</strong>：<code>ConfigurableBeanFactory</code> 及其子接口明确了哪些方法是在容器启动配置阶段使用的，哪些是在运行时使用的。这有助于保证容器在运行时的稳定性和线程安全。</p>
+</li>
+<li><p><strong>组合与门面模式</strong>：<code>ApplicationContext</code> 没有通过继承来获得所有功能，而是通过组合一个强大的 <code>ConfigurableListableBeanFactory</code> 并委托Bean相关的操作给它。这使得 <code>ApplicationContext</code> 可以专注于更高层次的应用集成功能，同时保持了架构的清晰和灵活。用户在日常开发中直接使用 <code>ApplicationContext</code>，享受其便利，而框架内部则在需要精细控制时使用底层的 <code>BeanFactory</code> 接口。</p>
+</li>
+</ol>
+<p>这种精妙的设计是Spring框架如此强大、灵活且经久不衰的重要原因之一。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Java/" rel="tag"># Java</a>
+              <a href="/tags/Spring/" rel="tag"># Spring</a>
+          </div>
+
+        
+  <div class="post-widgets">
+    <div class="wp_rating">
+      <div id="wpac-rating"></div>
+    </div>
+  </div>
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2025/11/29/interest/%E7%9C%8B%E5%AE%8C%E4%BD%A0%E7%9A%84%E7%89%A9%E6%AC%B2%E5%B0%B1%E6%B6%88%E5%A4%B1%E4%BA%86/" rel="prev" title="看完你的物欲就消失了">
+      <i class="fa fa-chevron-left"></i> 看完你的物欲就消失了
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2025/12/01/%E5%A4%8D%E4%B9%A0%E5%9B%9E%E9%A1%BE/%E5%A4%8D%E4%B9%A0%E6%9D%82%E8%AE%B0/" rel="next" title="复习杂记">
+      复习杂记 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+
+
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    
+  <div class="comments">
+    <div id="lv-container" data-id="city" data-uid="MTAyMC82MDk4Ni8zNzQ1Ng=="></div>
+  </div>
+  
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%A0%B8%E5%BF%83%E6%8E%A5%E5%8F%A3%E5%B1%82%E7%BA%A7%E5%85%B3%E7%B3%BB%E5%9B%BE"><span class="nav-text">核心接口层级关系图</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%90%84%E6%8E%A5%E5%8F%A3%E8%81%8C%E8%B4%A3%E4%B8%8E%E8%AE%BE%E8%AE%A1%E6%80%9D%E8%B7%AF%E5%88%86%E6%9E%90"><span class="nav-text">各接口职责与设计思路分析</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-BeanFactory-org-springframework-beans-factory"><span class="nav-text">1. BeanFactory (org.springframework.beans.factory)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-%E4%B8%89%E5%A4%A7%E5%8A%9F%E8%83%BD%E6%89%A9%E5%B1%95%E6%8E%A5%E5%8F%A3-%E8%81%8C%E8%B4%A3%E5%88%86%E7%A6%BB"><span class="nav-text">2. 三大功能扩展接口 (职责分离)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-ConfigurableBeanFactory"><span class="nav-text">3. ConfigurableBeanFactory</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-ConfigurableListableBeanFactory"><span class="nav-text">4. ConfigurableListableBeanFactory</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#5-ApplicationContext-org-springframework-context"><span class="nav-text">5. ApplicationContext (org.springframework.context)</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%80%BB%E7%BB%93%EF%BC%9A%E4%B8%BA%E5%95%A5%E8%BF%99%E6%A0%B7%E8%AE%BE%E8%AE%A1%EF%BC%9F"><span class="nav-text">总结：为啥这样设计？</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">YeChengfeng</p>
+  <div class="site-description" itemprop="description">Make Learning and Organizing a Habit!</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">209</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">45</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">56</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">YeChengfeng</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="站点总字数">455k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">6:53</span>
+</div>
+
+        
+
+
+
+
+
+
+<script>
+  (function() {
+    function leancloudSelector(url) {
+      url = encodeURI(url);
+      return document.getElementById(url).querySelector('.leancloud-visitors-count');
+    }
+
+    function addCount(Counter) {
+      var visitors = document.querySelector('.leancloud_visitors');
+      var url = decodeURI(visitors.id);
+      var title = visitors.dataset.flagTitle;
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          if (results.length > 0) {
+            var counter = results[0];
+            leancloudSelector(url).innerText = counter.time + 1;
+            Counter('put', '/classes/Counter/' + counter.objectId, { time: { '__op': 'Increment', 'amount': 1 } })
+              .catch(error => {
+                console.error('Failed to save visitor count', error);
+              });
+          } else {
+              Counter('post', '/classes/Counter', { title, url, time: 1 })
+                .then(response => response.json())
+                .then(() => {
+                  leancloudSelector(url).innerText = 1;
+                })
+                .catch(error => {
+                  console.error('Failed to create', error);
+                });
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    function showTime(Counter) {
+      var visitors = document.querySelectorAll('.leancloud_visitors');
+      var entries = [...visitors].map(element => {
+        return decodeURI(element.id);
+      });
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url: { '$in': entries } })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          for (let url of entries) {
+            let target = results.find(item => item.url === url);
+            leancloudSelector(url).innerText = target ? target.time : 0;
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    let { app_id, app_key, server_url } = {"enable":true,"app_id":"h7vZITYMXKA8TGvtiJFms589-MdYXbMMI","app_key":"TcCRmGMIrnp7A76AiTj67XKC","security":false};
+    function fetchData(api_server) {
+      var Counter = (method, url, data) => {
+        return fetch(`${api_server}/1.1${url}`, {
+          method,
+          headers: {
+            'X-LC-Id'     : app_id,
+            'X-LC-Key'    : app_key,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data)
+        });
+      };
+      if (CONFIG.page.isPost) {
+        if (CONFIG.hostname !== location.hostname) return;
+        addCount(Counter);
+      } else if (document.querySelectorAll('.post-title-link').length >= 1) {
+        showTime(Counter);
+      }
+    }
+
+    let api_server = app_id.slice(-9) !== '-MdYXbMMI' ? server_url : `https://${app_id.slice(0, 8).toLowerCase()}.api.lncldglobal.com`;
+
+    if (api_server) {
+      fetchData(api_server);
+    } else {
+      fetch('https://app-router.leancloud.cn/2/route?appId=' + app_id)
+        .then(response => response.json())
+        .then(({ api_server }) => {
+          fetchData('https://' + api_server);
+        });
+    }
+  })();
+</script>
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+  <script>
+  if (CONFIG.page.isPost) {
+    wpac_init = window.wpac_init || [];
+    wpac_init.push({
+      widget: 'Rating',
+      id    : h7vZITYMXKA8TGvtiJFms589-MdYXbMMI,
+      el    : 'wpac-rating',
+      color : 'fc6423'
+    });
+    (function() {
+      if ('WIDGETPACK_LOADED' in window) return;
+      WIDGETPACK_LOADED = true;
+      var mc = document.createElement('script');
+      mc.type = 'text/javascript';
+      mc.async = true;
+      mc.src = '//embed.widgetpack.com/widget.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(mc, s.nextSibling);
+    })();
+  }
+  </script>
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+<script>
+NexT.utils.loadComments(document.querySelector('#lv-container'), () => {
+  window.livereOptions = {
+    refer: location.pathname.replace(CONFIG.root, '').replace('index.html', '')
+  };
+  (function(d, s) {
+    var j, e = d.getElementsByTagName(s)[0];
+    if (typeof LivereTower === 'function') { return; }
+    j = d.createElement(s);
+    j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+    j.async = true;
+    e.parentNode.insertBefore(j, e);
+  })(document, 'script');
+});
+</script>
+
+</body>
+</html>

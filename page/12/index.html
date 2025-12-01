@@ -212,6 +212,818 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://leslie-shell.github.io/2025/11/22/%E5%88%86%E5%B8%83%E5%BC%8F/%E5%88%86%E5%B8%83%E5%BC%8F--%E5%88%86%E5%B8%83%E5%BC%8F%E6%9E%B6%E6%9E%84%E6%BC%94%E5%8F%98/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="YeChengfeng">
+      <meta itemprop="description" content="Make Learning and Organizing a Habit!">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="随笔">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2025/11/22/%E5%88%86%E5%B8%83%E5%BC%8F/%E5%88%86%E5%B8%83%E5%BC%8F--%E5%88%86%E5%B8%83%E5%BC%8F%E6%9E%B6%E6%9E%84%E6%BC%94%E5%8F%98/" class="post-title-link" itemprop="url">分布式架构演变</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2025-11-22 16:35:08" itemprop="dateCreated datePublished" datetime="2025-11-22T16:35:08+08:00">2025-11-22</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2025-11-29 23:13:27" itemprop="dateModified" datetime="2025-11-29T23:13:27+08:00">2025-11-29</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Java/" itemprop="url" rel="index"><span itemprop="name">Java</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/2025/11/22/%E5%88%86%E5%B8%83%E5%BC%8F/%E5%88%86%E5%B8%83%E5%BC%8F--%E5%88%86%E5%B8%83%E5%BC%8F%E6%9E%B6%E6%9E%84%E6%BC%94%E5%8F%98/" class="post-meta-item leancloud_visitors" data-flag-title="分布式架构演变" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>2.1k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>2 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>大型网站架构演进</p>
+<ol>
+<li><strong>单机架构</strong></li>
+<li><strong>单机负载告警，数据库与应用分离</strong></li>
+<li><strong>应用服务器负载告警 → 集群化</strong><ul>
+<li>引入负载均衡设备</li>
+<li>分布式 Session<ul>
+<li><strong>Session Sticky</strong>：会话粘滞</li>
+<li><strong>Session Replication</strong>：会话复制</li>
+<li><strong>Session 集中存储</strong></li>
+<li><strong>Cookie Based</strong></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><strong>数据库读压力增大 → 读写分离</strong><ul>
+<li>数据库主从复制</li>
+<li>搜索引擎</li>
+<li>分布式缓存</li>
+</ul>
+</li>
+<li><strong>弥补关系数据库不足 → 引入分布式存储系统</strong></li>
+<li><strong>数据库遇瓶颈 → 分库分表</strong><ul>
+<li><strong>垂直拆分（分库）</strong>：按业务拆分，需解决表关联和分布式事务问题</li>
+<li><strong>水平拆分（分表）</strong></li>
+</ul>
+</li>
+<li><strong>应用拆分与服务化</strong><ul>
+<li>应用拆分</li>
+<li>服务化</li>
+</ul>
+</li>
+<li><strong>消息中间件（异步 + 解耦）</strong></li>
+<li><strong>CDN（内容分发网络）</strong><ul>
+<li>将内容分发到离用户最近的节点，加速访问</li>
+<li>网络缓存技术，节省带宽，提高访问速度</li>
+<li>放置静态资源（图片、JS、CSS 等）</li>
+<li>浏览器访问流程：DNS → 负载均衡 → 应用服务器 → 缓存&#x2F;CDN → 渲染</li>
+</ul>
+</li>
+</ol>
+<hr>
+<h2 id="大型网站核心架构要素"><a href="#大型网站核心架构要素" class="headerlink" title="大型网站核心架构要素"></a>大型网站核心架构要素</h2><ol>
+<li><strong>性能指标</strong><ul>
+<li>PV、QPS、TPS、吞吐量、响应时间</li>
+</ul>
+</li>
+<li><strong>吞吐量指标</strong><ul>
+<li>TPS：每秒事务数</li>
+<li>QPS：每秒查询数</li>
+<li>HPS：每秒 HTTP 请求数</li>
+</ul>
+</li>
+<li><strong>Web 性能优化</strong><ul>
+<li><strong>前端优化</strong><ol>
+<li>浏览器缓存</li>
+<li>HTTP 请求合并</li>
+<li>CSS、JS、图片资源压缩合并</li>
+<li>CDN</li>
+<li>页面静态化</li>
+<li>减少 Cookie 传输</li>
+</ol>
+</li>
+<li><strong>服务端优化</strong><ol>
+<li>接入层：反向代理、负载均衡</li>
+<li>应用服务器集群</li>
+<li>分布式缓存</li>
+<li>数据库优化：索引、主从复制、读写分离、分库分表</li>
+<li>分布式消息队列，异步操作</li>
+</ol>
+</li>
+<li><strong>单机并发优化</strong><ul>
+<li><strong>CPU 消耗</strong>：减少阻塞、同步转异步、队列、降低锁竞争</li>
+<li><strong>文件 IO</strong>：异步读写、批量操作、限流、缓存、RAID</li>
+<li><strong>内存消耗</strong>：减少不必要引用、对象池、缓存失效算法</li>
+<li><strong>网络 IO</strong>：减少交互次数、减少传输量、异步非阻塞</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><strong>抢购&#x2F;超卖问题解决策略</strong><ul>
+<li><strong>前端</strong>：页面静态化、CDN、禁止重复提交</li>
+<li><strong>接入层</strong>：限制同 IP 访问频率、页面缓存</li>
+<li><strong>服务层</strong>：Token 防刷、随机返回失败、数据库悲观锁</li>
+<li><strong>数据层</strong>：主从复制、读写分离、分库分表</li>
+</ul>
+</li>
+<li><strong>负载均衡</strong><ul>
+<li><strong>算法</strong>：轮询、加权轮询、随机、最少连接、源地址散列</li>
+<li><strong>SSL 影响</strong>：需考虑负载均衡整合</li>
+</ul>
+</li>
+<li><strong>安全性</strong><ul>
+<li>XSS、SQL 注入、CSRF 等</li>
+<li>分类算法：贝叶斯</li>
+<li>黑名单：哈希表实现，但内存消耗大</li>
+</ul>
+</li>
+</ol>
+<hr>
+<h2 id="链路追踪（Distributed-Tracing）"><a href="#链路追踪（Distributed-Tracing）" class="headerlink" title="链路追踪（Distributed Tracing）"></a>链路追踪（Distributed Tracing）</h2><ol>
+<li><p><strong>定义</strong></p>
+<ul>
+<li>将一次分布式请求还原成调用链路</li>
+<li>展示各服务节点耗时、请求状态及到达的具体机器</li>
+</ul>
+</li>
+<li><p><strong>主要功能</strong></p>
+<ul>
+<li><strong>故障快速定位</strong>：结合调用链和日志快速定位错误</li>
+<li><strong>链路性能可视化</strong>：展示阶段耗时和服务依赖关系</li>
+<li><strong>链路分析</strong>：分析用户行为路径和业务统计</li>
+</ul>
+</li>
+<li><p><strong>常用系统</strong></p>
+<ul>
+<li><strong>国际</strong>：Zipkin、Jaeger、Pinpoint、SkyWalking</li>
+<li><strong>国内</strong>：阿里鹰眼、美团 Mtrace、滴滴 Trace、新浪 Watchman、京东 Hydra</li>
+</ul>
+</li>
+<li><p><strong>开源组件链接</strong></p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://zipkin.io/">Zipkin</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.jaegertracing.io/">Jaeger</a></li>
+<li><a target="_blank" rel="noopener" href="https://github.com/pinpoint-apm/pinpoint">Pinpoint</a></li>
+<li><a target="_blank" rel="noopener" href="http://skywalking.apache.org/">SkyWalking</a></li>
+</ul>
+</li>
+<li><p><strong>Zipkin 核心组件</strong></p>
+<ul>
+<li><p><strong>Collector</strong>：采集链路数据，验证、存储、索引</p>
+</li>
+<li><p><strong>Storage</strong>：保存链路信息，支持 Cassandra、Elasticsearch、MySQL</p>
+</li>
+<li><p><strong>Query Service</strong>：提供 JSON API 查询链路数据</p>
+</li>
+<li><p><strong>Web UI</strong>：可视化展示调用链信息，辅助运维</p>
+<p><img src="https://leslieyedoc.oss-cn-shanghai.aliyuncs.com/img/20250927-131925-8209378_b78011d7-aded-481f-f620-c68689d3b072.png" alt="img"></p>
+<p><img src="https://leslieyedoc.oss-cn-shanghai.aliyuncs.com/img/20251123-094050-8209378_1adfda2c-51e7-48d4-bb34-5449bdb6e9b9.png" alt="img"></p>
+</li>
+</ul>
+</li>
+</ol>
+<h2 id="分布式链路追踪（Zipkin）"><a href="#分布式链路追踪（Zipkin）" class="headerlink" title="分布式链路追踪（Zipkin）"></a>分布式链路追踪（Zipkin）</h2><ul>
+<li><strong>概述</strong><ul>
+<li>在服务运行过程中会产生大量链路信息，产生数据的地方称为 <strong>Reporter</strong>。</li>
+<li>Reporter 将链路信息通过 HTTP、RPC、Kafka 等方式发送到 Zipkin 的采集器（Collector）。</li>
+<li>Zipkin 处理后将链路信息保存到存储器（Storage）中，运维人员可通过 Web UI 查询调用链信息。</li>
+</ul>
+</li>
+<li><strong>Zipkin 核心组件</strong><ol>
+<li><strong>Collector</strong><ul>
+<li>采集线程获取链路追踪数据后，Zipkin 对其进行验证、存储和索引，并调用存储接口保存数据，以便查询。</li>
+</ul>
+</li>
+<li><strong>Storage</strong><ul>
+<li>最初为 Cassandra 构建，支持可伸缩存储和灵活模式。</li>
+<li>也支持 ElasticSearch、MySQL，后续可扩展第三方存储。</li>
+</ul>
+</li>
+<li><strong>Query Service</strong><ul>
+<li>存储和索引后的数据可以通过 Query Service 查询，提供 JSON API，方便运维快速定位问题。</li>
+</ul>
+</li>
+<li><strong>Web UI</strong><ul>
+<li>提供查询、搜索界面，运维人员可直观查看调用链信息，快速识别线上问题。</li>
+</ul>
+</li>
+</ol>
+</li>
+<li><strong>总结</strong><ul>
+<li>分布式链路追踪就是将每一次分布式请求还原成调用链路。</li>
+<li>核心概念：Trace、Span、Annotation、带内和带外数据、采样、存储。</li>
+<li>开源组件多基于 Google Dapper 论文演变而来。</li>
+<li>Zipkin 核心组件：Collector、Storage、Query Service、Web UI。</li>
+</ul>
+</li>
+</ul>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2025/11/22/%E5%88%86%E5%B8%83%E5%BC%8F/%E5%88%86%E5%B8%83%E5%BC%8F--%E5%88%86%E5%B8%83%E5%BC%8F%E6%9E%B6%E6%9E%84%E6%BC%94%E5%8F%98/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+
+
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://leslie-shell.github.io/2025/11/22/java/java-juc-%E5%A4%9A%E7%BA%BF%E7%A8%8B%E5%9F%BA%E7%A1%80/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="YeChengfeng">
+      <meta itemprop="description" content="Make Learning and Organizing a Habit!">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="随笔">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2025/11/22/java/java-juc-%E5%A4%9A%E7%BA%BF%E7%A8%8B%E5%9F%BA%E7%A1%80/" class="post-title-link" itemprop="url">AQS</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2025-11-22 15:24:08" itemprop="dateCreated datePublished" datetime="2025-11-22T15:24:08+08:00">2025-11-22</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2025-11-29 23:10:04" itemprop="dateModified" datetime="2025-11-29T23:10:04+08:00">2025-11-29</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Java/" itemprop="url" rel="index"><span itemprop="name">Java</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Java/Thread/" itemprop="url" rel="index"><span itemprop="name">Thread</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/2025/11/22/java/java-juc-%E5%A4%9A%E7%BA%BF%E7%A8%8B%E5%9F%BA%E7%A1%80/" class="post-meta-item leancloud_visitors" data-flag-title="AQS" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>1.2k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>1 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="多线程基础概念"><a href="#多线程基础概念" class="headerlink" title="多线程基础概念"></a>多线程基础概念</h1><h2 id="1-多线程核心概念"><a href="#1-多线程核心概念" class="headerlink" title="1. 多线程核心概念"></a>1. 多线程核心概念</h2><ul>
+<li><strong>同步 (Synchronous) 与 异步 (Asynchronous)</strong>  </li>
+<li><strong>并发 (Concurrency) 与 并行 (Parallelism)</strong>  </li>
+<li><strong>临界区 (Critical Section)</strong>  <ul>
+<li>临界区表示共享资源，每次只能有一个线程访问，其他线程必须等待。</li>
+</ul>
+</li>
+<li><strong>阻塞 (Blocking) 与 非阻塞 (Non-Blocking)</strong>  </li>
+<li><strong>死锁 (Deadlock)、饥饿 (Starvation) 与 活锁 (Livelock)</strong>  <ul>
+<li><strong>饥饿</strong>：某些线程无法获得资源，一直无法执行。  </li>
+<li><strong>活锁</strong>：线程主动释放资源给其他线程，但资源不断在线程间跳动，导致没有线程能完成任务。</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="2-并发级别"><a href="#2-并发级别" class="headerlink" title="2. 并发级别"></a>2. 并发级别</h2><ul>
+<li>并发级别受临界区控制策略影响，可分为：<ul>
+<li>阻塞 (Blocking)</li>
+<li>无饥饿 (No Starvation)</li>
+<li>无障碍 (Barrier-Free)</li>
+<li>无锁 (Lock-Free)</li>
+<li>无等待 (Wait-Free)</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="3-并行的两条定律"><a href="#3-并行的两条定律" class="headerlink" title="3. 并行的两条定律"></a>3. 并行的两条定律</h2><ul>
+<li><p><strong>Amdahl 定律 (阿姆达尔定律)</strong>  </p>
+<ul>
+<li>定义并行化后的加速比理论上限。  </li>
+<li>加速比 &#x3D; 优化前耗时 &#x2F; 优化后耗时</li>
+</ul>
+</li>
+<li><p><strong>Gustafson 定律</strong>  </p>
+<ul>
+<li>如果可并行化的代码比例足够大，加速比随 CPU 数量线性增长。</li>
+</ul>
+</li>
+</ul>
+<hr>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2025/11/22/java/java-juc-%E5%A4%9A%E7%BA%BF%E7%A8%8B%E5%9F%BA%E7%A1%80/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+
+
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://leslie-shell.github.io/2025/11/22/%E5%88%86%E5%B8%83%E5%BC%8F/%E5%88%86%E5%B8%83%E5%BC%8F--consul/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="YeChengfeng">
+      <meta itemprop="description" content="Make Learning and Organizing a Habit!">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="随笔">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2025/11/22/%E5%88%86%E5%B8%83%E5%BC%8F/%E5%88%86%E5%B8%83%E5%BC%8F--consul/" class="post-title-link" itemprop="url">Consul 优势与应用场景</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2025-11-22 15:13:01" itemprop="dateCreated datePublished" datetime="2025-11-22T15:13:01+08:00">2025-11-22</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2025-11-29 23:09:45" itemprop="dateModified" datetime="2025-11-29T23:09:45+08:00">2025-11-29</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Java/" itemprop="url" rel="index"><span itemprop="name">Java</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/2025/11/22/%E5%88%86%E5%B8%83%E5%BC%8F/%E5%88%86%E5%B8%83%E5%BC%8F--consul/" class="post-meta-item leancloud_visitors" data-flag-title="Consul 优势与应用场景" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>444</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>1 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>Consul 优势与应用场景</p>
+<ol>
+<li><strong>Consul 优势</strong><ul>
+<li><strong>服务注册与发现</strong><ul>
+<li>提供 DNS 或 RESTful 接口的方式进行服务注册和发现。</li>
+<li>服务可根据实际情况选择使用方式。</li>
+</ul>
+</li>
+<li><strong>健康检查</strong><ul>
+<li>Client 可提供任意数量的健康检查。</li>
+<li>健康检查既可与服务关联，也可与本地节点关联。</li>
+</ul>
+</li>
+<li><strong>多数据中心支持</strong><ul>
+<li>支持多数据中心部署，保证高可用性与扩展能力。</li>
+</ul>
+</li>
+<li><strong>Gossip Protocol</strong><ul>
+<li>实现多数据中心无需配置服务器地址，服务发现自动完成。</li>
+<li>健康检查故障处理分布式完成，不依赖单点服务器。</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><strong>Consul 使用场景</strong><ul>
+<li><strong>服务注册与发现</strong><ul>
+<li>Consul 作为注册中心，服务注册后可通过 DNS 或 HTTP 接口查询。</li>
+<li>支持健康检查（Health Check）功能。</li>
+</ul>
+</li>
+<li><strong>服务隔离</strong><ul>
+<li>可按服务设置访问策略。</li>
+<li>支持传统平台和新兴平台，TLS 证书分发及 Service-to-Service 加密。</li>
+</ul>
+</li>
+<li><strong>服务配置</strong><ul>
+<li>提供 Key-Value 数据存储功能。</li>
+<li>配置变更可快速通知服务，实现配置共享与动态更新。</li>
+</ul>
+</li>
+</ul>
+</li>
+</ol>
+<blockquote>
+<p>核心理念：<strong>Consul 提供高可用、可扩展的服务注册与发现、健康检查、服务隔离及配置管理能力，适用于分布式系统的服务治理。</strong></p>
+</blockquote>
+<img src="https://leslieyedoc.oss-cn-shanghai.aliyuncs.com/img/20250927-131904-8209378_7cd2b194-0f3e-4154-a72c-bb333c02df63.png" alt="img">
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2025/11/22/%E5%88%86%E5%B8%83%E5%BC%8F/%E5%88%86%E5%B8%83%E5%BC%8F--consul/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+
+
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://leslie-shell.github.io/2025/11/22/java/java--juc--%E7%BA%BF%E7%A8%8B%E4%B9%8B%E8%99%9A%E6%8B%9F%E7%BA%BF%E7%A8%8B/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="YeChengfeng">
+      <meta itemprop="description" content="Make Learning and Organizing a Habit!">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="随笔">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2025/11/22/java/java--juc--%E7%BA%BF%E7%A8%8B%E4%B9%8B%E8%99%9A%E6%8B%9F%E7%BA%BF%E7%A8%8B/" class="post-title-link" itemprop="url">java虚拟线程</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2025-11-22 15:12:51" itemprop="dateCreated datePublished" datetime="2025-11-22T15:12:51+08:00">2025-11-22</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2025-11-29 23:22:28" itemprop="dateModified" datetime="2025-11-29T23:22:28+08:00">2025-11-29</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Java/" itemprop="url" rel="index"><span itemprop="name">Java</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Java/Thread/" itemprop="url" rel="index"><span itemprop="name">Thread</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/2025/11/22/java/java--juc--%E7%BA%BF%E7%A8%8B%E4%B9%8B%E8%99%9A%E6%8B%9F%E7%BA%BF%E7%A8%8B/" class="post-meta-item leancloud_visitors" data-flag-title="java虚拟线程" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>1.8k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>2 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>参考：<a target="_blank" rel="noopener" href="https://javadoop.com/post/virtual-thread">https://javadoop.com/post/virtual-thread</a></p>
+<h1 id="Java-虚拟线程（Virtual-Threads"><a href="#Java-虚拟线程（Virtual-Threads" class="headerlink" title="Java 虚拟线程（Virtual Threads"></a>Java 虚拟线程（Virtual Threads</h1><h2 id="1-概述"><a href="#1-概述" class="headerlink" title="1. 概述"></a>1. 概述</h2><p>虚拟线程（Virtual Thread）是 Java Project Loom 提供的一种轻量级线程。<br>它由 JVM 调度，而不是由操作系统调度，因此可以创建海量线程，适合 I&#x2F;O 密集型任务。</p>
+<p>传统线程 &#x3D; OS 线程<br>虚拟线程 &#x3D; JVM 管理的轻量线程（类似 goroutine &#x2F; coroutine）</p>
+<hr>
+<h2 id="2-虚拟线程解决了什么问题"><a href="#2-虚拟线程解决了什么问题" class="headerlink" title="2. 虚拟线程解决了什么问题"></a>2. 虚拟线程解决了什么问题</h2><h3 id="2-1-阻塞-I-O-导致资源浪费"><a href="#2-1-阻塞-I-O-导致资源浪费" class="headerlink" title="2.1 阻塞 I&#x2F;O 导致资源浪费"></a>2.1 阻塞 I&#x2F;O 导致资源浪费</h3><p>传统线程在执行 I&#x2F;O（数据库、网络、文件）时会阻塞 OS 线程，导致：</p>
+<ul>
+<li>线程占着内核资源却在等待</li>
+<li>大量线程导致上下文切换开销大</li>
+<li>系统可承载并发有限（几千级）</li>
+</ul>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2025/11/22/java/java--juc--%E7%BA%BF%E7%A8%8B%E4%B9%8B%E8%99%9A%E6%8B%9F%E7%BA%BF%E7%A8%8B/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+
+
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://leslie-shell.github.io/2025/11/22/Tech--%E4%B8%80%E4%BA%9B%E6%AF%94%E8%BE%83%E4%B8%8D%E9%94%99%E7%9A%84%E6%8A%80%E6%9C%AF%E9%93%BE%E6%8E%A5/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="YeChengfeng">
+      <meta itemprop="description" content="Make Learning and Organizing a Habit!">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="随笔">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2025/11/22/Tech--%E4%B8%80%E4%BA%9B%E6%AF%94%E8%BE%83%E4%B8%8D%E9%94%99%E7%9A%84%E6%8A%80%E6%9C%AF%E9%93%BE%E6%8E%A5/" class="post-title-link" itemprop="url">一些比较不错的技术链接整理</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2025-11-22 14:50:54" itemprop="dateCreated datePublished" datetime="2025-11-22T14:50:54+08:00">2025-11-22</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2025-11-29 23:12:34" itemprop="dateModified" datetime="2025-11-29T23:12:34+08:00">2025-11-29</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Java/" itemprop="url" rel="index"><span itemprop="name">Java</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/2025/11/22/Tech--%E4%B8%80%E4%BA%9B%E6%AF%94%E8%BE%83%E4%B8%8D%E9%94%99%E7%9A%84%E6%8A%80%E6%9C%AF%E9%93%BE%E6%8E%A5/" class="post-meta-item leancloud_visitors" data-flag-title="一些比较不错的技术链接整理" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>1.2k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>1 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <hr>
+<h1 id="Java-后端技术学习资源总览（整理版）"><a href="#Java-后端技术学习资源总览（整理版）" class="headerlink" title="Java &amp; 后端技术学习资源总览（整理版）"></a>Java &amp; 后端技术学习资源总览（整理版）</h1><h2 id="一、Java-基础-进阶博客"><a href="#一、Java-基础-进阶博客" class="headerlink" title="一、Java 基础 &#x2F; 进阶博客"></a>一、Java 基础 &#x2F; 进阶博客</h2><h3 id="高质量博客"><a href="#高质量博客" class="headerlink" title="高质量博客"></a>高质量博客</h3><ul>
+<li><strong>Javadoop</strong><br> <a target="_blank" rel="noopener" href="https://javadoop.com/">https://javadoop.com/</a><br> <em>Java 底层 + JVM + 并发 + 源码分析（强烈推荐）</em></li>
+<li><strong>半方池水半方田</strong><br> <a target="_blank" rel="noopener" href="https://blog.uuanqin.top/">https://blog.uuanqin.top/</a><br> <em>Java、浏览器、网络等技术文章</em></li>
+<li><strong>街头卖艺的肖邦（coder-zyc）</strong><br> <a target="_blank" rel="noopener" href="https://www.cnblogs.com/coder-zyc">https://www.cnblogs.com/coder-zyc</a><br> <em>Java 基础、面试、源码分析</em></li>
+<li><strong>小林Coding</strong><br> <a target="_blank" rel="noopener" href="https://xiaolincoding.com/mysql/index/2000w.html">https://xiaolincoding.com/mysql/index/2000w.html</a><br> <em>图解系列：操作系统、计算机网络、MySQL、Redis 等（可视化最强）</em></li>
+<li><strong>叶落阁（yelog）阅读清单</strong><br> <a target="_blank" rel="noopener" href="https://yelog.org/2017/01/31/reading-list/">https://yelog.org/2017/01/31/reading-list/</a></li>
+</ul>
+<hr>
+<h2 id="二、算法系列"><a href="#二、算法系列" class="headerlink" title="二、算法系列"></a>二、算法系列</h2><ul>
+<li><strong>Hello 算法</strong>（中英双语、动画）<br> <a target="_blank" rel="noopener" href="https://www.hello-algo.com/chapter_hello_algo/">https://www.hello-algo.com/chapter_hello_algo/</a></li>
+</ul>
+<hr>
+<h2 id="三、Spring-Boot-Spring-全家桶"><a href="#三、Spring-Boot-Spring-全家桶" class="headerlink" title="三、Spring Boot &#x2F; Spring 全家桶"></a>三、Spring Boot &#x2F; Spring 全家桶</h2>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2025/11/22/Tech--%E4%B8%80%E4%BA%9B%E6%AF%94%E8%BE%83%E4%B8%8D%E9%94%99%E7%9A%84%E6%8A%80%E6%9C%AF%E9%93%BE%E6%8E%A5/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+
+
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="https://leslie-shell.github.io/2025/11/19/mysql/mysql--8.%E5%87%BD%E6%95%B0%E5%92%8C%E5%AD%98%E5%82%A8%E8%BF%87%E7%A8%8B/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -795,593 +1607,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://leslie-shell.github.io/2025/11/19/mysql/mysql--%E5%8A%9B%E6%89%A3--3%E7%AC%ACn%E9%AB%98%E7%9A%84%E8%96%AA%E6%B0%B4/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="YeChengfeng">
-      <meta itemprop="description" content="Make Learning and Organizing a Habit!">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="随笔">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2025/11/19/mysql/mysql--%E5%8A%9B%E6%89%A3--3%E7%AC%ACn%E9%AB%98%E7%9A%84%E8%96%AA%E6%B0%B4/" class="post-title-link" itemprop="url">力扣-Mysql-第n高的薪水 （Normal）</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2025-11-19 22:44:23" itemprop="dateCreated datePublished" datetime="2025-11-19T22:44:23+08:00">2025-11-19</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2025-11-29 23:18:37" itemprop="dateModified" datetime="2025-11-29T23:18:37+08:00">2025-11-29</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Mysql/" itemprop="url" rel="index"><span itemprop="name">Mysql</span></a>
-                </span>
-            </span>
-
-          
-            <span id="/2025/11/19/mysql/mysql--%E5%8A%9B%E6%89%A3--3%E7%AC%ACn%E9%AB%98%E7%9A%84%E8%96%AA%E6%B0%B4/" class="post-meta-item leancloud_visitors" data-flag-title="力扣-Mysql-第n高的薪水 （Normal）" title="阅读次数">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-eye"></i>
-              </span>
-              <span class="post-meta-item-text">阅读次数：</span>
-              <span class="leancloud-visitors-count"></span>
-            </span><br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>861</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>1 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/nth-highest-salary/">177. 第N高的薪水</a></p>
-<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">Employee</span><br><span class="line">+-------------+------+</span><br><span class="line">| Column Name | Type |</span><br><span class="line">+-------------+------+</span><br><span class="line">| id          | int  |</span><br><span class="line">| salary      | int  |</span><br><span class="line">+-------------+------+</span><br><span class="line">id 是该表的主键（列中的值互不相同）。</span><br><span class="line">该表的每一行都包含有关员工工资的信息。</span><br></pre></td></tr></table></figure>
-
-<p>编写一个解决方案查询 <code>Employee</code> 表中第 <code>n</code> 高的 <strong>不同</strong> 工资。如果少于 <code>n</code> 个不同工资，查询结果应该为 <code>null</code> 。</p>
-<p>查询结果格式如下所示。</p>
-<p><strong>示例 1:</strong></p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">输入: </span><br><span class="line">Employee table:</span><br><span class="line">+----+--------+</span><br><span class="line">| id | salary |</span><br><span class="line">+----+--------+</span><br><span class="line">| 1  | 100    |</span><br><span class="line">| 2  | 200    |</span><br><span class="line">| 3  | 300    |</span><br><span class="line">+----+--------+</span><br><span class="line">n = 2</span><br><span class="line">输出: </span><br><span class="line">+------------------------+</span><br><span class="line">| getNthHighestSalary(2) |</span><br><span class="line">+------------------------+</span><br><span class="line">| 200                    |</span><br><span class="line">+------------------------+</span><br></pre></td></tr></table></figure>
-
-<p><strong>示例 2:</strong></p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">输入: </span><br><span class="line">Employee 表:</span><br><span class="line">+----+--------+</span><br><span class="line">| id | salary |</span><br><span class="line">+----+--------+</span><br><span class="line">| 1  | 100    |</span><br><span class="line">+----+--------+</span><br><span class="line">n = 2</span><br><span class="line">输出: </span><br><span class="line">+------------------------+</span><br><span class="line">| getNthHighestSalary(2) |</span><br><span class="line">+------------------------+</span><br><span class="line">| null                   |</span><br><span class="line">+------------------------+</span><br></pre></td></tr></table></figure>
-
-<p>解答: 自定义function，利用limit函数解决</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> <span class="keyword">FUNCTION</span> getNthHighestSalary(N <span class="type">INT</span>) <span class="keyword">RETURNS</span> <span class="type">INT</span></span><br><span class="line"><span class="keyword">BEGIN</span></span><br><span class="line"><span class="keyword">DECLARE</span> M <span class="type">INT</span>; </span><br><span class="line">    <span class="keyword">SET</span> M <span class="operator">=</span> N<span class="number">-1</span>; </span><br><span class="line">  <span class="keyword">RETURN</span> (</span><br><span class="line">      <span class="keyword">SELECT</span> <span class="keyword">DISTINCT</span> salary</span><br><span class="line">      <span class="keyword">FROM</span> Employee</span><br><span class="line">      <span class="keyword">ORDER</span> <span class="keyword">BY</span> salary <span class="keyword">DESC</span></span><br><span class="line">      LIMIT M, <span class="number">1</span></span><br><span class="line">  );</span><br><span class="line"><span class="keyword">END</span></span><br></pre></td></tr></table></figure>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2025/11/19/mysql/mysql--%E5%8A%9B%E6%89%A3--3%E7%AC%ACn%E9%AB%98%E7%9A%84%E8%96%AA%E6%B0%B4/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-
-
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://leslie-shell.github.io/2025/11/19/mysql/mysql--%E5%8A%9B%E6%89%A3--2%E7%AC%AC%E4%BA%8C%E9%AB%98%E7%9A%84%E8%96%AA%E6%B0%B4/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="YeChengfeng">
-      <meta itemprop="description" content="Make Learning and Organizing a Habit!">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="随笔">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2025/11/19/mysql/mysql--%E5%8A%9B%E6%89%A3--2%E7%AC%AC%E4%BA%8C%E9%AB%98%E7%9A%84%E8%96%AA%E6%B0%B4/" class="post-title-link" itemprop="url">力扣-Mysql-第二高的薪水 (Normal)</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2025-11-19 22:07:48" itemprop="dateCreated datePublished" datetime="2025-11-19T22:07:48+08:00">2025-11-19</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2025-11-29 23:17:47" itemprop="dateModified" datetime="2025-11-29T23:17:47+08:00">2025-11-29</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Mysql/" itemprop="url" rel="index"><span itemprop="name">Mysql</span></a>
-                </span>
-            </span>
-
-          
-            <span id="/2025/11/19/mysql/mysql--%E5%8A%9B%E6%89%A3--2%E7%AC%AC%E4%BA%8C%E9%AB%98%E7%9A%84%E8%96%AA%E6%B0%B4/" class="post-meta-item leancloud_visitors" data-flag-title="力扣-Mysql-第二高的薪水 (Normal)" title="阅读次数">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-eye"></i>
-              </span>
-              <span class="post-meta-item-text">阅读次数：</span>
-              <span class="leancloud-visitors-count"></span>
-            </span><br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>1.2k</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>1 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/second-highest-salary/">176. 第二高的薪水</a></p>
-<blockquote>
-<p><code>Employee</code> 表：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">+-------------+------+</span><br><span class="line">| Column Name | Type |</span><br><span class="line">+-------------+------+</span><br><span class="line">| id          | int  |</span><br><span class="line">| salary      | int  |</span><br><span class="line">+-------------+------+</span><br><span class="line">id 是这个表的主键。</span><br><span class="line">表的每一行包含员工的工资信息。</span><br></pre></td></tr></table></figure>
-
-<p>查询并返回 <code>Employee</code> 表中第二高的 <strong>不同</strong> 薪水 。如果不存在第二高的薪水，查询应该返回 <code>null(Pandas 则返回 None)</code> 。</p>
-<p>查询结果如下例所示。</p>
-<p><strong>示例 1：</strong></p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">输入：</span><br><span class="line">Employee 表：</span><br><span class="line">+----+--------+</span><br><span class="line">| id | salary |</span><br><span class="line">+----+--------+</span><br><span class="line">| 1  | 100    |</span><br><span class="line">| 2  | 200    |</span><br><span class="line">| 3  | 300    |</span><br><span class="line">+----+--------+</span><br><span class="line">输出：</span><br><span class="line">+---------------------+</span><br><span class="line">| SecondHighestSalary |</span><br><span class="line">+---------------------+</span><br><span class="line">| 200                 |</span><br><span class="line">+---------------------+</span><br></pre></td></tr></table></figure>
-
-<p><strong>示例 2：</strong></p>
-<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">输入：</span><br><span class="line">Employee 表：</span><br><span class="line">+----+--------+</span><br><span class="line">| id | salary |</span><br><span class="line">+----+--------+</span><br><span class="line">| <span class="number">1</span>  | <span class="number">100</span>    |</span><br><span class="line">+----+--------+</span><br><span class="line">输出：</span><br><span class="line">+---------------------+</span><br><span class="line">| SecondHighestSalary |</span><br><span class="line">+---------------------+</span><br><span class="line">| null                |</span><br><span class="line">+---------------------+</span><br></pre></td></tr></table></figure></blockquote>
-<h4 id="解答"><a href="#解答" class="headerlink" title="解答"></a>解答</h4><ol>
-<li>利用max函数聚合，剔除掉最大的一个。</li>
-</ol>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span></span><br><span class="line">	<span class="built_in">max</span>(salary) <span class="keyword">as</span> SecondHighestSalary</span><br><span class="line"><span class="keyword">from</span></span><br><span class="line">	Employee </span><br><span class="line"><span class="keyword">where</span> </span><br><span class="line">	salary <span class="keyword">not</span> <span class="keyword">in</span> ( <span class="keyword">select</span> <span class="built_in">max</span>(salary) <span class="keyword">as</span> salary <span class="keyword">from</span> Employee )		</span><br></pre></td></tr></table></figure>
-
-<ol start="2">
-<li>利用max函数具体，小于第一的，就是第二的</li>
-</ol>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> <span class="built_in">max</span>(salary) <span class="keyword">as</span> SecondHighestSalary </span><br><span class="line"><span class="keyword">from</span> Employee</span><br><span class="line"><span class="keyword">where</span> salary <span class="operator">&lt;</span> (<span class="keyword">select</span> <span class="built_in">max</span>(salary) <span class="keyword">from</span> Employee);		</span><br></pre></td></tr></table></figure>
-
-<ol start="3">
-<li><strong>利用分页的思想，外面需要包一层，否则可能查不出来数据，为空</strong></li>
-</ol>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> (<span class="keyword">SELECT</span> <span class="keyword">DISTINCT</span></span><br><span class="line">    Salary <span class="keyword">AS</span> SecondHighestSalary</span><br><span class="line"><span class="keyword">FROM</span></span><br><span class="line">    Employee</span><br><span class="line"><span class="keyword">ORDER</span> <span class="keyword">BY</span> Salary <span class="keyword">DESC</span></span><br><span class="line">LIMIT <span class="number">1</span> ,<span class="number">1</span>) <span class="keyword">as</span> SecondHighestSalary</span><br></pre></td></tr></table></figure>
-
-<ol start="4">
-<li><p><strong>利用 LIMIT 1 OFFSET 1，和第三点类似</strong></p>
-</li>
-<li><p><strong>利用函数IFNULL,ifnull是实际开发中常用的一个函数</strong></p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span></span><br><span class="line">    IFNULL(</span><br><span class="line">      (<span class="keyword">SELECT</span> <span class="keyword">DISTINCT</span> Salary</span><br><span class="line">       <span class="keyword">FROM</span> Employee</span><br><span class="line">       <span class="keyword">ORDER</span> <span class="keyword">BY</span> Salary <span class="keyword">DESC</span></span><br><span class="line">        LIMIT <span class="number">1</span> <span class="keyword">OFFSET</span> <span class="number">1</span>),</span><br><span class="line">    <span class="keyword">NULL</span>) <span class="keyword">AS</span> SecondHighestSalary</span><br></pre></td></tr></table></figure></li>
-</ol>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2025/11/19/mysql/mysql--%E5%8A%9B%E6%89%A3--2%E7%AC%AC%E4%BA%8C%E9%AB%98%E7%9A%84%E8%96%AA%E6%B0%B4/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-
-
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://leslie-shell.github.io/2025/11/19/mysql/mysql--%E5%8A%9B%E6%89%A3--1%E7%BB%84%E5%90%88%E4%BF%A9%E4%B8%AA%E8%A1%A8/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="YeChengfeng">
-      <meta itemprop="description" content="Make Learning and Organizing a Habit!">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="随笔">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2025/11/19/mysql/mysql--%E5%8A%9B%E6%89%A3--1%E7%BB%84%E5%90%88%E4%BF%A9%E4%B8%AA%E8%A1%A8/" class="post-title-link" itemprop="url">力扣-Mysql-组合俩个表 (Easy)</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2025-11-19 22:01:19" itemprop="dateCreated datePublished" datetime="2025-11-19T22:01:19+08:00">2025-11-19</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2025-11-29 23:19:04" itemprop="dateModified" datetime="2025-11-29T23:19:04+08:00">2025-11-29</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Mysql/" itemprop="url" rel="index"><span itemprop="name">Mysql</span></a>
-                </span>
-            </span>
-
-          
-            <span id="/2025/11/19/mysql/mysql--%E5%8A%9B%E6%89%A3--1%E7%BB%84%E5%90%88%E4%BF%A9%E4%B8%AA%E8%A1%A8/" class="post-meta-item leancloud_visitors" data-flag-title="力扣-Mysql-组合俩个表 (Easy)" title="阅读次数">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-eye"></i>
-              </span>
-              <span class="post-meta-item-text">阅读次数：</span>
-              <span class="leancloud-visitors-count"></span>
-            </span><br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>641</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>1 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/combine-two-tables/">175. 组合两个表</a></p>
-<blockquote>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">+-------------+---------+</span><br><span class="line">| 列名         | 类型     |</span><br><span class="line">+-------------+---------+</span><br><span class="line">| PersonId    | int     |</span><br><span class="line">| FirstName   | varchar |</span><br><span class="line">| LastName    | varchar |</span><br><span class="line">+-------------+---------+</span><br><span class="line">personId 是该表的主键（具有唯一值的列）。</span><br><span class="line">该表包含一些人的 ID 和他们的姓和名的信息。</span><br></pre></td></tr></table></figure>
-
-<p>表: <code>Address</code></p>
-<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">+-------------+---------+</span><br><span class="line">| 列名         | 类型    |</span><br><span class="line">+-------------+---------+</span><br><span class="line">| AddressId   | int     |</span><br><span class="line">| PersonId    | int     |</span><br><span class="line">| City        | varchar |</span><br><span class="line">| State       | varchar |</span><br><span class="line">+-------------+---------+</span><br><span class="line">addressId 是该表的主键（具有唯一值的列）。</span><br><span class="line">该表的每一行都包含一个 ID = PersonId 的人的城市和州的信息。</span><br></pre></td></tr></table></figure></blockquote>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span></span><br><span class="line">	P.firstName ,</span><br><span class="line">	P.lastName ,</span><br><span class="line">  A.city ,</span><br><span class="line">  A.state <span class="keyword">from</span> Person P</span><br><span class="line"> <span class="keyword">left</span> <span class="keyword">join</span> Address A  <span class="keyword">on</span> P.PersonId <span class="operator">=</span>A.PersonId    <span class="comment">-- Easy</span></span><br></pre></td></tr></table></figure>
-
-<h4 id="Summarize"><a href="#Summarize" class="headerlink" title="Summarize"></a>Summarize</h4><blockquote>
-<p>　①A inner join B：取交集</p>
-<p>　②A left join B：取A全部，B没有对应的值，则为null</p>
-<p>　③A right join B：取B全部，A没有对应的值，则为null</p>
-<p>　④A full outer join B：取并集，彼此没有对应的值为null</p>
-</blockquote>
-
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2025/11/19/mysql/mysql--%E5%8A%9B%E6%89%A3--1%E7%BB%84%E5%90%88%E4%BF%A9%E4%B8%AA%E8%A1%A8/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-
-
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://leslie-shell.github.io/2025/11/09/english/common/word--%E5%B7%A5%E4%BD%9C%E5%8D%95%E8%AF%8D%E6%94%B6%E8%97%8F202211/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="YeChengfeng">
-      <meta itemprop="description" content="Make Learning and Organizing a Habit!">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="随笔">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2025/11/09/english/common/word--%E5%B7%A5%E4%BD%9C%E5%8D%95%E8%AF%8D%E6%94%B6%E8%97%8F202211/" class="post-title-link" itemprop="url">Caribbean | Shakespeare</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-              
-
-              <time title="创建时间：2025-11-09 20:18:47 / 修改时间：20:19:19" itemprop="dateCreated datePublished" datetime="2025-11-09T20:18:47+08:00">2025-11-09</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/English/" itemprop="url" rel="index"><span itemprop="name">English</span></a>
-                </span>
-                  ，
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/English/Vocabulary/" itemprop="url" rel="index"><span itemprop="name">Vocabulary</span></a>
-                </span>
-                  ，
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/English/Vocabulary/20221102/" itemprop="url" rel="index"><span itemprop="name">20221102</span></a>
-                </span>
-            </span>
-
-          
-            <span id="/2025/11/09/english/common/word--%E5%B7%A5%E4%BD%9C%E5%8D%95%E8%AF%8D%E6%94%B6%E8%97%8F202211/" class="post-meta-item leancloud_visitors" data-flag-title="Caribbean | Shakespeare" title="阅读次数">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-eye"></i>
-              </span>
-              <span class="post-meta-item-text">阅读次数：</span>
-              <span class="leancloud-visitors-count"></span>
-            </span><br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>919</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>1 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>Caribbean | Shakespeare</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2025/11/09/english/common/word--%E5%B7%A5%E4%BD%9C%E5%8D%95%E8%AF%8D%E6%94%B6%E8%97%8F202211/">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-
-
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://leslie-shell.github.io/2025/11/09/english/common/%E8%AF%8D%E6%A0%B9%E8%AF%8D%E6%B1%87-%E9%93%BE%E6%8E%A5/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="YeChengfeng">
-      <meta itemprop="description" content="Make Learning and Organizing a Habit!">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="随笔">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2025/11/09/english/common/%E8%AF%8D%E6%A0%B9%E8%AF%8D%E6%B1%87-%E9%93%BE%E6%8E%A5/" class="post-title-link" itemprop="url">词根ANY-Awe-BACK-base</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-              
-
-              <time title="创建时间：2025-11-09 20:15:20 / 修改时间：20:16:18" itemprop="dateCreated datePublished" datetime="2025-11-09T20:15:20+08:00">2025-11-09</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/English/" itemprop="url" rel="index"><span itemprop="name">English</span></a>
-                </span>
-                  ，
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/English/%E8%AF%8D%E6%A0%B9/" itemprop="url" rel="index"><span itemprop="name">词根</span></a>
-                </span>
-            </span>
-
-          
-            <span id="/2025/11/09/english/common/%E8%AF%8D%E6%A0%B9%E8%AF%8D%E6%B1%87-%E9%93%BE%E6%8E%A5/" class="post-meta-item leancloud_visitors" data-flag-title="词根ANY-Awe-BACK-base" title="阅读次数">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-eye"></i>
-              </span>
-              <span class="post-meta-item-text">阅读次数：</span>
-              <span class="leancloud-visitors-count"></span>
-            </span><br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>302</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>1 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h5 id="词根词汇学习链接"><a href="#词根词汇学习链接" class="headerlink" title="词根词汇学习链接"></a>词根词汇学习链接</h5><ul>
-<li><a target="_blank" rel="noopener" href="https://www.readingrockets.org/topics/spelling-and-word-study/articles/root-words-roots-and-affixes">Root Words, Roots and Affixes | Reading Rockets</a></li>
-<li><a target="_blank" rel="noopener" href="https://www.learnthat.org/pages/view/roots.html">Word roots: The web’s largest word root and prefix directory</a></li>
-<li><a target="_blank" rel="noopener" href="http://www.macroevolution.net/root-word-dictionary-bc.html#top-of-list">Root Word Dictionary B-C</a></li>
-<li><a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/List_of_medical_roots,_suffixes_and_prefixes">List of medical roots, suffixes and prefixes - Wikipedia</a></li>
-<li><a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/List_of_Greek_and_Latin_roots_in_English/G">List of Greek and Latin roots in English&#x2F;G - Wikipedia</a></li>
-<li><a target="_blank" rel="noopener" href="http://www.prefixsuffix.com/rootchart.php">Chart of English Language Roots - PrefixSuffix.com</a></li>
-<li><a target="_blank" rel="noopener" href="https://console.cloud.google.com/apis/credentials?hl=zh-cn&project=verdant-medium-303808">API 和服务 – My First Project – Google Cloud Console</a></li>
-</ul>
-
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2025/11/09/english/common/%E8%AF%8D%E6%A0%B9%E8%AF%8D%E6%B1%87-%E9%93%BE%E6%8E%A5/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-
-
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -1451,20 +1676,20 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">204</span>
+          <span class="site-state-item-count">209</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">43</span>
+        <span class="site-state-item-count">45</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">55</span>
+        <span class="site-state-item-count">56</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -1500,12 +1725,12 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-area"></i>
     </span>
-    <span title="站点总字数">435k</span>
+    <span title="站点总字数">455k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">6:35</span>
+    <span title="站点阅读时长">6:53</span>
 </div>
 
         

@@ -1,0 +1,874 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <script>
+    (function () {
+        if ('') {
+            if (prompt('请输入文章密码') !== '') {
+                alert('密码错误！');
+                if (history.length === 1) {
+                    location.replace("http://xxxxxxx.xxx"); // 这里替换成你的首页
+                } else {
+                    history.back();
+                }
+            }    
+        }
+    })();
+</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 8.1.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css">
+  <script src="/lib/pace/pace.min.js"></script>
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"leslie-shell.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"always","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":true,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.json"};
+  </script>
+
+  <meta name="description" content="大型网站架构演进  单机架构 单机负载告警，数据库与应用分离 应用服务器负载告警 → 集群化 引入负载均衡设备 分布式 Session Session Sticky：会话粘滞 Session Replication：会话复制 Session 集中存储 Cookie Based     数据库读压力增大 → 读写分离 数据库主从复制 搜索引擎 分布式缓存   弥补关系数据库不足 → 引入分布式存储系">
+<meta property="og:type" content="article">
+<meta property="og:title" content="分布式架构演变">
+<meta property="og:url" content="https://leslie-shell.github.io/2025/11/22/%E5%88%86%E5%B8%83%E5%BC%8F/%E5%88%86%E5%B8%83%E5%BC%8F--%E5%88%86%E5%B8%83%E5%BC%8F%E6%9E%B6%E6%9E%84%E6%BC%94%E5%8F%98/index.html">
+<meta property="og:site_name" content="随笔">
+<meta property="og:description" content="大型网站架构演进  单机架构 单机负载告警，数据库与应用分离 应用服务器负载告警 → 集群化 引入负载均衡设备 分布式 Session Session Sticky：会话粘滞 Session Replication：会话复制 Session 集中存储 Cookie Based     数据库读压力增大 → 读写分离 数据库主从复制 搜索引擎 分布式缓存   弥补关系数据库不足 → 引入分布式存储系">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://leslieyedoc.oss-cn-shanghai.aliyuncs.com/img/20250927-131925-8209378_b78011d7-aded-481f-f620-c68689d3b072.png">
+<meta property="og:image" content="https://leslieyedoc.oss-cn-shanghai.aliyuncs.com/img/20251123-094050-8209378_1adfda2c-51e7-48d4-bb34-5449bdb6e9b9.png">
+<meta property="og:image" content="https://leslieyedoc.oss-cn-shanghai.aliyuncs.com/img/20250927-132112-8209378_d8ca16cc-5617-4453-8dd8-0f9df3ad0912.png">
+<meta property="article:published_time" content="2025-11-22T08:35:08.631Z">
+<meta property="article:modified_time" content="2025-11-29T15:13:27.341Z">
+<meta property="article:author" content="YeChengfeng">
+<meta property="article:tag" content="Java">
+<meta property="article:tag" content="分布式">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://leslieyedoc.oss-cn-shanghai.aliyuncs.com/img/20250927-131925-8209378_b78011d7-aded-481f-f620-c68689d3b072.png">
+
+<link rel="canonical" href="https://leslie-shell.github.io/2025/11/22/%E5%88%86%E5%B8%83%E5%BC%8F/%E5%88%86%E5%B8%83%E5%BC%8F--%E5%88%86%E5%B8%83%E5%BC%8F%E6%9E%B6%E6%9E%84%E6%BC%94%E5%8F%98/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>分布式架构演变 | 随笔</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">随笔</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-rank">
+
+    <a href="/rank/" rel="section"><i class="fa fa-fire fa-fw"></i>热度</a>
+
+  </li>
+        <li class="menu-item menu-item-recommended">
+
+    <a href="/recommended/" rel="section"><i class="fa fa-flag fa-fw"></i>推荐</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://leslie-shell.github.io/2025/11/22/%E5%88%86%E5%B8%83%E5%BC%8F/%E5%88%86%E5%B8%83%E5%BC%8F--%E5%88%86%E5%B8%83%E5%BC%8F%E6%9E%B6%E6%9E%84%E6%BC%94%E5%8F%98/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="YeChengfeng">
+      <meta itemprop="description" content="Make Learning and Organizing a Habit!">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="随笔">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          分布式架构演变
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2025-11-22 16:35:08" itemprop="dateCreated datePublished" datetime="2025-11-22T16:35:08+08:00">2025-11-22</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2025-11-29 23:13:27" itemprop="dateModified" datetime="2025-11-29T23:13:27+08:00">2025-11-29</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Java/" itemprop="url" rel="index"><span itemprop="name">Java</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/2025/11/22/%E5%88%86%E5%B8%83%E5%BC%8F/%E5%88%86%E5%B8%83%E5%BC%8F--%E5%88%86%E5%B8%83%E5%BC%8F%E6%9E%B6%E6%9E%84%E6%BC%94%E5%8F%98/" class="post-meta-item leancloud_visitors" data-flag-title="分布式架构演变" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>2.1k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>2 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>大型网站架构演进</p>
+<ol>
+<li><strong>单机架构</strong></li>
+<li><strong>单机负载告警，数据库与应用分离</strong></li>
+<li><strong>应用服务器负载告警 → 集群化</strong><ul>
+<li>引入负载均衡设备</li>
+<li>分布式 Session<ul>
+<li><strong>Session Sticky</strong>：会话粘滞</li>
+<li><strong>Session Replication</strong>：会话复制</li>
+<li><strong>Session 集中存储</strong></li>
+<li><strong>Cookie Based</strong></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><strong>数据库读压力增大 → 读写分离</strong><ul>
+<li>数据库主从复制</li>
+<li>搜索引擎</li>
+<li>分布式缓存</li>
+</ul>
+</li>
+<li><strong>弥补关系数据库不足 → 引入分布式存储系统</strong></li>
+<li><strong>数据库遇瓶颈 → 分库分表</strong><ul>
+<li><strong>垂直拆分（分库）</strong>：按业务拆分，需解决表关联和分布式事务问题</li>
+<li><strong>水平拆分（分表）</strong></li>
+</ul>
+</li>
+<li><strong>应用拆分与服务化</strong><ul>
+<li>应用拆分</li>
+<li>服务化</li>
+</ul>
+</li>
+<li><strong>消息中间件（异步 + 解耦）</strong></li>
+<li><strong>CDN（内容分发网络）</strong><ul>
+<li>将内容分发到离用户最近的节点，加速访问</li>
+<li>网络缓存技术，节省带宽，提高访问速度</li>
+<li>放置静态资源（图片、JS、CSS 等）</li>
+<li>浏览器访问流程：DNS → 负载均衡 → 应用服务器 → 缓存&#x2F;CDN → 渲染</li>
+</ul>
+</li>
+</ol>
+<hr>
+<h2 id="大型网站核心架构要素"><a href="#大型网站核心架构要素" class="headerlink" title="大型网站核心架构要素"></a>大型网站核心架构要素</h2><ol>
+<li><strong>性能指标</strong><ul>
+<li>PV、QPS、TPS、吞吐量、响应时间</li>
+</ul>
+</li>
+<li><strong>吞吐量指标</strong><ul>
+<li>TPS：每秒事务数</li>
+<li>QPS：每秒查询数</li>
+<li>HPS：每秒 HTTP 请求数</li>
+</ul>
+</li>
+<li><strong>Web 性能优化</strong><ul>
+<li><strong>前端优化</strong><ol>
+<li>浏览器缓存</li>
+<li>HTTP 请求合并</li>
+<li>CSS、JS、图片资源压缩合并</li>
+<li>CDN</li>
+<li>页面静态化</li>
+<li>减少 Cookie 传输</li>
+</ol>
+</li>
+<li><strong>服务端优化</strong><ol>
+<li>接入层：反向代理、负载均衡</li>
+<li>应用服务器集群</li>
+<li>分布式缓存</li>
+<li>数据库优化：索引、主从复制、读写分离、分库分表</li>
+<li>分布式消息队列，异步操作</li>
+</ol>
+</li>
+<li><strong>单机并发优化</strong><ul>
+<li><strong>CPU 消耗</strong>：减少阻塞、同步转异步、队列、降低锁竞争</li>
+<li><strong>文件 IO</strong>：异步读写、批量操作、限流、缓存、RAID</li>
+<li><strong>内存消耗</strong>：减少不必要引用、对象池、缓存失效算法</li>
+<li><strong>网络 IO</strong>：减少交互次数、减少传输量、异步非阻塞</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><strong>抢购&#x2F;超卖问题解决策略</strong><ul>
+<li><strong>前端</strong>：页面静态化、CDN、禁止重复提交</li>
+<li><strong>接入层</strong>：限制同 IP 访问频率、页面缓存</li>
+<li><strong>服务层</strong>：Token 防刷、随机返回失败、数据库悲观锁</li>
+<li><strong>数据层</strong>：主从复制、读写分离、分库分表</li>
+</ul>
+</li>
+<li><strong>负载均衡</strong><ul>
+<li><strong>算法</strong>：轮询、加权轮询、随机、最少连接、源地址散列</li>
+<li><strong>SSL 影响</strong>：需考虑负载均衡整合</li>
+</ul>
+</li>
+<li><strong>安全性</strong><ul>
+<li>XSS、SQL 注入、CSRF 等</li>
+<li>分类算法：贝叶斯</li>
+<li>黑名单：哈希表实现，但内存消耗大</li>
+</ul>
+</li>
+</ol>
+<hr>
+<h2 id="链路追踪（Distributed-Tracing）"><a href="#链路追踪（Distributed-Tracing）" class="headerlink" title="链路追踪（Distributed Tracing）"></a>链路追踪（Distributed Tracing）</h2><ol>
+<li><p><strong>定义</strong></p>
+<ul>
+<li>将一次分布式请求还原成调用链路</li>
+<li>展示各服务节点耗时、请求状态及到达的具体机器</li>
+</ul>
+</li>
+<li><p><strong>主要功能</strong></p>
+<ul>
+<li><strong>故障快速定位</strong>：结合调用链和日志快速定位错误</li>
+<li><strong>链路性能可视化</strong>：展示阶段耗时和服务依赖关系</li>
+<li><strong>链路分析</strong>：分析用户行为路径和业务统计</li>
+</ul>
+</li>
+<li><p><strong>常用系统</strong></p>
+<ul>
+<li><strong>国际</strong>：Zipkin、Jaeger、Pinpoint、SkyWalking</li>
+<li><strong>国内</strong>：阿里鹰眼、美团 Mtrace、滴滴 Trace、新浪 Watchman、京东 Hydra</li>
+</ul>
+</li>
+<li><p><strong>开源组件链接</strong></p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://zipkin.io/">Zipkin</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.jaegertracing.io/">Jaeger</a></li>
+<li><a target="_blank" rel="noopener" href="https://github.com/pinpoint-apm/pinpoint">Pinpoint</a></li>
+<li><a target="_blank" rel="noopener" href="http://skywalking.apache.org/">SkyWalking</a></li>
+</ul>
+</li>
+<li><p><strong>Zipkin 核心组件</strong></p>
+<ul>
+<li><p><strong>Collector</strong>：采集链路数据，验证、存储、索引</p>
+</li>
+<li><p><strong>Storage</strong>：保存链路信息，支持 Cassandra、Elasticsearch、MySQL</p>
+</li>
+<li><p><strong>Query Service</strong>：提供 JSON API 查询链路数据</p>
+</li>
+<li><p><strong>Web UI</strong>：可视化展示调用链信息，辅助运维</p>
+<p><img src="https://leslieyedoc.oss-cn-shanghai.aliyuncs.com/img/20250927-131925-8209378_b78011d7-aded-481f-f620-c68689d3b072.png" alt="img"></p>
+<p><img src="https://leslieyedoc.oss-cn-shanghai.aliyuncs.com/img/20251123-094050-8209378_1adfda2c-51e7-48d4-bb34-5449bdb6e9b9.png" alt="img"></p>
+</li>
+</ul>
+</li>
+</ol>
+<h2 id="分布式链路追踪（Zipkin）"><a href="#分布式链路追踪（Zipkin）" class="headerlink" title="分布式链路追踪（Zipkin）"></a>分布式链路追踪（Zipkin）</h2><ul>
+<li><strong>概述</strong><ul>
+<li>在服务运行过程中会产生大量链路信息，产生数据的地方称为 <strong>Reporter</strong>。</li>
+<li>Reporter 将链路信息通过 HTTP、RPC、Kafka 等方式发送到 Zipkin 的采集器（Collector）。</li>
+<li>Zipkin 处理后将链路信息保存到存储器（Storage）中，运维人员可通过 Web UI 查询调用链信息。</li>
+</ul>
+</li>
+<li><strong>Zipkin 核心组件</strong><ol>
+<li><strong>Collector</strong><ul>
+<li>采集线程获取链路追踪数据后，Zipkin 对其进行验证、存储和索引，并调用存储接口保存数据，以便查询。</li>
+</ul>
+</li>
+<li><strong>Storage</strong><ul>
+<li>最初为 Cassandra 构建，支持可伸缩存储和灵活模式。</li>
+<li>也支持 ElasticSearch、MySQL，后续可扩展第三方存储。</li>
+</ul>
+</li>
+<li><strong>Query Service</strong><ul>
+<li>存储和索引后的数据可以通过 Query Service 查询，提供 JSON API，方便运维快速定位问题。</li>
+</ul>
+</li>
+<li><strong>Web UI</strong><ul>
+<li>提供查询、搜索界面，运维人员可直观查看调用链信息，快速识别线上问题。</li>
+</ul>
+</li>
+</ol>
+</li>
+<li><strong>总结</strong><ul>
+<li>分布式链路追踪就是将每一次分布式请求还原成调用链路。</li>
+<li>核心概念：Trace、Span、Annotation、带内和带外数据、采样、存储。</li>
+<li>开源组件多基于 Google Dapper 论文演变而来。</li>
+<li>Zipkin 核心组件：Collector、Storage、Query Service、Web UI。</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="华为分布式软总线"><a href="#华为分布式软总线" class="headerlink" title="华为分布式软总线"></a>华为分布式软总线</h2><ul>
+<li><strong>传统总线概念</strong><ul>
+<li>总线是计算机内部各部件传递信息的公用通道，外部设备通过接口电路连接总线。</li>
+<li>按信息种类，分为：<ul>
+<li>数据总线：传输数据</li>
+<li>地址总线：传输数据地址</li>
+<li>控制总线：传输控制信号</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p><img src="https://leslieyedoc.oss-cn-shanghai.aliyuncs.com/img/20250927-132112-8209378_d8ca16cc-5617-4453-8dd8-0f9df3ad0912.png" alt="img"></p>
+<ul>
+<li><strong>分布式软总线定义</strong><ul>
+<li>基于华为通信技术积累，参考计算机硬件总线，在 <strong>1+8+N</strong> 设备间搭建“无形”的总线。<ul>
+<li>1：手机</li>
+<li>8：车机、音箱、耳机、手表&#x2F;手环、平板、大屏、PC、AR&#x2F;VR</li>
+<li>N：其他 IoT 设备</li>
+</ul>
+</li>
+<li>特点：自发现、自组网、高带宽、低时延</li>
+</ul>
+</li>
+<li><strong>功能与原理</strong><ul>
+<li><strong>架构</strong><ul>
+<li>协议货架 + 软硬协同层屏蔽不同设备协议差异</li>
+<li>总线中枢解析命令，实现设备发现和连接</li>
+<li>通过任务总线和数据总线实现文件传输和消息传输</li>
+</ul>
+</li>
+<li><strong>总体目标</strong>：设备间无感发现、零等待传输</li>
+<li><strong>关键问题</strong>：<ol>
+<li>设备如何发现和连接？</li>
+<li>多设备互联如何组网？</li>
+<li>多设备多协议如何实现传输？</li>
+</ol>
+</li>
+<li><strong>关键技术</strong>：<ul>
+<li>自发现连接（从手动到自动）</li>
+<li>异构网络组网</li>
+<li>高效传输机制</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Java/" rel="tag"># Java</a>
+              <a href="/tags/%E5%88%86%E5%B8%83%E5%BC%8F/" rel="tag"># 分布式</a>
+          </div>
+
+        
+  <div class="post-widgets">
+    <div class="wp_rating">
+      <div id="wpac-rating"></div>
+    </div>
+  </div>
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2025/11/22/java/java-juc-%E5%A4%9A%E7%BA%BF%E7%A8%8B%E5%9F%BA%E7%A1%80/" rel="prev" title="AQS">
+      <i class="fa fa-chevron-left"></i> AQS
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2025/11/22/%E5%88%86%E5%B8%83%E5%BC%8F/%E5%88%86%E5%B8%83%E5%BC%8F--%E9%99%90%E6%B5%81/" rel="next" title="分布式限流">
+      分布式限流 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+
+
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    
+  <div class="comments">
+    <div id="lv-container" data-id="city" data-uid="MTAyMC82MDk4Ni8zNzQ1Ng=="></div>
+  </div>
+  
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A4%A7%E5%9E%8B%E7%BD%91%E7%AB%99%E6%A0%B8%E5%BF%83%E6%9E%B6%E6%9E%84%E8%A6%81%E7%B4%A0"><span class="nav-text">大型网站核心架构要素</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%93%BE%E8%B7%AF%E8%BF%BD%E8%B8%AA%EF%BC%88Distributed-Tracing%EF%BC%89"><span class="nav-text">链路追踪（Distributed Tracing）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%86%E5%B8%83%E5%BC%8F%E9%93%BE%E8%B7%AF%E8%BF%BD%E8%B8%AA%EF%BC%88Zipkin%EF%BC%89"><span class="nav-text">分布式链路追踪（Zipkin）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8D%8E%E4%B8%BA%E5%88%86%E5%B8%83%E5%BC%8F%E8%BD%AF%E6%80%BB%E7%BA%BF"><span class="nav-text">华为分布式软总线</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">YeChengfeng</p>
+  <div class="site-description" itemprop="description">Make Learning and Organizing a Habit!</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">209</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">45</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">56</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">YeChengfeng</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="站点总字数">455k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">6:53</span>
+</div>
+
+        
+
+
+
+
+
+
+<script>
+  (function() {
+    function leancloudSelector(url) {
+      url = encodeURI(url);
+      return document.getElementById(url).querySelector('.leancloud-visitors-count');
+    }
+
+    function addCount(Counter) {
+      var visitors = document.querySelector('.leancloud_visitors');
+      var url = decodeURI(visitors.id);
+      var title = visitors.dataset.flagTitle;
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          if (results.length > 0) {
+            var counter = results[0];
+            leancloudSelector(url).innerText = counter.time + 1;
+            Counter('put', '/classes/Counter/' + counter.objectId, { time: { '__op': 'Increment', 'amount': 1 } })
+              .catch(error => {
+                console.error('Failed to save visitor count', error);
+              });
+          } else {
+              Counter('post', '/classes/Counter', { title, url, time: 1 })
+                .then(response => response.json())
+                .then(() => {
+                  leancloudSelector(url).innerText = 1;
+                })
+                .catch(error => {
+                  console.error('Failed to create', error);
+                });
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    function showTime(Counter) {
+      var visitors = document.querySelectorAll('.leancloud_visitors');
+      var entries = [...visitors].map(element => {
+        return decodeURI(element.id);
+      });
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url: { '$in': entries } })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          for (let url of entries) {
+            let target = results.find(item => item.url === url);
+            leancloudSelector(url).innerText = target ? target.time : 0;
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    let { app_id, app_key, server_url } = {"enable":true,"app_id":"h7vZITYMXKA8TGvtiJFms589-MdYXbMMI","app_key":"TcCRmGMIrnp7A76AiTj67XKC","security":false};
+    function fetchData(api_server) {
+      var Counter = (method, url, data) => {
+        return fetch(`${api_server}/1.1${url}`, {
+          method,
+          headers: {
+            'X-LC-Id'     : app_id,
+            'X-LC-Key'    : app_key,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data)
+        });
+      };
+      if (CONFIG.page.isPost) {
+        if (CONFIG.hostname !== location.hostname) return;
+        addCount(Counter);
+      } else if (document.querySelectorAll('.post-title-link').length >= 1) {
+        showTime(Counter);
+      }
+    }
+
+    let api_server = app_id.slice(-9) !== '-MdYXbMMI' ? server_url : `https://${app_id.slice(0, 8).toLowerCase()}.api.lncldglobal.com`;
+
+    if (api_server) {
+      fetchData(api_server);
+    } else {
+      fetch('https://app-router.leancloud.cn/2/route?appId=' + app_id)
+        .then(response => response.json())
+        .then(({ api_server }) => {
+          fetchData('https://' + api_server);
+        });
+    }
+  })();
+</script>
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+  <script>
+  if (CONFIG.page.isPost) {
+    wpac_init = window.wpac_init || [];
+    wpac_init.push({
+      widget: 'Rating',
+      id    : h7vZITYMXKA8TGvtiJFms589-MdYXbMMI,
+      el    : 'wpac-rating',
+      color : 'fc6423'
+    });
+    (function() {
+      if ('WIDGETPACK_LOADED' in window) return;
+      WIDGETPACK_LOADED = true;
+      var mc = document.createElement('script');
+      mc.type = 'text/javascript';
+      mc.async = true;
+      mc.src = '//embed.widgetpack.com/widget.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(mc, s.nextSibling);
+    })();
+  }
+  </script>
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+<script>
+NexT.utils.loadComments(document.querySelector('#lv-container'), () => {
+  window.livereOptions = {
+    refer: location.pathname.replace(CONFIG.root, '').replace('index.html', '')
+  };
+  (function(d, s) {
+    var j, e = d.getElementsByTagName(s)[0];
+    if (typeof LivereTower === 'function') { return; }
+    j = d.createElement(s);
+    j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+    j.async = true;
+    e.parentNode.insertBefore(j, e);
+  })(document, 'script');
+});
+</script>
+
+</body>
+</html>
