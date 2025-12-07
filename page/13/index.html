@@ -212,6 +212,326 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://leslie-shell.github.io/2025/11/19/mysql/mysql--4%E6%9C%80%E5%B8%B8%E7%94%A8%E7%9A%84%E5%87%BD%E6%95%B0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="YeChengfeng">
+      <meta itemprop="description" content="Make Learning and Organizing a Habit!">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="随笔">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2025/11/19/mysql/mysql--4%E6%9C%80%E5%B8%B8%E7%94%A8%E7%9A%84%E5%87%BD%E6%95%B0/" class="post-title-link" itemprop="url">mysql最常用函数合集</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2025-11-19 23:25:42" itemprop="dateCreated datePublished" datetime="2025-11-19T23:25:42+08:00">2025-11-19</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2025-11-29 23:18:07" itemprop="dateModified" datetime="2025-11-29T23:18:07+08:00">2025-11-29</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Mysql/" itemprop="url" rel="index"><span itemprop="name">Mysql</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/2025/11/19/mysql/mysql--4%E6%9C%80%E5%B8%B8%E7%94%A8%E7%9A%84%E5%87%BD%E6%95%B0/" class="post-meta-item leancloud_visitors" data-flag-title="mysql最常用函数合集" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>2.5k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>2 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p> MySQL 最常用 Top 30 函数（含例子）</p>
+<hr>
+<h1 id="1-IFNULL-expr-alt-—-NULL-替代（最常用之一）"><a href="#1-IFNULL-expr-alt-—-NULL-替代（最常用之一）" class="headerlink" title="1. IFNULL(expr, alt) — NULL 替代（最常用之一）"></a>1. <code>IFNULL(expr, alt)</code> — NULL 替代（最常用之一）</h1><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> IFNULL(nickname, <span class="string">&#x27;未填写&#x27;</span>) <span class="keyword">AS</span> nick <span class="keyword">FROM</span> <span class="keyword">user</span>;</span><br></pre></td></tr></table></figure>
+
+<h1 id="2-COALESCE-a-b-c-—-多字段取第一个非-NULL"><a href="#2-COALESCE-a-b-c-—-多字段取第一个非-NULL" class="headerlink" title="2. COALESCE(a, b, c...) — 多字段取第一个非 NULL"></a>2. <code>COALESCE(a, b, c...)</code> — 多字段取第一个非 NULL</h1><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="built_in">COALESCE</span>(phone, email, <span class="string">&#x27;无联系方式&#x27;</span>) <span class="keyword">FROM</span> <span class="keyword">user</span>;</span><br></pre></td></tr></table></figure>
+
+<h1 id="3-NULLIF-a-b-—-a-b-则-NULL"><a href="#3-NULLIF-a-b-—-a-b-则-NULL" class="headerlink" title="3. NULLIF(a, b) — a&#x3D;b 则 NULL"></a>3. <code>NULLIF(a, b)</code> — a&#x3D;b 则 NULL</h1><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="built_in">NULLIF</span>(status, <span class="string">&#x27;未知&#x27;</span>);</span><br></pre></td></tr></table></figure>
+
+<h1 id="4-IF-expr-true-val-false-val-—-条件判断"><a href="#4-IF-expr-true-val-false-val-—-条件判断" class="headerlink" title="4. IF(expr, true_val, false_val) — 条件判断"></a>4. <code>IF(expr, true_val, false_val)</code> — 条件判断</h1><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> IF(score<span class="operator">&gt;=</span><span class="number">60</span>,<span class="string">&#x27;及格&#x27;</span>,<span class="string">&#x27;不及格&#x27;</span>) <span class="keyword">FROM</span> exam;</span><br></pre></td></tr></table></figure>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2025/11/19/mysql/mysql--4%E6%9C%80%E5%B8%B8%E7%94%A8%E7%9A%84%E5%87%BD%E6%95%B0/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+
+
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://leslie-shell.github.io/2025/11/19/mysql/mysql--6%E7%AA%97%E5%8F%A3%E5%87%BD%E6%95%B0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="YeChengfeng">
+      <meta itemprop="description" content="Make Learning and Organizing a Habit!">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="随笔">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2025/11/19/mysql/mysql--6%E7%AA%97%E5%8F%A3%E5%87%BD%E6%95%B0/" class="post-title-link" itemprop="url">mysql窗口函数</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2025-11-19 23:17:11" itemprop="dateCreated datePublished" datetime="2025-11-19T23:17:11+08:00">2025-11-19</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2025-11-29 23:17:52" itemprop="dateModified" datetime="2025-11-29T23:17:52+08:00">2025-11-29</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Mysql/" itemprop="url" rel="index"><span itemprop="name">Mysql</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/2025/11/19/mysql/mysql--6%E7%AA%97%E5%8F%A3%E5%87%BD%E6%95%B0/" class="post-meta-item leancloud_visitors" data-flag-title="mysql窗口函数" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>0</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>1 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+
+
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://leslie-shell.github.io/2025/11/19/mysql/mysql--5%E5%B8%B8%E7%94%A8%E5%87%BD%E6%95%B0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="YeChengfeng">
+      <meta itemprop="description" content="Make Learning and Organizing a Habit!">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="随笔">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2025/11/19/mysql/mysql--5%E5%B8%B8%E7%94%A8%E5%87%BD%E6%95%B0/" class="post-title-link" itemprop="url">mysql常用函数</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2025-11-19 23:15:07" itemprop="dateCreated datePublished" datetime="2025-11-19T23:15:07+08:00">2025-11-19</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2025-11-29 23:19:40" itemprop="dateModified" datetime="2025-11-29T23:19:40+08:00">2025-11-29</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Mysql/" itemprop="url" rel="index"><span itemprop="name">Mysql</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/2025/11/19/mysql/mysql--5%E5%B8%B8%E7%94%A8%E5%87%BD%E6%95%B0/" class="post-meta-item leancloud_visitors" data-flag-title="mysql常用函数" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>5.4k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>5 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="一、空值与条件处理（NULL-条件）"><a href="#一、空值与条件处理（NULL-条件）" class="headerlink" title="一、空值与条件处理（NULL &#x2F; 条件）"></a>一、空值与条件处理（NULL &#x2F; 条件）</h1><h3 id="IF-expr-true-val-false-val-—-三元判断"><a href="#IF-expr-true-val-false-val-—-三元判断" class="headerlink" title="IF(expr, true_val, false_val) — 三元判断"></a><code>IF(expr, true_val, false_val)</code> — 三元判断</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> IF(score <span class="operator">&gt;=</span> <span class="number">60</span>, <span class="string">&#x27;及格&#x27;</span>, <span class="string">&#x27;不及格&#x27;</span>) <span class="keyword">FROM</span> exam;</span><br></pre></td></tr></table></figure>
+
+<h3 id="IFNULL-expr-alt-—-expr-为-NULL-则用-alt"><a href="#IFNULL-expr-alt-—-expr-为-NULL-则用-alt" class="headerlink" title="IFNULL(expr, alt) — expr 为 NULL 则用 alt"></a><code>IFNULL(expr, alt)</code> — expr 为 NULL 则用 alt</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> IFNULL(nickname, <span class="string">&#x27;未填写&#x27;</span>) <span class="keyword">FROM</span> <span class="keyword">user</span>;</span><br></pre></td></tr></table></figure>
+
+<h3 id="COALESCE-expr1-expr2-—-返回第一个非-NULL-值"><a href="#COALESCE-expr1-expr2-—-返回第一个非-NULL-值" class="headerlink" title="COALESCE(expr1, expr2, ...) — 返回第一个非 NULL 值"></a><code>COALESCE(expr1, expr2, ...)</code> — 返回第一个非 NULL 值</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="built_in">COALESCE</span>(<span class="keyword">NULL</span>, <span class="string">&#x27;&#x27;</span>, <span class="string">&#x27;a&#x27;</span>);  <span class="comment">-- 返回 &#x27;&#x27;</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="NULLIF-a-b-—-若-a-b-返回-NULL，否则返回-a"><a href="#NULLIF-a-b-—-若-a-b-返回-NULL，否则返回-a" class="headerlink" title="NULLIF(a, b) — 若 a &#x3D; b 返回 NULL，否则返回 a"></a><code>NULLIF(a, b)</code> — 若 a &#x3D; b 返回 NULL，否则返回 a</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="built_in">NULLIF</span>(<span class="string">&#x27;&#x27;</span>, <span class="string">&#x27;&#x27;</span>);  <span class="comment">-- 返回 NULL</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="CASE-WHEN-THEN-END-—-多分支条件"><a href="#CASE-WHEN-THEN-END-—-多分支条件" class="headerlink" title="CASE ... WHEN ... THEN ... END — 多分支条件"></a><code>CASE ... WHEN ... THEN ... END</code> — 多分支条件</h3>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2025/11/19/mysql/mysql--5%E5%B8%B8%E7%94%A8%E5%87%BD%E6%95%B0/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+
+
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="https://leslie-shell.github.io/2025/11/19/mysql/mysql--%E5%8A%9B%E6%89%A3--3%E7%AC%ACn%E9%AB%98%E7%9A%84%E8%96%AA%E6%B0%B4/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1007,356 +1327,10 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://leslie-shell.github.io/2025/11/09/english/common/word--%E5%B7%A5%E4%BD%9C%E5%8D%95%E8%AF%8D%E8%AF%8D%E6%B1%87%E6%94%B6%E8%97%8F202211/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="YeChengfeng">
-      <meta itemprop="description" content="Make Learning and Organizing a Habit!">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="随笔">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2025/11/09/english/common/word--%E5%B7%A5%E4%BD%9C%E5%8D%95%E8%AF%8D%E8%AF%8D%E6%B1%87%E6%94%B6%E8%97%8F202211/" class="post-title-link" itemprop="url">material | operation | melody|  specification| slap| predict| relativity |evolution| scarce| hyper</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-              
-
-              <time title="创建时间：2025-11-09 19:58:38 / 修改时间：20:05:09" itemprop="dateCreated datePublished" datetime="2025-11-09T19:58:38+08:00">2025-11-09</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/English/" itemprop="url" rel="index"><span itemprop="name">English</span></a>
-                </span>
-                  ，
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/English/Vocabulary/" itemprop="url" rel="index"><span itemprop="name">Vocabulary</span></a>
-                </span>
-                  ，
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/English/Vocabulary/20221102/" itemprop="url" rel="index"><span itemprop="name">20221102</span></a>
-                </span>
-            </span>
-
-          
-            <span id="/2025/11/09/english/common/word--%E5%B7%A5%E4%BD%9C%E5%8D%95%E8%AF%8D%E8%AF%8D%E6%B1%87%E6%94%B6%E8%97%8F202211/" class="post-meta-item leancloud_visitors" data-flag-title="material | operation | melody|  specification| slap| predict| relativity |evolution| scarce| hyper" title="阅读次数">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-eye"></i>
-              </span>
-              <span class="post-meta-item-text">阅读次数：</span>
-              <span class="leancloud-visitors-count"></span>
-            </span><br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>3.6k</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>3 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>material | operation | melody|  specification| slap| predict| relativity |evolution| scarce| hyper</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2025/11/09/english/common/word--%E5%B7%A5%E4%BD%9C%E5%8D%95%E8%AF%8D%E8%AF%8D%E6%B1%87%E6%94%B6%E8%97%8F202211/">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-
-
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://leslie-shell.github.io/2025/11/09/english/common/word--%E5%B7%A5%E4%BD%9C%E5%8D%95%E8%AF%8D%E8%AF%8D%E6%B1%87%E6%94%B6%E8%97%8F20220401-5/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="YeChengfeng">
-      <meta itemprop="description" content="Make Learning and Organizing a Habit!">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="随笔">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2025/11/09/english/common/word--%E5%B7%A5%E4%BD%9C%E5%8D%95%E8%AF%8D%E8%AF%8D%E6%B1%87%E6%94%B6%E8%97%8F20220401-5/" class="post-title-link" itemprop="url">工作单词词汇收藏20220401-5</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-              
-
-              <time title="创建时间：2025-11-09 17:43:28 / 修改时间：17:45:12" itemprop="dateCreated datePublished" datetime="2025-11-09T17:43:28+08:00">2025-11-09</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/English/" itemprop="url" rel="index"><span itemprop="name">English</span></a>
-                </span>
-                  ，
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/English/Vocabulary/" itemprop="url" rel="index"><span itemprop="name">Vocabulary</span></a>
-                </span>
-                  ，
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/English/Vocabulary/20220401/" itemprop="url" rel="index"><span itemprop="name">20220401</span></a>
-                </span>
-            </span>
-
-          
-            <span id="/2025/11/09/english/common/word--%E5%B7%A5%E4%BD%9C%E5%8D%95%E8%AF%8D%E8%AF%8D%E6%B1%87%E6%94%B6%E8%97%8F20220401-5/" class="post-meta-item leancloud_visitors" data-flag-title="工作单词词汇收藏20220401-5" title="阅读次数">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-eye"></i>
-              </span>
-              <span class="post-meta-item-text">阅读次数：</span>
-              <span class="leancloud-visitors-count"></span>
-            </span><br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>2.4k</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>2 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h3 id="1-established-ɪˈstaeblɪʃt"><a href="#1-established-ɪˈstaeblɪʃt" class="headerlink" title="1. established &#x2F;ɪˈstæblɪʃt&#x2F;"></a>1. <span style="color:red;">es</span><span style="color:green;">tab</span><span style="color:blue;">lished</span> &#x2F;ɪˈstæblɪʃt&#x2F;</h3><p><strong>adj — recognized or accepted over a long period; having existed for a long time</strong><br>中文释义: 已建立的；公认的；已有声望的。  </p>
-<p>Examples:  </p>
-<ul>
-<li>She works for an established law firm.  </li>
-<li>The restaurant is one of the most established in the city.</li>
-</ul>
-<p>Common phrases:  </p>
-<ul>
-<li>established company — 老牌公司  </li>
-<li>established procedure — 既定程序  </li>
-<li>well-established — 信誉良好的</li>
-</ul>
-<hr>
-<h3 id="2-charming-ˈtʃɑːrmɪŋ"><a href="#2-charming-ˈtʃɑːrmɪŋ" class="headerlink" title="2. charming &#x2F;ˈtʃɑːrmɪŋ&#x2F;"></a>2. <span style="color:red;">ch</span><span style="color:green;">arm</span><span style="color:blue;">ing</span> &#x2F;ˈtʃɑːrmɪŋ&#x2F;</h3><p><strong>adj — very pleasant or attractive</strong><br>中文释义: 迷人的；有吸引力的。  </p>
-<p>Examples:  </p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2025/11/09/english/common/word--%E5%B7%A5%E4%BD%9C%E5%8D%95%E8%AF%8D%E8%AF%8D%E6%B1%87%E6%94%B6%E8%97%8F20220401-5/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-
-
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://leslie-shell.github.io/2025/11/09/english/common/word--%E5%B7%A5%E4%BD%9C%E5%8D%95%E8%AF%8D%E8%AF%8D%E6%B1%87%E6%94%B6%E8%97%8F20220401-6/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="YeChengfeng">
-      <meta itemprop="description" content="Make Learning and Organizing a Habit!">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="随笔">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2025/11/09/english/common/word--%E5%B7%A5%E4%BD%9C%E5%8D%95%E8%AF%8D%E8%AF%8D%E6%B1%87%E6%94%B6%E8%97%8F20220401-6/" class="post-title-link" itemprop="url">工作单词词汇收藏20220401-6</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-              
-
-              <time title="创建时间：2025-11-09 17:43:28 / 修改时间：17:46:20" itemprop="dateCreated datePublished" datetime="2025-11-09T17:43:28+08:00">2025-11-09</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/English/" itemprop="url" rel="index"><span itemprop="name">English</span></a>
-                </span>
-                  ，
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/English/Vocabulary/" itemprop="url" rel="index"><span itemprop="name">Vocabulary</span></a>
-                </span>
-                  ，
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/English/Vocabulary/20220401/" itemprop="url" rel="index"><span itemprop="name">20220401</span></a>
-                </span>
-            </span>
-
-          
-            <span id="/2025/11/09/english/common/word--%E5%B7%A5%E4%BD%9C%E5%8D%95%E8%AF%8D%E8%AF%8D%E6%B1%87%E6%94%B6%E8%97%8F20220401-6/" class="post-meta-item leancloud_visitors" data-flag-title="工作单词词汇收藏20220401-6" title="阅读次数">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-eye"></i>
-              </span>
-              <span class="post-meta-item-text">阅读次数：</span>
-              <span class="leancloud-visitors-count"></span>
-            </span><br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>1.3k</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>1 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h3 id="1-invader-ɪnˈveɪdər"><a href="#1-invader-ɪnˈveɪdər" class="headerlink" title="1. invader &#x2F;ɪnˈveɪdər&#x2F;"></a>1. <span style="color:red;">in</span><span style="color:green;">vad</span><span style="color:blue;">er</span> &#x2F;ɪnˈveɪdər&#x2F;</h3><p><strong>n — a person, army, or country that enters another place by force</strong><br>中文释义: 入侵者；侵略者。  </p>
-<p>Examples:  </p>
-<ul>
-<li>The invaders were repelled by the local army.  </li>
-<li>Ancient invaders often shaped the culture of the conquered land.</li>
-</ul>
-<p>Common phrases:  </p>
-<ul>
-<li>foreign invader — 外来入侵者  </li>
-<li>enemy invader — 敌方入侵者  </li>
-<li>invader forces — 入侵部队</li>
-</ul>
-<hr>
-<h3 id="2-fragment-ˈfraeɡmənt"><a href="#2-fragment-ˈfraeɡmənt" class="headerlink" title="2. fragment &#x2F;ˈfræɡmənt&#x2F;"></a>2. <span style="color:red;">frag</span><span style="color:green;">ment</span> &#x2F;ˈfræɡmənt&#x2F;</h3><p><strong>n — a small part broken off or detached from something</strong><br>中文释义: 碎片；片段。  </p>
-<p>Examples:  </p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2025/11/09/english/common/word--%E5%B7%A5%E4%BD%9C%E5%8D%95%E8%AF%8D%E8%AF%8D%E6%B1%87%E6%94%B6%E8%97%8F20220401-6/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-
-
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/12/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/12/">12</a><span class="page-number current">13</span><a class="page-number" href="/page/14/">14</a><span class="space">&hellip;</span><a class="page-number" href="/page/21/">21</a><a class="extend next" rel="next" href="/page/14/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
+    <a class="extend prev" rel="prev" href="/page/12/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/12/">12</a><span class="page-number current">13</span><a class="page-number" href="/page/14/">14</a><span class="space">&hellip;</span><a class="page-number" href="/page/22/">22</a><a class="extend next" rel="next" href="/page/14/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
   </nav>
 
 
@@ -1422,14 +1396,14 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">209</span>
+          <span class="site-state-item-count">212</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">45</span>
+        <span class="site-state-item-count">44</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
@@ -1471,12 +1445,12 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-area"></i>
     </span>
-    <span title="站点总字数">455k</span>
+    <span title="站点总字数">456k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">6:53</span>
+    <span title="站点阅读时长">6:55</span>
 </div>
 
         
