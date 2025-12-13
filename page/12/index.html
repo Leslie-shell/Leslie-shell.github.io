@@ -212,6 +212,373 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://leslie-shell.github.io/2025/11/22/redis/redis%E5%86%85%E5%AD%98%E6%B7%98%E6%B1%B0%E7%AD%96%E7%95%A5/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="YeChengfeng">
+      <meta itemprop="description" content="Make Learning and Organizing a Habit!">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="随笔">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2025/11/22/redis/redis%E5%86%85%E5%AD%98%E6%B7%98%E6%B1%B0%E7%AD%96%E7%95%A5/" class="post-title-link" itemprop="url">redis内存淘汰策略</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2025-11-22 21:26:43" itemprop="dateCreated datePublished" datetime="2025-11-22T21:26:43+08:00">2025-11-22</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2025-11-29 23:10:39" itemprop="dateModified" datetime="2025-11-29T23:10:39+08:00">2025-11-29</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Java/" itemprop="url" rel="index"><span itemprop="name">Java</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Java/Redis/" itemprop="url" rel="index"><span itemprop="name">Redis</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/2025/11/22/redis/redis%E5%86%85%E5%AD%98%E6%B7%98%E6%B1%B0%E7%AD%96%E7%95%A5/" class="post-meta-item leancloud_visitors" data-flag-title="redis内存淘汰策略" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>902</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>1 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="Redis-内存管理与淘汰策略"><a href="#Redis-内存管理与淘汰策略" class="headerlink" title="Redis 内存管理与淘汰策略"></a>Redis 内存管理与淘汰策略</h1><p>Redis 内存管理是保证缓存高效运行的基础，主要涉及 <strong>最大内存配置、内存淘汰策略、内存失效机制</strong>。</p>
+<hr>
+<h2 id="1-配置最大内存"><a href="#1-配置最大内存" class="headerlink" title="1. 配置最大内存"></a>1. 配置最大内存</h2><ul>
+<li>Redis 可以通过配置限制占用内存大小：</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># 配置最大内存为1024MB</span><br><span class="line">maxmemory 1024mb</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>注意事项：<ul>
+<li>默认 <code>maxmemory=0</code>：<ul>
+<li>64位系统：Redis 最大内存使用剩余操作系统内存</li>
+<li>32位系统：最大约 3GB</li>
+</ul>
+</li>
+<li>可以动态调整：</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 修改最大内存为200MB</span></span><br><span class="line">config <span class="built_in">set</span> maxmemory 200mb</span><br><span class="line"></span><br><span class="line"><span class="comment"># 查看当前最大内存配置</span></span><br><span class="line">config get maxmemory</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="2-内存淘汰策略"><a href="#2-内存淘汰策略" class="headerlink" title="2. 内存淘汰策略"></a>2. 内存淘汰策略</h2>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2025/11/22/redis/redis%E5%86%85%E5%AD%98%E6%B7%98%E6%B1%B0%E7%AD%96%E7%95%A5/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+
+
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://leslie-shell.github.io/2025/11/22/redis/redis%E5%86%85%E5%AD%98%E7%A2%8E%E7%89%87%E5%8C%96%E5%8A%A8%E6%80%81%E5%A4%84%E7%90%86%E6%9C%BA%E5%88%B6/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="YeChengfeng">
+      <meta itemprop="description" content="Make Learning and Organizing a Habit!">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="随笔">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2025/11/22/redis/redis%E5%86%85%E5%AD%98%E7%A2%8E%E7%89%87%E5%8C%96%E5%8A%A8%E6%80%81%E5%A4%84%E7%90%86%E6%9C%BA%E5%88%B6/" class="post-title-link" itemprop="url">redis内存碎片化动态处理机制</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2025-11-22 21:25:13" itemprop="dateCreated datePublished" datetime="2025-11-22T21:25:13+08:00">2025-11-22</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2025-11-29 23:10:45" itemprop="dateModified" datetime="2025-11-29T23:10:45+08:00">2025-11-29</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Java/" itemprop="url" rel="index"><span itemprop="name">Java</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Java/Redis/" itemprop="url" rel="index"><span itemprop="name">Redis</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/2025/11/22/redis/redis%E5%86%85%E5%AD%98%E7%A2%8E%E7%89%87%E5%8C%96%E5%8A%A8%E6%80%81%E5%A4%84%E7%90%86%E6%9C%BA%E5%88%B6/" class="post-meta-item leancloud_visitors" data-flag-title="redis内存碎片化动态处理机制" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>1.2k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>1 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <hr>
+<h1 id="Redis-内存碎片化管理"><a href="#Redis-内存碎片化管理" class="headerlink" title="Redis 内存碎片化管理"></a>Redis 内存碎片化管理</h1><p>Redis 内存碎片化是指已分配的内存无法被有效利用，导致内存浪费的现象。Redis 提供了多种机制来动态处理内存碎片化问题，包括监控、自动整理和手动整理，同时提供了最佳实践和注意事项。</p>
+<hr>
+<h2 id="1-内存碎片率监控"><a href="#1-内存碎片率监控" class="headerlink" title="1. 内存碎片率监控"></a>1. 内存碎片率监控</h2><ul>
+<li>通过 <code>INFO MEMORY</code> 命令查看内存碎片情况：</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">redis-cli info memory | grep ratio</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>关键指标 <code>mem_fragmentation_ratio</code>：<ul>
+<li><code>≈1.0</code> → 内存几乎没有碎片</li>
+<li><code>1.0 - 1.5</code> → 碎片率合理</li>
+<li><code>&gt;1.5</code> → 碎片较多</li>
+<li><code>&lt;1.0</code> → Redis 使用了交换空间 (swap)</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="2-动态内存回收机制"><a href="#2-动态内存回收机制" class="headerlink" title="2. 动态内存回收机制"></a>2. 动态内存回收机制</h2>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2025/11/22/redis/redis%E5%86%85%E5%AD%98%E7%A2%8E%E7%89%87%E5%8C%96%E5%8A%A8%E6%80%81%E5%A4%84%E7%90%86%E6%9C%BA%E5%88%B6/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+
+
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://leslie-shell.github.io/2025/11/22/spring/spring--%E7%BA%AF%E6%B3%A8%E8%A7%A3%E9%A9%B1%E5%8A%A8%E5%BC%80%E5%8F%91-5%E6%BA%90%E7%A0%81/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="YeChengfeng">
+      <meta itemprop="description" content="Make Learning and Organizing a Habit!">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="随笔">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2025/11/22/spring/spring--%E7%BA%AF%E6%B3%A8%E8%A7%A3%E9%A9%B1%E5%8A%A8%E5%BC%80%E5%8F%91-5%E6%BA%90%E7%A0%81/" class="post-title-link" itemprop="url">spring纯注解开发驱动-4 源码</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2025-11-22 21:00:58" itemprop="dateCreated datePublished" datetime="2025-11-22T21:00:58+08:00">2025-11-22</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2025-11-29 23:15:04" itemprop="dateModified" datetime="2025-11-29T23:15:04+08:00">2025-11-29</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Java/" itemprop="url" rel="index"><span itemprop="name">Java</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Java/Spring/" itemprop="url" rel="index"><span itemprop="name">Spring</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Java/Spring/%E6%BA%90%E7%A0%81/" itemprop="url" rel="index"><span itemprop="name">源码</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/2025/11/22/spring/spring--%E7%BA%AF%E6%B3%A8%E8%A7%A3%E9%A9%B1%E5%8A%A8%E5%BC%80%E5%8F%91-5%E6%BA%90%E7%A0%81/" class="post-meta-item leancloud_visitors" data-flag-title="spring纯注解开发驱动-4 源码" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>3.8k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>3 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>spring纯注解驱动-源码</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2025/11/22/spring/spring--%E7%BA%AF%E6%B3%A8%E8%A7%A3%E9%A9%B1%E5%8A%A8%E5%BC%80%E5%8F%91-5%E6%BA%90%E7%A0%81/">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+
+
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="https://leslie-shell.github.io/2025/11/22/spring/spring--%E7%BA%AF%E6%B3%A8%E8%A7%A3%E9%A9%B1%E5%8A%A8%E5%BC%80%E5%8F%91-3%E5%A3%B0%E6%98%8E%E5%BC%8F%E4%BA%8B%E5%8A%A1/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -992,380 +1359,10 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://leslie-shell.github.io/2025/11/22/spring/spring--%E9%9D%A2%E8%AF%95--tutorial/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="YeChengfeng">
-      <meta itemprop="description" content="Make Learning and Organizing a Habit!">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="随笔">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2025/11/22/spring/spring--%E9%9D%A2%E8%AF%95--tutorial/" class="post-title-link" itemprop="url">spring面试系列-0</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2025-11-22 16:59:28" itemprop="dateCreated datePublished" datetime="2025-11-22T16:59:28+08:00">2025-11-22</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2025-11-29 23:13:19" itemprop="dateModified" datetime="2025-11-29T23:13:19+08:00">2025-11-29</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Java/" itemprop="url" rel="index"><span itemprop="name">Java</span></a>
-                </span>
-                  ，
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Java/Spring/" itemprop="url" rel="index"><span itemprop="name">Spring</span></a>
-                </span>
-            </span>
-
-          
-            <span id="/2025/11/22/spring/spring--%E9%9D%A2%E8%AF%95--tutorial/" class="post-meta-item leancloud_visitors" data-flag-title="spring面试系列-0" title="阅读次数">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-eye"></i>
-              </span>
-              <span class="post-meta-item-text">阅读次数：</span>
-              <span class="leancloud-visitors-count"></span>
-            </span><br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>1.6k</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>1 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>spring面试八股文系列，参考java-tutorial，</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2025/11/22/spring/spring--%E9%9D%A2%E8%AF%95--tutorial/">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-
-
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://leslie-shell.github.io/2025/11/22/%E5%88%86%E5%B8%83%E5%BC%8F/%E5%88%86%E5%B8%83%E5%BC%8F--dubbo/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="YeChengfeng">
-      <meta itemprop="description" content="Make Learning and Organizing a Habit!">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="随笔">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2025/11/22/%E5%88%86%E5%B8%83%E5%BC%8F/%E5%88%86%E5%B8%83%E5%BC%8F--dubbo/" class="post-title-link" itemprop="url">Dubbo 服务治理</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2025-11-22 16:57:12" itemprop="dateCreated datePublished" datetime="2025-11-22T16:57:12+08:00">2025-11-22</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2025-11-29 23:12:06" itemprop="dateModified" datetime="2025-11-29T23:12:06+08:00">2025-11-29</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Java/" itemprop="url" rel="index"><span itemprop="name">Java</span></a>
-                </span>
-            </span>
-
-          
-            <span id="/2025/11/22/%E5%88%86%E5%B8%83%E5%BC%8F/%E5%88%86%E5%B8%83%E5%BC%8F--dubbo/" class="post-meta-item leancloud_visitors" data-flag-title="Dubbo 服务治理" title="阅读次数">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-eye"></i>
-              </span>
-              <span class="post-meta-item-text">阅读次数：</span>
-              <span class="leancloud-visitors-count"></span>
-            </span><br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>2.1k</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>2 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>参考:</p>
-<p><a target="_blank" rel="noopener" href="https://cn.dubbo.apache.org/zh-cn/overview/mannual/java-sdk/advanced-features-and-usage/performance/threading-model/provider/">https://cn.dubbo.apache.org/zh-cn/overview/mannual/java-sdk/advanced-features-and-usage/performance/threading-model/provider/</a></p>
-<h1 id="Dubbo-服务治理"><a href="#Dubbo-服务治理" class="headerlink" title="Dubbo 服务治理"></a>Dubbo 服务治理</h1><hr>
-<h2 id="一、节点角色说明"><a href="#一、节点角色说明" class="headerlink" title="一、节点角色说明"></a>一、节点角色说明</h2><ul>
-<li><strong>Provider</strong>：暴露服务的服务提供方</li>
-<li><strong>Consumer</strong>：调用远程服务的服务消费方</li>
-<li><strong>Registry</strong>：服务注册与发现的注册中心</li>
-<li><strong>Monitor</strong>：统计服务调用次数和调用时间的监控中心</li>
-<li><strong>Container</strong>：服务运行容器</li>
-</ul>
-<hr>
-<h2 id="二、调用关系说明"><a href="#二、调用关系说明" class="headerlink" title="二、调用关系说明"></a>二、调用关系说明</h2><ol>
-<li>服务容器负责启动、加载并运行服务提供者。</li>
-<li>服务提供者启动时向注册中心注册所提供的服务。</li>
-<li>服务消费者启动时向注册中心订阅所需服务。</li>
-<li>注册中心返回服务提供者地址列表给消费者，如有变更，通过长连接推送更新数据。</li>
-<li>消费者根据软负载均衡算法选择提供者调用，调用失败时重试其他提供者。</li>
-<li>消费者和提供者在内存中累计调用次数和调用时间，每分钟发送一次统计数据到监控中心。</li>
-</ol>
-<hr>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2025/11/22/%E5%88%86%E5%B8%83%E5%BC%8F/%E5%88%86%E5%B8%83%E5%BC%8F--dubbo/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-
-
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://leslie-shell.github.io/2025/11/22/%E5%88%86%E5%B8%83%E5%BC%8F/%E5%88%86%E5%B8%83%E5%BC%8F--%E9%99%90%E6%B5%81/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="YeChengfeng">
-      <meta itemprop="description" content="Make Learning and Organizing a Habit!">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="随笔">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2025/11/22/%E5%88%86%E5%B8%83%E5%BC%8F/%E5%88%86%E5%B8%83%E5%BC%8F--%E9%99%90%E6%B5%81/" class="post-title-link" itemprop="url">分布式限流</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2025-11-22 16:42:25" itemprop="dateCreated datePublished" datetime="2025-11-22T16:42:25+08:00">2025-11-22</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2025-11-29 23:13:52" itemprop="dateModified" datetime="2025-11-29T23:13:52+08:00">2025-11-29</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Java/" itemprop="url" rel="index"><span itemprop="name">Java</span></a>
-                </span>
-            </span>
-
-          
-            <span id="/2025/11/22/%E5%88%86%E5%B8%83%E5%BC%8F/%E5%88%86%E5%B8%83%E5%BC%8F--%E9%99%90%E6%B5%81/" class="post-meta-item leancloud_visitors" data-flag-title="分布式限流" title="阅读次数">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-eye"></i>
-              </span>
-              <span class="post-meta-item-text">阅读次数：</span>
-              <span class="leancloud-visitors-count"></span>
-            </span><br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>592</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>1 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <hr>
-<h2 id="Guava-与-RateLimiter-限流"><a href="#Guava-与-RateLimiter-限流" class="headerlink" title="Guava 与 RateLimiter 限流"></a>Guava 与 RateLimiter 限流</h2><ul>
-<li><p><strong>背景</strong></p>
-<ul>
-<li>应用或模块通常有访问速率上限。</li>
-<li>超过上限的请求不仅无法处理，还可能压垮系统。</li>
-<li><strong>限流</strong>是保护系统的重要手段，Guava 的 <code>RateLimiter</code> 提供了简单易用的限流工具。</li>
-</ul>
-</li>
-<li><p><strong>常见限流算法</strong></p>
-<ol>
-<li><strong>漏桶算法（Leaky Bucket）</strong><ul>
-<li>基本思想：请求进入系统时先放入缓存区，然后以固定速率流出进行处理。</li>
-<li>作用：平滑流量，防止瞬时高峰压垮系统。</li>
-</ul>
-</li>
-<li><strong>令牌桶算法（Token Bucket）</strong><ul>
-<li>基本思想：桶中存放令牌，处理程序只有拿到令牌才能处理请求。</li>
-<li>如果没有令牌，请求要么被丢弃，要么等待令牌。</li>
-<li>限速方式：每单位时间产生固定数量令牌，例如每秒 1 个令牌。</li>
-<li>桶容量有限：未消耗的令牌可累积有限数量。</li>
-</ul>
-</li>
-</ol>
-</li>
-<li><p><strong>Guava RateLimiter API</strong></p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 创建限流器，每秒允许100个请求</span></span><br><span class="line"><span class="type">RateLimiter</span> <span class="variable">rateLimiter</span> <span class="operator">=</span> RateLimiter.create(<span class="number">100</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 阻塞直到获取令牌</span></span><br><span class="line">rateLimiter.acquire();</span><br><span class="line"></span><br><span class="line"><span class="comment">// 非阻塞获取令牌</span></span><br><span class="line">rateLimiter.tryAcquire();</span><br><span class="line"></span><br><span class="line"><span class="comment">// 带超时时间的非阻塞获取</span></span><br><span class="line">rateLimiter.tryAcquire(<span class="number">500</span>, TimeUnit.MILLISECONDS);</span><br></pre></td></tr></table></figure>
-</li>
-<li><p><strong>适用场景</strong></p>
-<ul>
-<li><strong>单机限流</strong>：直接使用 Guava RateLimiter。</li>
-<li><strong>分布式限流</strong>：需要结合 Redis 或专业限流组件（如 Sentinel）实现集群级别的限流。</li>
-</ul>
-</li>
-</ul>
-
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2025/11/22/%E5%88%86%E5%B8%83%E5%BC%8F/%E5%88%86%E5%B8%83%E5%BC%8F--%E9%99%90%E6%B5%81/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-
-
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/11/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/11/">11</a><span class="page-number current">12</span><a class="page-number" href="/page/13/">13</a><span class="space">&hellip;</span><a class="page-number" href="/page/22/">22</a><a class="extend next" rel="next" href="/page/13/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
+    <a class="extend prev" rel="prev" href="/page/11/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/11/">11</a><span class="page-number current">12</span><a class="page-number" href="/page/13/">13</a><span class="space">&hellip;</span><a class="page-number" href="/page/23/">23</a><a class="extend next" rel="next" href="/page/13/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
   </nav>
 
 
@@ -1431,7 +1428,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">219</span>
+          <span class="site-state-item-count">222</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -1480,12 +1477,12 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-area"></i>
     </span>
-    <span title="站点总字数">468k</span>
+    <span title="站点总字数">475k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">7:05</span>
+    <span title="站点阅读时长">7:12</span>
 </div>
 
         

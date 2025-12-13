@@ -1,0 +1,916 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <script>
+    (function () {
+        if ('') {
+            if (prompt('请输入文章密码') !== '') {
+                alert('密码错误！');
+                if (history.length === 1) {
+                    location.replace("http://xxxxxxx.xxx"); // 这里替换成你的首页
+                } else {
+                    history.back();
+                }
+            }    
+        }
+    })();
+</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 8.1.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css">
+  <script src="/lib/pace/pace.min.js"></script>
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"leslie-shell.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"always","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":true,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.json"};
+  </script>
+
+  <meta name="description" content="如何通过“公司财务运作逻辑 + 财务三表”，判断公司真实经营质量与风险。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="11.财务三表分析（一）｜利润与现金流">
+<meta property="og:url" content="https://leslie-shell.github.io/2025/12/14/economic/11.%E8%B4%A2%E5%8A%A1%E4%B8%89%E8%A1%A8%E5%88%86%E6%9E%90%EF%BC%88%E4%B8%80%EF%BC%89%EF%BD%9C%E5%88%A9%E6%B6%A6%E4%B8%8E%E7%8E%B0%E9%87%91%E6%B5%81/index.html">
+<meta property="og:site_name" content="随笔">
+<meta property="og:description" content="如何通过“公司财务运作逻辑 + 财务三表”，判断公司真实经营质量与风险。">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2025-12-13T16:25:43.556Z">
+<meta property="article:modified_time" content="2025-12-13T16:33:00.539Z">
+<meta property="article:author" content="YeChengfeng">
+<meta property="article:tag" content="经济">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://leslie-shell.github.io/2025/12/14/economic/11.%E8%B4%A2%E5%8A%A1%E4%B8%89%E8%A1%A8%E5%88%86%E6%9E%90%EF%BC%88%E4%B8%80%EF%BC%89%EF%BD%9C%E5%88%A9%E6%B6%A6%E4%B8%8E%E7%8E%B0%E9%87%91%E6%B5%81/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>11.财务三表分析（一）｜利润与现金流 | 随笔</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">随笔</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-rank">
+
+    <a href="/rank/" rel="section"><i class="fa fa-fire fa-fw"></i>热度</a>
+
+  </li>
+        <li class="menu-item menu-item-recommended">
+
+    <a href="/recommended/" rel="section"><i class="fa fa-flag fa-fw"></i>推荐</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://leslie-shell.github.io/2025/12/14/economic/11.%E8%B4%A2%E5%8A%A1%E4%B8%89%E8%A1%A8%E5%88%86%E6%9E%90%EF%BC%88%E4%B8%80%EF%BC%89%EF%BD%9C%E5%88%A9%E6%B6%A6%E4%B8%8E%E7%8E%B0%E9%87%91%E6%B5%81/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="YeChengfeng">
+      <meta itemprop="description" content="Make Learning and Organizing a Habit!">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="随笔">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          11.财务三表分析（一）｜利润与现金流
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2025-12-14 00:25:43 / 修改时间：00:33:00" itemprop="dateCreated datePublished" datetime="2025-12-14T00:25:43+08:00">2025-12-14</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%BB%8F%E6%B5%8E/" itemprop="url" rel="index"><span itemprop="name">经济</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/2025/12/14/economic/11.%E8%B4%A2%E5%8A%A1%E4%B8%89%E8%A1%A8%E5%88%86%E6%9E%90%EF%BC%88%E4%B8%80%EF%BC%89%EF%BD%9C%E5%88%A9%E6%B6%A6%E4%B8%8E%E7%8E%B0%E9%87%91%E6%B5%81/" class="post-meta-item leancloud_visitors" data-flag-title="11.财务三表分析（一）｜利润与现金流" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>2.3k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>2 分钟</span>
+            </span>
+            <div class="post-description">如何通过“公司财务运作逻辑 + 财务三表”，判断公司真实经营质量与风险。</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="一、从资产负债表到利润与现金流"><a href="#一、从资产负债表到利润与现金流" class="headerlink" title="一、从资产负债表到利润与现金流"></a>一、从资产负债表到利润与现金流</h2><p>在上一期中，我们通过<strong>资产负债表</strong>分析了公司的商业模式。本期内容继续向下推进：</p>
+<blockquote>
+<p><strong>好的商业模式，最终一定要体现在“经营成果”上。</strong></p>
+</blockquote>
+<p>而经营成果，主要通过两张表来验证：</p>
+<ul>
+<li><strong>利润表</strong>：公司赚不赚钱、赚得稳不稳</li>
+<li><strong>现金流量表</strong>：赚到的钱是不是真钱、能不能活下去</li>
+</ul>
+<p>本期依然以 <strong>珀莱雅</strong> 作为核心案例，带大家完整走一遍职业投资者解读利润表与现金流量表的逻辑。</p>
+<hr>
+<h2 id="二、从年报首页开始：主要业绩信息的正确用法"><a href="#二、从年报首页开始：主要业绩信息的正确用法" class="headerlink" title="二、从年报首页开始：主要业绩信息的正确用法"></a>二、从年报首页开始：主要业绩信息的正确用法</h2><p>上市公司在年报正文最前面，会贴心地给出一张 <strong>主要财务数据摘要表</strong>，包括：</p>
+<ul>
+<li>营业收入</li>
+<li>净利润</li>
+<li>总资产</li>
+<li>经营活动现金流净额</li>
+</ul>
+<p>以珀莱雅为例：</p>
+<ul>
+<li>2024 年营收 <strong>107.78 亿</strong></li>
+<li>2023 年营收 <strong>89.04 亿</strong></li>
+<li>同比增长 <strong>21.04%</strong></li>
+</ul>
+<p>乍一看，这是一份“非常漂亮”的成绩单。</p>
+<p>但<strong>职业分析不会止步于此</strong>。</p>
+<hr>
+<h2 id="三、年度同比是“陷阱”，季度趋势才是真相"><a href="#三、年度同比是“陷阱”，季度趋势才是真相" class="headerlink" title="三、年度同比是“陷阱”，季度趋势才是真相"></a>三、年度同比是“陷阱”，季度趋势才是真相</h2><p>年报里的业绩数据，大多采用<strong>年度累加口径</strong>。</p>
+<p>问题在于：</p>
+<ul>
+<li>四季度 &#x3D; 一至四季度的累加值</li>
+<li>如果前三季度很好、第四季度出现拐点</li>
+<li>全年数据仍然可能“看起来很美”</li>
+</ul>
+<h3 id="正确做法："><a href="#正确做法：" class="headerlink" title="正确做法："></a>正确做法：</h3><blockquote>
+<p><strong>把历史业绩全部拆成“季度维度”，做成趋势图。</strong></p>
+</blockquote>
+<p>当我们将珀莱雅的营收按季度拉开后，会发现：</p>
+<ul>
+<li>2024 年的增长，主要来自 <strong>Q2</strong></li>
+<li>Q3、Q4 以及 2025 年 Q1</li>
+<li>增速已经出现 <strong>边际放缓</strong></li>
+</ul>
+<p>👉 <strong>这类信息，在年报原文里是看不到的。</strong></p>
+<hr>
+<h2 id="四、把“市值”叠加进来，才能理解股价"><a href="#四、把“市值”叠加进来，才能理解股价" class="headerlink" title="四、把“市值”叠加进来，才能理解股价"></a>四、把“市值”叠加进来，才能理解股价</h2><p>如果在季度业绩趋势图上，再叠加公司的 <strong>市值曲线</strong>，你会看到更关键的事实：</p>
+<ul>
+<li>2020 年：市值明显领先于业绩增长</li>
+<li>对应的是一轮白马股估值大牛市</li>
+<li>2021 年后：估值泡沫破裂</li>
+<li>之后几年：业绩通过增长，慢慢消化高估值</li>
+</ul>
+<blockquote>
+<p><strong>长期来看，市值一定跟着业绩走。</strong></p>
+</blockquote>
+<p>不是观点，是大量数据验证后的结论。</p>
+<p>短期可能无关，但时间一拉长，<strong>无一例外</strong>。</p>
+<hr>
+<h2 id="五、利润表-≠-现金流：为什么要把两张表放在一起看"><a href="#五、利润表-≠-现金流：为什么要把两张表放在一起看" class="headerlink" title="五、利润表 ≠ 现金流：为什么要把两张表放在一起看"></a>五、利润表 ≠ 现金流：为什么要把两张表放在一起看</h2><h3 id="1️⃣-主营业务现金流的重要性"><a href="#1️⃣-主营业务现金流的重要性" class="headerlink" title="1️⃣ 主营业务现金流的重要性"></a>1️⃣ 主营业务现金流的重要性</h3><p>利润和业绩，都可以在会计准则下进行调整；</p>
+<p>但<strong>经营活动现金流</strong>：</p>
+<ul>
+<li>需要真实资金过账</li>
+<li>作假的难度极高</li>
+</ul>
+<blockquote>
+<p><strong>利润不重要，现金流才是企业的血液。</strong></p>
+</blockquote>
+<p>没有现金流的公司，坚持不了多久。</p>
+<hr>
+<h3 id="2️⃣-三种典型现金流特征"><a href="#2️⃣-三种典型现金流特征" class="headerlink" title="2️⃣ 三种典型现金流特征"></a>2️⃣ 三种典型现金流特征</h3><h4 id="✅-现金流-业绩（优质模式）"><a href="#✅-现金流-业绩（优质模式）" class="headerlink" title="✅ 现金流 &gt; 业绩（优质模式）"></a>✅ 现金流 &gt; 业绩（优质模式）</h4><ul>
+<li>代表公司产品畅销</li>
+<li>预收款多、回款快</li>
+<li>典型案例：<strong>贵州茅台</strong></li>
+</ul>
+<h4 id="⚠️-现金流-≈-业绩（正常模式）"><a href="#⚠️-现金流-≈-业绩（正常模式）" class="headerlink" title="⚠️ 现金流 ≈ 业绩（正常模式）"></a>⚠️ 现金流 ≈ 业绩（正常模式）</h4><ul>
+<li>回款节奏健康</li>
+<li>珀莱雅属于这一类</li>
+</ul>
+<h4 id="❌-现金流-业绩（高风险模式）"><a href="#❌-现金流-业绩（高风险模式）" class="headerlink" title="❌ 现金流 &lt; 业绩（高风险模式）"></a>❌ 现金流 &lt; 业绩（高风险模式）</h4><ul>
+<li>应收账款高企</li>
+<li>产品卖得出去，但钱收不回来</li>
+<li>商业模式存在结构性问题</li>
+</ul>
+<blockquote>
+<p><strong>一旦出现长期现金流显著低于业绩，直接淘汰。</strong></p>
+</blockquote>
+<hr>
+<h2 id="六、从收入来源，反推商业结构"><a href="#六、从收入来源，反推商业结构" class="headerlink" title="六、从收入来源，反推商业结构"></a>六、从收入来源，反推商业结构</h2><h3 id="1️⃣-销售渠道分析"><a href="#1️⃣-销售渠道分析" class="headerlink" title="1️⃣ 销售渠道分析"></a>1️⃣ 销售渠道分析</h3><p>珀莱雅：</p>
+<ul>
+<li>线上销售占比 <strong>95%+</strong></li>
+<li>线下占比不足 5%</li>
+</ul>
+<p>这是公司的战略选择。</p>
+<p>战略好坏未必一眼能判断，但：</p>
+<blockquote>
+<p><strong>至少要知道：公司是“怎么把产品卖出去的”。</strong></p>
+</blockquote>
+<hr>
+<h3 id="2️⃣-产品矩阵分析"><a href="#2️⃣-产品矩阵分析" class="headerlink" title="2️⃣ 产品矩阵分析"></a>2️⃣ 产品矩阵分析</h3><p>分析要点包括：</p>
+<ul>
+<li>核心产品是否稳定增长</li>
+<li>是否依赖单一品类</li>
+<li>是否有新品类或战略级品牌</li>
+</ul>
+<p>珀莱雅：</p>
+<ul>
+<li>护肤品贡献约 <strong>90%</strong> 收入</li>
+<li>通过收购与孵化，布局多品牌矩阵</li>
+</ul>
+<hr>
+<h3 id="3️⃣-客户集中度（To-B-公司重点）"><a href="#3️⃣-客户集中度（To-B-公司重点）" class="headerlink" title="3️⃣ 客户集中度（To B 公司重点）"></a>3️⃣ 客户集中度（To B 公司重点）</h3><p>如果是 To B 公司，必须看：</p>
+<ul>
+<li>前五大客户收入占比</li>
+</ul>
+<p>案例中某公司：</p>
+<ul>
+<li>第一大客户占比 <strong>54%</strong></li>
+<li>前五客户合计 <strong>79%</strong></li>
+</ul>
+<p>👉 <strong>完全依赖甲方生存，应收账款高是必然结果。</strong></p>
+<hr>
+<h2 id="七、成本与毛利率：公司靠什么赚钱"><a href="#七、成本与毛利率：公司靠什么赚钱" class="headerlink" title="七、成本与毛利率：公司靠什么赚钱"></a>七、成本与毛利率：公司靠什么赚钱</h2><h3 id="1️⃣-毛利率的本质"><a href="#1️⃣-毛利率的本质" class="headerlink" title="1️⃣ 毛利率的本质"></a>1️⃣ 毛利率的本质</h3><blockquote>
+<p><strong>毛利率 &#x3D; 公司“赋予原料价值”的能力。</strong></p>
+</blockquote>
+<p>珀莱雅毛利率：<strong>71.39%</strong>（高毛利）</p>
+<p>对比：</p>
+<ul>
+<li>贵州茅台：约 <strong>91%</strong></li>
+</ul>
+<p>高毛利公司的优势：</p>
+<ul>
+<li>定价权强</li>
+<li>抗周期能力强</li>
+<li>不容易亏损</li>
+</ul>
+<hr>
+<h3 id="2️⃣-高毛利-vs-低毛利模式"><a href="#2️⃣-高毛利-vs-低毛利模式" class="headerlink" title="2️⃣ 高毛利 vs 低毛利模式"></a>2️⃣ 高毛利 vs 低毛利模式</h3><ul>
+<li><strong>高毛利公司</strong>：靠品牌 &#x2F; 技术 &#x2F; 文化溢价</li>
+<li><strong>低毛利公司</strong>：靠运营效率（如物流）</li>
+</ul>
+<p>低毛利公司：</p>
+<ul>
+<li>对管理层依赖极高</li>
+<li>一旦管理失误，业绩下滑极快</li>
+</ul>
+<p>👉 <strong>新手投资者，应尽量规避低毛利行业。</strong></p>
+<hr>
+<h2 id="八、三费分析：钱花在了哪里"><a href="#八、三费分析：钱花在了哪里" class="headerlink" title="八、三费分析：钱花在了哪里"></a>八、三费分析：钱花在了哪里</h2><h3 id="1️⃣-销售费用"><a href="#1️⃣-销售费用" class="headerlink" title="1️⃣ 销售费用"></a>1️⃣ 销售费用</h3><p>珀莱雅 2024 年销售费用：</p>
+<ul>
+<li><strong>51 亿</strong></li>
+<li>占总费用约 <strong>90%</strong></li>
+</ul>
+<p>说明：</p>
+<ul>
+<li>典型 <strong>营销驱动型公司</strong></li>
+</ul>
+<p>关键不是高不高，而是：</p>
+<blockquote>
+<p><strong>钱花下去，业绩有没有增长。</strong></p>
+</blockquote>
+<hr>
+<h3 id="2️⃣-管理费用"><a href="#2️⃣-管理费用" class="headerlink" title="2️⃣ 管理费用"></a>2️⃣ 管理费用</h3><ul>
+<li>更多看 <strong>费用 &#x2F; 营收比例是否稳定</strong></li>
+<li>珀莱雅管理费 3.66 亿</li>
+<li>对百亿营收体量来说，合理</li>
+</ul>
+<hr>
+<h3 id="3️⃣-财务费用"><a href="#3️⃣-财务费用" class="headerlink" title="3️⃣ 财务费用"></a>3️⃣ 财务费用</h3><p>珀莱雅财务费用为 <strong>负数</strong>：</p>
+<ul>
+<li>原因：账上现金多，利息收入大于支出</li>
+</ul>
+<p>与资产负债表形成印证。</p>
+<hr>
+<h3 id="4️⃣-研发费用"><a href="#4️⃣-研发费用" class="headerlink" title="4️⃣ 研发费用"></a>4️⃣ 研发费用</h3><ul>
+<li>不同行业，逻辑完全不同</li>
+<li>茅台：研发低是优势</li>
+<li>科技公司：研发低是风险</li>
+</ul>
+<p>必须 <strong>结合业务判断</strong>，不能只看数字。</p>
+<hr>
+<h3 id="5️⃣-费用占比经验区间（参考）"><a href="#5️⃣-费用占比经验区间（参考）" class="headerlink" title="5️⃣ 费用占比经验区间（参考）"></a>5️⃣ 费用占比经验区间（参考）</h3><p>以“费用 &#x2F; 毛利润”为尺度：</p>
+<ul>
+<li><strong>&lt;30%</strong>：非常优秀</li>
+<li><strong>30%–70%</strong>：普通偏好</li>
+<li><strong>&gt;70%</strong>：需重点警惕</li>
+</ul>
+<p>珀莱雅约 <strong>74%</strong>，</p>
+<p>👉 <strong>未来必须持续盯营销效率。</strong></p>
+<hr>
+<h2 id="九、净利润与-ROE：最终赚钱能力"><a href="#九、净利润与-ROE：最终赚钱能力" class="headerlink" title="九、净利润与 ROE：最终赚钱能力"></a>九、净利润与 ROE：最终赚钱能力</h2><h3 id="1️⃣-净利润分析"><a href="#1️⃣-净利润分析" class="headerlink" title="1️⃣ 净利润分析"></a>1️⃣ 净利润分析</h3><p>方法：</p>
+<ul>
+<li>同样做趋势图</li>
+<li>与营收、现金流交叉验证</li>
+</ul>
+<p>如果净利润异常：</p>
+<ul>
+<li>向前排查：收入 &#x2F; 成本 &#x2F; 费用</li>
+</ul>
+<hr>
+<h3 id="2️⃣-ROE（净资产收益率）"><a href="#2️⃣-ROE（净资产收益率）" class="headerlink" title="2️⃣ ROE（净资产收益率）"></a>2️⃣ ROE（净资产收益率）</h3><p>核心含义：</p>
+<blockquote>
+<p><strong>用股东的钱，赚了多少钱。</strong></p>
+</blockquote>
+<p>简化理解：<br>[ ROE ≈ 净利润 ÷ 净资产 ]</p>
+<p>杜邦分析法拆解：</p>
+<ul>
+<li>盈利能力</li>
+<li>运营效率</li>
+<li>财务杠杆</li>
+</ul>
+<p>ROE 低的公司：</p>
+<ul>
+<li>本质是赚钱能力差</li>
+<li>不值得长期持有</li>
+</ul>
+<hr>
+<h2 id="十、现金流量表三大模块"><a href="#十、现金流量表三大模块" class="headerlink" title="十、现金流量表三大模块"></a>十、现金流量表三大模块</h2><h3 id="1️⃣-经营活动现金流"><a href="#1️⃣-经营活动现金流" class="headerlink" title="1️⃣ 经营活动现金流"></a>1️⃣ 经营活动现金流</h3><ul>
+<li>应与净利润趋势一致</li>
+<li>长期低于利润 &#x3D; 经营风险</li>
+</ul>
+<hr>
+<h3 id="2️⃣-投资活动现金流"><a href="#2️⃣-投资活动现金流" class="headerlink" title="2️⃣ 投资活动现金流"></a>2️⃣ 投资活动现金流</h3><ul>
+<li>为负：扩张 &#x2F; 投资</li>
+<li>为正：收缩 &#x2F; 回收</li>
+</ul>
+<p>案例：</p>
+<ul>
+<li>珀莱雅：主要是理财投资</li>
+<li>安琪酵母：大量现金用于建厂扩产</li>
+</ul>
+<p>关键在于：</p>
+<blockquote>
+<p><strong>你是否认可公司的扩张战略，以及它所承担的风险。</strong></p>
+</blockquote>
+<hr>
+<h3 id="3️⃣-筹资活动现金流"><a href="#3️⃣-筹资活动现金流" class="headerlink" title="3️⃣ 筹资活动现金流"></a>3️⃣ 筹资活动现金流</h3><ul>
+<li>为正：借钱 &#x2F; 融资</li>
+<li>为负：还债 &#x2F; 分红</li>
+</ul>
+<p>成熟公司：</p>
+<ul>
+<li>增长放缓</li>
+<li>持续分红</li>
+</ul>
+<p>问题公司：</p>
+<ul>
+<li>增长停滞</li>
+<li>仍大量借钱</li>
+</ul>
+<hr>
+<h2 id="十一、财务造假为什么“没用”"><a href="#十一、财务造假为什么“没用”" class="headerlink" title="十一、财务造假为什么“没用”"></a>十一、财务造假为什么“没用”</h2><p>财务三表是<strong>高度联动的</strong>：</p>
+<ul>
+<li>业务 → 财务特征</li>
+<li>数据之间相互印证</li>
+</ul>
+<blockquote>
+<p><strong>你可以修数字，但修不了商业模式。</strong></p>
+</blockquote>
+<p>就像：</p>
+<ul>
+<li>一个平时成绩很差的学生</li>
+<li>突然考了高分</li>
+</ul>
+<p>第一反应不是“他很强”，而是：</p>
+<blockquote>
+<p><strong>是不是作弊了？</strong></p>
+</blockquote>
+<hr>
+<h2 id="十二、总结：建立自己的分析框架"><a href="#十二、总结：建立自己的分析框架" class="headerlink" title="十二、总结：建立自己的分析框架"></a>十二、总结：建立自己的分析框架</h2><p>本期不是讲“细节大全”，而是：</p>
+<ul>
+<li>帮你 <strong>建立一套可复用的分析框架</strong></li>
+<li>用真实案例，验证逻辑</li>
+</ul>
+<p>掌握框架后：</p>
+<ul>
+<li>多练习</li>
+<li>多交叉验证</li>
+<li>不断修正判断</li>
+</ul>
+<blockquote>
+<p><strong>这才是普通投资者，走向长期稳定回报的唯一路径。</strong></p>
+</blockquote>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E7%BB%8F%E6%B5%8E/" rel="tag"># 经济</a>
+          </div>
+
+        
+  <div class="post-widgets">
+    <div class="wp_rating">
+      <div id="wpac-rating"></div>
+    </div>
+  </div>
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2025/12/14/economic/10.%E8%B4%A2%E5%8A%A1%E4%B8%89%E8%A1%A8%E5%88%86%E6%9E%90%EF%BC%88%E4%B8%80%EF%BC%89%EF%BD%9C%E8%B5%84%E4%BA%A7%E8%B4%9F%E5%80%BA%E8%A1%A8/" rel="prev" title="10.财务三表分析（一）｜资产负债表">
+      <i class="fa fa-chevron-left"></i> 10.财务三表分析（一）｜资产负债表
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+
+
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    
+  <div class="comments">
+    <div id="lv-container" data-id="city" data-uid="MTAyMC82MDk4Ni8zNzQ1Ng=="></div>
+  </div>
+  
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%80%E3%80%81%E4%BB%8E%E8%B5%84%E4%BA%A7%E8%B4%9F%E5%80%BA%E8%A1%A8%E5%88%B0%E5%88%A9%E6%B6%A6%E4%B8%8E%E7%8E%B0%E9%87%91%E6%B5%81"><span class="nav-text">一、从资产负债表到利润与现金流</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%8C%E3%80%81%E4%BB%8E%E5%B9%B4%E6%8A%A5%E9%A6%96%E9%A1%B5%E5%BC%80%E5%A7%8B%EF%BC%9A%E4%B8%BB%E8%A6%81%E4%B8%9A%E7%BB%A9%E4%BF%A1%E6%81%AF%E7%9A%84%E6%AD%A3%E7%A1%AE%E7%94%A8%E6%B3%95"><span class="nav-text">二、从年报首页开始：主要业绩信息的正确用法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%89%E3%80%81%E5%B9%B4%E5%BA%A6%E5%90%8C%E6%AF%94%E6%98%AF%E2%80%9C%E9%99%B7%E9%98%B1%E2%80%9D%EF%BC%8C%E5%AD%A3%E5%BA%A6%E8%B6%8B%E5%8A%BF%E6%89%8D%E6%98%AF%E7%9C%9F%E7%9B%B8"><span class="nav-text">三、年度同比是“陷阱”，季度趋势才是真相</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%AD%A3%E7%A1%AE%E5%81%9A%E6%B3%95%EF%BC%9A"><span class="nav-text">正确做法：</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9B%9B%E3%80%81%E6%8A%8A%E2%80%9C%E5%B8%82%E5%80%BC%E2%80%9D%E5%8F%A0%E5%8A%A0%E8%BF%9B%E6%9D%A5%EF%BC%8C%E6%89%8D%E8%83%BD%E7%90%86%E8%A7%A3%E8%82%A1%E4%BB%B7"><span class="nav-text">四、把“市值”叠加进来，才能理解股价</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%94%E3%80%81%E5%88%A9%E6%B6%A6%E8%A1%A8-%E2%89%A0-%E7%8E%B0%E9%87%91%E6%B5%81%EF%BC%9A%E4%B8%BA%E4%BB%80%E4%B9%88%E8%A6%81%E6%8A%8A%E4%B8%A4%E5%BC%A0%E8%A1%A8%E6%94%BE%E5%9C%A8%E4%B8%80%E8%B5%B7%E7%9C%8B"><span class="nav-text">五、利润表 ≠ 现金流：为什么要把两张表放在一起看</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1%EF%B8%8F%E2%83%A3-%E4%B8%BB%E8%90%A5%E4%B8%9A%E5%8A%A1%E7%8E%B0%E9%87%91%E6%B5%81%E7%9A%84%E9%87%8D%E8%A6%81%E6%80%A7"><span class="nav-text">1️⃣ 主营业务现金流的重要性</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2%EF%B8%8F%E2%83%A3-%E4%B8%89%E7%A7%8D%E5%85%B8%E5%9E%8B%E7%8E%B0%E9%87%91%E6%B5%81%E7%89%B9%E5%BE%81"><span class="nav-text">2️⃣ 三种典型现金流特征</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E2%9C%85-%E7%8E%B0%E9%87%91%E6%B5%81-%E4%B8%9A%E7%BB%A9%EF%BC%88%E4%BC%98%E8%B4%A8%E6%A8%A1%E5%BC%8F%EF%BC%89"><span class="nav-text">✅ 现金流 &gt; 业绩（优质模式）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E2%9A%A0%EF%B8%8F-%E7%8E%B0%E9%87%91%E6%B5%81-%E2%89%88-%E4%B8%9A%E7%BB%A9%EF%BC%88%E6%AD%A3%E5%B8%B8%E6%A8%A1%E5%BC%8F%EF%BC%89"><span class="nav-text">⚠️ 现金流 ≈ 业绩（正常模式）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E2%9D%8C-%E7%8E%B0%E9%87%91%E6%B5%81-%E4%B8%9A%E7%BB%A9%EF%BC%88%E9%AB%98%E9%A3%8E%E9%99%A9%E6%A8%A1%E5%BC%8F%EF%BC%89"><span class="nav-text">❌ 现金流 &lt; 业绩（高风险模式）</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%AD%E3%80%81%E4%BB%8E%E6%94%B6%E5%85%A5%E6%9D%A5%E6%BA%90%EF%BC%8C%E5%8F%8D%E6%8E%A8%E5%95%86%E4%B8%9A%E7%BB%93%E6%9E%84"><span class="nav-text">六、从收入来源，反推商业结构</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1%EF%B8%8F%E2%83%A3-%E9%94%80%E5%94%AE%E6%B8%A0%E9%81%93%E5%88%86%E6%9E%90"><span class="nav-text">1️⃣ 销售渠道分析</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2%EF%B8%8F%E2%83%A3-%E4%BA%A7%E5%93%81%E7%9F%A9%E9%98%B5%E5%88%86%E6%9E%90"><span class="nav-text">2️⃣ 产品矩阵分析</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3%EF%B8%8F%E2%83%A3-%E5%AE%A2%E6%88%B7%E9%9B%86%E4%B8%AD%E5%BA%A6%EF%BC%88To-B-%E5%85%AC%E5%8F%B8%E9%87%8D%E7%82%B9%EF%BC%89"><span class="nav-text">3️⃣ 客户集中度（To B 公司重点）</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%83%E3%80%81%E6%88%90%E6%9C%AC%E4%B8%8E%E6%AF%9B%E5%88%A9%E7%8E%87%EF%BC%9A%E5%85%AC%E5%8F%B8%E9%9D%A0%E4%BB%80%E4%B9%88%E8%B5%9A%E9%92%B1"><span class="nav-text">七、成本与毛利率：公司靠什么赚钱</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1%EF%B8%8F%E2%83%A3-%E6%AF%9B%E5%88%A9%E7%8E%87%E7%9A%84%E6%9C%AC%E8%B4%A8"><span class="nav-text">1️⃣ 毛利率的本质</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2%EF%B8%8F%E2%83%A3-%E9%AB%98%E6%AF%9B%E5%88%A9-vs-%E4%BD%8E%E6%AF%9B%E5%88%A9%E6%A8%A1%E5%BC%8F"><span class="nav-text">2️⃣ 高毛利 vs 低毛利模式</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%AB%E3%80%81%E4%B8%89%E8%B4%B9%E5%88%86%E6%9E%90%EF%BC%9A%E9%92%B1%E8%8A%B1%E5%9C%A8%E4%BA%86%E5%93%AA%E9%87%8C"><span class="nav-text">八、三费分析：钱花在了哪里</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1%EF%B8%8F%E2%83%A3-%E9%94%80%E5%94%AE%E8%B4%B9%E7%94%A8"><span class="nav-text">1️⃣ 销售费用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2%EF%B8%8F%E2%83%A3-%E7%AE%A1%E7%90%86%E8%B4%B9%E7%94%A8"><span class="nav-text">2️⃣ 管理费用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3%EF%B8%8F%E2%83%A3-%E8%B4%A2%E5%8A%A1%E8%B4%B9%E7%94%A8"><span class="nav-text">3️⃣ 财务费用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4%EF%B8%8F%E2%83%A3-%E7%A0%94%E5%8F%91%E8%B4%B9%E7%94%A8"><span class="nav-text">4️⃣ 研发费用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5%EF%B8%8F%E2%83%A3-%E8%B4%B9%E7%94%A8%E5%8D%A0%E6%AF%94%E7%BB%8F%E9%AA%8C%E5%8C%BA%E9%97%B4%EF%BC%88%E5%8F%82%E8%80%83%EF%BC%89"><span class="nav-text">5️⃣ 费用占比经验区间（参考）</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B9%9D%E3%80%81%E5%87%80%E5%88%A9%E6%B6%A6%E4%B8%8E-ROE%EF%BC%9A%E6%9C%80%E7%BB%88%E8%B5%9A%E9%92%B1%E8%83%BD%E5%8A%9B"><span class="nav-text">九、净利润与 ROE：最终赚钱能力</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1%EF%B8%8F%E2%83%A3-%E5%87%80%E5%88%A9%E6%B6%A6%E5%88%86%E6%9E%90"><span class="nav-text">1️⃣ 净利润分析</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2%EF%B8%8F%E2%83%A3-ROE%EF%BC%88%E5%87%80%E8%B5%84%E4%BA%A7%E6%94%B6%E7%9B%8A%E7%8E%87%EF%BC%89"><span class="nav-text">2️⃣ ROE（净资产收益率）</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8D%81%E3%80%81%E7%8E%B0%E9%87%91%E6%B5%81%E9%87%8F%E8%A1%A8%E4%B8%89%E5%A4%A7%E6%A8%A1%E5%9D%97"><span class="nav-text">十、现金流量表三大模块</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1%EF%B8%8F%E2%83%A3-%E7%BB%8F%E8%90%A5%E6%B4%BB%E5%8A%A8%E7%8E%B0%E9%87%91%E6%B5%81"><span class="nav-text">1️⃣ 经营活动现金流</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2%EF%B8%8F%E2%83%A3-%E6%8A%95%E8%B5%84%E6%B4%BB%E5%8A%A8%E7%8E%B0%E9%87%91%E6%B5%81"><span class="nav-text">2️⃣ 投资活动现金流</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3%EF%B8%8F%E2%83%A3-%E7%AD%B9%E8%B5%84%E6%B4%BB%E5%8A%A8%E7%8E%B0%E9%87%91%E6%B5%81"><span class="nav-text">3️⃣ 筹资活动现金流</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8D%81%E4%B8%80%E3%80%81%E8%B4%A2%E5%8A%A1%E9%80%A0%E5%81%87%E4%B8%BA%E4%BB%80%E4%B9%88%E2%80%9C%E6%B2%A1%E7%94%A8%E2%80%9D"><span class="nav-text">十一、财务造假为什么“没用”</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8D%81%E4%BA%8C%E3%80%81%E6%80%BB%E7%BB%93%EF%BC%9A%E5%BB%BA%E7%AB%8B%E8%87%AA%E5%B7%B1%E7%9A%84%E5%88%86%E6%9E%90%E6%A1%86%E6%9E%B6"><span class="nav-text">十二、总结：建立自己的分析框架</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">YeChengfeng</p>
+  <div class="site-description" itemprop="description">Make Learning and Organizing a Habit!</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">222</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">45</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">57</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">YeChengfeng</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="站点总字数">475k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">7:12</span>
+</div>
+
+        
+
+
+
+
+
+
+<script>
+  (function() {
+    function leancloudSelector(url) {
+      url = encodeURI(url);
+      return document.getElementById(url).querySelector('.leancloud-visitors-count');
+    }
+
+    function addCount(Counter) {
+      var visitors = document.querySelector('.leancloud_visitors');
+      var url = decodeURI(visitors.id);
+      var title = visitors.dataset.flagTitle;
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          if (results.length > 0) {
+            var counter = results[0];
+            leancloudSelector(url).innerText = counter.time + 1;
+            Counter('put', '/classes/Counter/' + counter.objectId, { time: { '__op': 'Increment', 'amount': 1 } })
+              .catch(error => {
+                console.error('Failed to save visitor count', error);
+              });
+          } else {
+              Counter('post', '/classes/Counter', { title, url, time: 1 })
+                .then(response => response.json())
+                .then(() => {
+                  leancloudSelector(url).innerText = 1;
+                })
+                .catch(error => {
+                  console.error('Failed to create', error);
+                });
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    function showTime(Counter) {
+      var visitors = document.querySelectorAll('.leancloud_visitors');
+      var entries = [...visitors].map(element => {
+        return decodeURI(element.id);
+      });
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url: { '$in': entries } })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          for (let url of entries) {
+            let target = results.find(item => item.url === url);
+            leancloudSelector(url).innerText = target ? target.time : 0;
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    let { app_id, app_key, server_url } = {"enable":true,"app_id":"h7vZITYMXKA8TGvtiJFms589-MdYXbMMI","app_key":"TcCRmGMIrnp7A76AiTj67XKC","security":false};
+    function fetchData(api_server) {
+      var Counter = (method, url, data) => {
+        return fetch(`${api_server}/1.1${url}`, {
+          method,
+          headers: {
+            'X-LC-Id'     : app_id,
+            'X-LC-Key'    : app_key,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data)
+        });
+      };
+      if (CONFIG.page.isPost) {
+        if (CONFIG.hostname !== location.hostname) return;
+        addCount(Counter);
+      } else if (document.querySelectorAll('.post-title-link').length >= 1) {
+        showTime(Counter);
+      }
+    }
+
+    let api_server = app_id.slice(-9) !== '-MdYXbMMI' ? server_url : `https://${app_id.slice(0, 8).toLowerCase()}.api.lncldglobal.com`;
+
+    if (api_server) {
+      fetchData(api_server);
+    } else {
+      fetch('https://app-router.leancloud.cn/2/route?appId=' + app_id)
+        .then(response => response.json())
+        .then(({ api_server }) => {
+          fetchData('https://' + api_server);
+        });
+    }
+  })();
+</script>
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+  <script>
+  if (CONFIG.page.isPost) {
+    wpac_init = window.wpac_init || [];
+    wpac_init.push({
+      widget: 'Rating',
+      id    : h7vZITYMXKA8TGvtiJFms589-MdYXbMMI,
+      el    : 'wpac-rating',
+      color : 'fc6423'
+    });
+    (function() {
+      if ('WIDGETPACK_LOADED' in window) return;
+      WIDGETPACK_LOADED = true;
+      var mc = document.createElement('script');
+      mc.type = 'text/javascript';
+      mc.async = true;
+      mc.src = '//embed.widgetpack.com/widget.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(mc, s.nextSibling);
+    })();
+  }
+  </script>
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+<script>
+NexT.utils.loadComments(document.querySelector('#lv-container'), () => {
+  window.livereOptions = {
+    refer: location.pathname.replace(CONFIG.root, '').replace('index.html', '')
+  };
+  (function(d, s) {
+    var j, e = d.getElementsByTagName(s)[0];
+    if (typeof LivereTower === 'function') { return; }
+    j = d.createElement(s);
+    j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+    j.async = true;
+    e.parentNode.insertBefore(j, e);
+  })(document, 'script');
+});
+</script>
+
+</body>
+</html>
