@@ -1,0 +1,850 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <script>
+    (function () {
+        if ('') {
+            if (prompt('请输入文章密码') !== '') {
+                alert('密码错误！');
+                if (history.length === 1) {
+                    location.replace("http://xxxxxxx.xxx"); // 这里替换成你的首页
+                } else {
+                    history.back();
+                }
+            }    
+        }
+    })();
+</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 8.1.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css">
+  <script src="/lib/pace/pace.min.js"></script>
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"leslie-shell.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"always","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":true,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.json"};
+  </script>
+
+  <meta name="description" content="一、jstack jstack 用于打印 Java 进程中 所有线程的执行栈和状态，是线上排查 CPU 飙高、卡死、死锁问题的核心工具。  典型用途：  CPU 使用率异常 接口无响应 &#x2F; 系统假死 线程池耗尽 synchronized &#x2F; Lock 死锁   二、示例 jstack 原始内容123&quot;TimerQueue&quot; #44 daemon prio&#x3D;5">
+<meta property="og:type" content="article">
+<meta property="og:title" content="jstack命令使用">
+<meta property="og:url" content="https://leslie-shell.github.io/2025/12/23/java/JVM/jstack/index.html">
+<meta property="og:site_name" content="随笔">
+<meta property="og:description" content="一、jstack jstack 用于打印 Java 进程中 所有线程的执行栈和状态，是线上排查 CPU 飙高、卡死、死锁问题的核心工具。  典型用途：  CPU 使用率异常 接口无响应 &#x2F; 系统假死 线程池耗尽 synchronized &#x2F; Lock 死锁   二、示例 jstack 原始内容123&quot;TimerQueue&quot; #44 daemon prio&#x3D;5">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2025-12-23T15:20:59.875Z">
+<meta property="article:modified_time" content="2025-12-23T15:32:28.140Z">
+<meta property="article:author" content="YeChengfeng">
+<meta property="article:tag" content="JVM">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://leslie-shell.github.io/2025/12/23/java/JVM/jstack/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>jstack命令使用 | 随笔</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">随笔</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-rank">
+
+    <a href="/rank/" rel="section"><i class="fa fa-fire fa-fw"></i>热度</a>
+
+  </li>
+        <li class="menu-item menu-item-recommended">
+
+    <a href="/recommended/" rel="section"><i class="fa fa-flag fa-fw"></i>推荐</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://leslie-shell.github.io/2025/12/23/java/JVM/jstack/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="YeChengfeng">
+      <meta itemprop="description" content="Make Learning and Organizing a Habit!">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="随笔">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          jstack命令使用
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2025-12-23 23:20:59 / 修改时间：23:32:28" itemprop="dateCreated datePublished" datetime="2025-12-23T23:20:59+08:00">2025-12-23</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Java/" itemprop="url" rel="index"><span itemprop="name">Java</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Java/JVM/" itemprop="url" rel="index"><span itemprop="name">JVM</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/2025/12/23/java/JVM/jstack/" class="post-meta-item leancloud_visitors" data-flag-title="jstack命令使用" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>2k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>2 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="一、jstack"><a href="#一、jstack" class="headerlink" title="一、jstack"></a>一、jstack</h2><blockquote>
+<p><code>jstack</code> 用于打印 Java 进程中 <strong>所有线程的执行栈和状态</strong>，是线上排查 CPU 飙高、卡死、死锁问题的核心工具。</p>
+</blockquote>
+<p>典型用途：</p>
+<ul>
+<li>CPU 使用率异常</li>
+<li>接口无响应 &#x2F; 系统假死</li>
+<li>线程池耗尽</li>
+<li>synchronized &#x2F; Lock 死锁</li>
+</ul>
+<hr>
+<h2 id="二、示例-jstack-原始内容"><a href="#二、示例-jstack-原始内容" class="headerlink" title="二、示例 jstack 原始内容"></a>二、示例 jstack 原始内容</h2><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&quot;TimerQueue&quot; #44 daemon prio=5 os_prio=31 cpu=0.12ms elapsed=2072280.54s</span><br><span class="line"> tid=0x00007fbf5b8fa800 nid=0x1c003 waiting on condition  </span><br><span class="line"> [0x000070000d26d000]</span><br></pre></td></tr></table></figure>
+
+<p>上述内容是本地机器jstack的部分内容，<strong>该线程是 JVM 内部的定时器守护线程（TimerQueue），CPU 消耗极低，处于等待状态，属于完全正常线程，用来分析jstack打印的输出</strong></p>
+<hr>
+<h2 id="四、jstack-线程头字段逐项解析"><a href="#四、jstack-线程头字段逐项解析" class="headerlink" title="四、jstack 线程头字段逐项解析"></a>四、jstack 线程头字段逐项解析</h2><h3 id="4-1-线程名：TimerQueue"><a href="#4-1-线程名：TimerQueue" class="headerlink" title="4.1 线程名：TimerQueue"></a>4.1 线程名：<code>TimerQueue</code></h3><ul>
+<li>JVM 内部线程</li>
+<li>与 <code>java.util.Timer</code>、定时调度机制有关</li>
+<li>非业务线程</li>
+</ul>
+<hr>
+<h3 id="4-2-线程编号：-44"><a href="#4-2-线程编号：-44" class="headerlink" title="4.2 线程编号：#44"></a>4.2 线程编号：<code>#44</code></h3><ul>
+<li>JVM 内部顺序编号</li>
+<li>仅用于区分线程</li>
+</ul>
+<hr>
+<h3 id="4-3-daemon"><a href="#4-3-daemon" class="headerlink" title="4.3 daemon"></a>4.3 <code>daemon</code></h3><ul>
+<li>守护线程</li>
+<li>JVM 退出时不会等待该线程结束</li>
+</ul>
+<hr>
+<h3 id="4-4-Java-优先级：prio-5"><a href="#4-4-Java-优先级：prio-5" class="headerlink" title="4.4 Java 优先级：prio=5"></a>4.4 Java 优先级：<code>prio=5</code></h3><ul>
+<li>Java 线程优先级范围：1~10</li>
+<li>5 为默认值</li>
+</ul>
+<hr>
+<h3 id="4-5-OS-优先级：os-prio-31"><a href="#4-5-OS-优先级：os-prio-31" class="headerlink" title="4.5 OS 优先级：os_prio=31"></a>4.5 OS 优先级：<code>os_prio=31</code></h3><ul>
+<li>操作系统线程优先级</li>
+<li>在 macOS &#x2F; BSD 系统中数值偏大</li>
+<li>通常无需关注</li>
+</ul>
+<hr>
+<h3 id="4-6-CPU-使用时间：cpu-0-12ms"><a href="#4-6-CPU-使用时间：cpu-0-12ms" class="headerlink" title="4.6 CPU 使用时间：cpu=0.12ms"></a>4.6 CPU 使用时间：<code>cpu=0.12ms</code></h3><ul>
+<li>线程自创建以来累计消耗 CPU 时间</li>
+<li>数值极低</li>
+</ul>
+<p><strong>结论：</strong></p>
+<blockquote>
+<p>该线程没有忙等或死循环</p>
+</blockquote>
+<hr>
+<h3 id="4-7-存活时间：elapsed-2072280-54s"><a href="#4-7-存活时间：elapsed-2072280-54s" class="headerlink" title="4.7 存活时间：elapsed=2072280.54s"></a>4.7 存活时间：<code>elapsed=2072280.54s</code></h3><ul>
+<li>单位：秒（约 24 天）</li>
+<li>表示 JVM 长期运行</li>
+</ul>
+<hr>
+<h3 id="4-8-JVM-内部线程-ID：tid-0x00007fbf5b8fa800"><a href="#4-8-JVM-内部线程-ID：tid-0x00007fbf5b8fa800" class="headerlink" title="4.8 JVM 内部线程 ID：tid=0x00007fbf5b8fa800"></a>4.8 JVM 内部线程 ID：<code>tid=0x00007fbf5b8fa800</code></h3><ul>
+<li>JVM 内部管理线程使用</li>
+<li>排障中一般不使用</li>
+</ul>
+<hr>
+<h3 id="4-9-本地线程-ID：nid-0x1c003（重点）"><a href="#4-9-本地线程-ID：nid-0x1c003（重点）" class="headerlink" title="4.9 本地线程 ID：nid=0x1c003（重点）"></a>4.9 本地线程 ID：<code>nid=0x1c003</code>（重点）</h3><ul>
+<li><p>Native Thread ID（操作系统线程 ID）</p>
+</li>
+<li><p>十六进制  </p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">printf %d 0x1c003    #16转10</span><br></pre></td></tr></table></figure></li>
+</ul>
+<p><strong>作用：</strong></p>
+<ul>
+<li>用于和 <code>top</code> &#x2F; <code>ps</code> 中的线程 ID 对应</li>
+</ul>
+<hr>
+<h3 id="4-10-线程状态：waiting-on-condition"><a href="#4-10-线程状态：waiting-on-condition" class="headerlink" title="4.10 线程状态：waiting on condition"></a>4.10 线程状态：<code>waiting on condition</code></h3><p>表示线程：</p>
+<ul>
+<li>正在等待条件满足</li>
+<li>常见于 <code>wait / park / sleep</code></li>
+</ul>
+<p>特点：</p>
+<ul>
+<li>不占 CPU</li>
+<li>不持有锁</li>
+</ul>
+<hr>
+<h3 id="4-11-栈内存地址"><a href="#4-11-栈内存地址" class="headerlink" title="4.11 栈内存地址"></a>4.11 栈内存地址</h3><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[0x000070000d26d000]</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>JVM 为线程分配的栈地址</li>
+<li>可忽略</li>
+</ul>
+<hr>
+<h2 id="五、如何快速判断“问题线程”？"><a href="#五、如何快速判断“问题线程”？" class="headerlink" title="五、如何快速判断“问题线程”？"></a>五、如何快速判断“问题线程”？</h2><table>
+<thead>
+<tr>
+<th>判断维度</th>
+<th>是否异常</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>状态为 RUNNABLE</td>
+<td><span style="color:red">可能</span></td>
+</tr>
+<tr>
+<td>CPU 时间高</td>
+<td><span style="color:red">可能</span></td>
+</tr>
+<tr>
+<td>BLOCKED</td>
+<td><span style="color:red">锁问题</span></td>
+</tr>
+<tr>
+<td>WAITING + CPU 低</td>
+<td>正常</td>
+</tr>
+<tr>
+<td>daemon + 系统线程</td>
+<td>正常</td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="六、jstack-与-top-配合使用"><a href="#六、jstack-与-top-配合使用" class="headerlink" title="六、jstack 与 top 配合使用"></a>六、jstack 与 top 配合使用</h2><h3 id="场景：Java-进程-CPU-飙高"><a href="#场景：Java-进程-CPU-飙高" class="headerlink" title="场景：Java 进程 CPU 飙高"></a>场景：Java 进程 CPU 飙高</h3><h4 id="Step-1：找到-Java-进程-PID"><a href="#Step-1：找到-Java-进程-PID" class="headerlink" title="Step 1：找到 Java 进程 PID"></a>Step 1：找到 Java 进程 PID</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">jps</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h4 id="Step-2：查看进程内线程-CPU"><a href="#Step-2：查看进程内线程-CPU" class="headerlink" title="Step 2：查看进程内线程 CPU"></a>Step 2：查看进程内线程 CPU</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">top -Hp &lt;pid&gt;  <span class="comment">## mac会不一样 top -M  或者 top -pid</span></span><br></pre></td></tr></table></figure>
+
+<p>示例输出：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">PID     TID     %CPU</span><br><span class="line">12345   23456   180.3</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>注意：<code>TID</code> 是 <strong>十进制</strong></p>
+</blockquote>
+<hr>
+<h4 id="Step-3：TID-转换为-16-进制"><a href="#Step-3：TID-转换为-16-进制" class="headerlink" title="Step 3：TID 转换为 16 进制"></a>Step 3：TID 转换为 16 进制</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">printf</span> <span class="string">&quot;%x\n&quot;</span> 23456</span><br></pre></td></tr></table></figure>
+
+<p>输出：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">5ba0</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h4 id="Step-4：jstack-中定位线程"><a href="#Step-4：jstack-中定位线程" class="headerlink" title="Step 4：jstack 中定位线程"></a>Step 4：jstack 中定位线程</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">jstack &lt;pid&gt; | grep -A 20 5ba0</span><br></pre></td></tr></table></figure>
+
+<p>示例：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&quot;http-nio-8080-exec-12&quot; #123 prio=5 tid=0x... nid=0x5ba0 runnable</span><br><span class="line">    at com.xxx.service.OrderService.calculate(OrderService.java:123)</span><br></pre></td></tr></table></figure>
+
+<p><strong>结论：</strong></p>
+<blockquote>
+<p>CPU 高的线程 + RUNNABLE + 业务代码 &#x3D; 问题根因</p>
+</blockquote>
+<hr>
+<h2 id="七、线上排查案例-1：CPU-飙高"><a href="#七、线上排查案例-1：CPU-飙高" class="headerlink" title="七、线上排查案例 1：CPU 飙高"></a>七、线上排查案例 1：CPU 飙高</h2><p><strong>现象：</strong></p>
+<ul>
+<li>CPU 100%</li>
+<li>机器未宕机</li>
+</ul>
+<p><strong>排查过程：</strong></p>
+<ol>
+<li><code>top -Hp pid</code> 定位高 CPU 线程</li>
+<li>TID → 16 进制</li>
+<li><code>jstack</code> 定位到具体代码行</li>
+</ol>
+<p><strong>结果：</strong></p>
+<ul>
+<li>while(true) 未加 sleep</li>
+<li>无限重试逻辑</li>
+</ul>
+<hr>
+<h2 id="八、线上排查案例-2：接口无响应-假死"><a href="#八、线上排查案例-2：接口无响应-假死" class="headerlink" title="八、线上排查案例 2：接口无响应 &#x2F; 假死"></a>八、线上排查案例 2：接口无响应 &#x2F; 假死</h2><p><strong>现象：</strong></p>
+<ul>
+<li>请求堆积</li>
+<li>CPU 不高</li>
+</ul>
+<p><strong>jstack 特征：</strong></p>
+<ul>
+<li>大量线程状态为 <code>BLOCKED</code></li>
+<li>卡在 <code>synchronized</code></li>
+</ul>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">java.lang.Thread.State: BLOCKED (on object monitor)</span><br></pre></td></tr></table></figure>
+
+<p><strong>原因：</strong></p>
+<ul>
+<li>锁粒度过大</li>
+<li>单点锁竞争</li>
+</ul>
+<hr>
+<h2 id="九、线上排查案例-3：线程池耗尽"><a href="#九、线上排查案例-3：线程池耗尽" class="headerlink" title="九、线上排查案例 3：线程池耗尽"></a>九、线上排查案例 3：线程池耗尽</h2><p><strong>现象：</strong></p>
+<ul>
+<li>新请求直接失败</li>
+</ul>
+<p><strong>jstack 特征：</strong></p>
+<ul>
+<li>大量 <code>pool-x-thread-y</code></li>
+<li>状态一致，卡在同一行 I&#x2F;O 或 RPC</li>
+</ul>
+<p><strong>结论：</strong></p>
+<ul>
+<li>下游服务阻塞</li>
+<li>线程池配置不合理</li>
+</ul>
+<hr>
+<h2 id="十、jstack-使用建议（生产经验）"><a href="#十、jstack-使用建议（生产经验）" class="headerlink" title="十、jstack 使用建议（生产经验）"></a>十、jstack 使用建议（生产经验）</h2><ul>
+<li>推荐连续 dump：</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">jstack pid &gt; dump1.log</span><br><span class="line"><span class="built_in">sleep</span> 5</span><br><span class="line">jstack pid &gt; dump2.log</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>多次对比判断是否卡死</li>
+<li>尽量使用：</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">jstack -l pid</span><br></pre></td></tr></table></figure>
+
+<p>查看锁信息</p>
+<hr>
+<h2 id="十一、一句话总结"><a href="#十一、一句话总结" class="headerlink" title="十一、一句话总结"></a>十一、一句话总结</h2><blockquote>
+<p><strong>jstack 是 Java 线上排障的“核心工具”，配合 top 使用，几乎可以把 CPU、卡死、死锁问题直接定位到代码行。</strong></p>
+</blockquote>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/JVM/" rel="tag"># JVM</a>
+          </div>
+
+        
+  <div class="post-widgets">
+    <div class="wp_rating">
+      <div id="wpac-rating"></div>
+    </div>
+  </div>
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2025/12/23/mysql/mysql--%E5%8A%9B%E6%89%A3--10%E5%88%A0%E9%99%A4%E9%87%8D%E5%A4%8D%E7%9A%84%E7%94%B5%E5%AD%90%E9%82%AE%E4%BB%B6/" rel="prev" title="mysql--力扣--196.删除重复的电子邮件(Normal)">
+      <i class="fa fa-chevron-left"></i> mysql--力扣--196.删除重复的电子邮件(Normal)
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+
+
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    
+  <div class="comments">
+    <div id="lv-container" data-id="city" data-uid="MTAyMC82MDk4Ni8zNzQ1Ng=="></div>
+  </div>
+  
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%80%E3%80%81jstack"><span class="nav-text">一、jstack</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%8C%E3%80%81%E7%A4%BA%E4%BE%8B-jstack-%E5%8E%9F%E5%A7%8B%E5%86%85%E5%AE%B9"><span class="nav-text">二、示例 jstack 原始内容</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9B%9B%E3%80%81jstack-%E7%BA%BF%E7%A8%8B%E5%A4%B4%E5%AD%97%E6%AE%B5%E9%80%90%E9%A1%B9%E8%A7%A3%E6%9E%90"><span class="nav-text">四、jstack 线程头字段逐项解析</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#4-1-%E7%BA%BF%E7%A8%8B%E5%90%8D%EF%BC%9ATimerQueue"><span class="nav-text">4.1 线程名：TimerQueue</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-2-%E7%BA%BF%E7%A8%8B%E7%BC%96%E5%8F%B7%EF%BC%9A-44"><span class="nav-text">4.2 线程编号：#44</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-3-daemon"><span class="nav-text">4.3 daemon</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-4-Java-%E4%BC%98%E5%85%88%E7%BA%A7%EF%BC%9Aprio-5"><span class="nav-text">4.4 Java 优先级：prio&#x3D;5</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-5-OS-%E4%BC%98%E5%85%88%E7%BA%A7%EF%BC%9Aos-prio-31"><span class="nav-text">4.5 OS 优先级：os_prio&#x3D;31</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-6-CPU-%E4%BD%BF%E7%94%A8%E6%97%B6%E9%97%B4%EF%BC%9Acpu-0-12ms"><span class="nav-text">4.6 CPU 使用时间：cpu&#x3D;0.12ms</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-7-%E5%AD%98%E6%B4%BB%E6%97%B6%E9%97%B4%EF%BC%9Aelapsed-2072280-54s"><span class="nav-text">4.7 存活时间：elapsed&#x3D;2072280.54s</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-8-JVM-%E5%86%85%E9%83%A8%E7%BA%BF%E7%A8%8B-ID%EF%BC%9Atid-0x00007fbf5b8fa800"><span class="nav-text">4.8 JVM 内部线程 ID：tid&#x3D;0x00007fbf5b8fa800</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-9-%E6%9C%AC%E5%9C%B0%E7%BA%BF%E7%A8%8B-ID%EF%BC%9Anid-0x1c003%EF%BC%88%E9%87%8D%E7%82%B9%EF%BC%89"><span class="nav-text">4.9 本地线程 ID：nid&#x3D;0x1c003（重点）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-10-%E7%BA%BF%E7%A8%8B%E7%8A%B6%E6%80%81%EF%BC%9Awaiting-on-condition"><span class="nav-text">4.10 线程状态：waiting on condition</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-11-%E6%A0%88%E5%86%85%E5%AD%98%E5%9C%B0%E5%9D%80"><span class="nav-text">4.11 栈内存地址</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%94%E3%80%81%E5%A6%82%E4%BD%95%E5%BF%AB%E9%80%9F%E5%88%A4%E6%96%AD%E2%80%9C%E9%97%AE%E9%A2%98%E7%BA%BF%E7%A8%8B%E2%80%9D%EF%BC%9F"><span class="nav-text">五、如何快速判断“问题线程”？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%AD%E3%80%81jstack-%E4%B8%8E-top-%E9%85%8D%E5%90%88%E4%BD%BF%E7%94%A8"><span class="nav-text">六、jstack 与 top 配合使用</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9C%BA%E6%99%AF%EF%BC%9AJava-%E8%BF%9B%E7%A8%8B-CPU-%E9%A3%99%E9%AB%98"><span class="nav-text">场景：Java 进程 CPU 飙高</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Step-1%EF%BC%9A%E6%89%BE%E5%88%B0-Java-%E8%BF%9B%E7%A8%8B-PID"><span class="nav-text">Step 1：找到 Java 进程 PID</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Step-2%EF%BC%9A%E6%9F%A5%E7%9C%8B%E8%BF%9B%E7%A8%8B%E5%86%85%E7%BA%BF%E7%A8%8B-CPU"><span class="nav-text">Step 2：查看进程内线程 CPU</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Step-3%EF%BC%9ATID-%E8%BD%AC%E6%8D%A2%E4%B8%BA-16-%E8%BF%9B%E5%88%B6"><span class="nav-text">Step 3：TID 转换为 16 进制</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Step-4%EF%BC%9Ajstack-%E4%B8%AD%E5%AE%9A%E4%BD%8D%E7%BA%BF%E7%A8%8B"><span class="nav-text">Step 4：jstack 中定位线程</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%83%E3%80%81%E7%BA%BF%E4%B8%8A%E6%8E%92%E6%9F%A5%E6%A1%88%E4%BE%8B-1%EF%BC%9ACPU-%E9%A3%99%E9%AB%98"><span class="nav-text">七、线上排查案例 1：CPU 飙高</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%AB%E3%80%81%E7%BA%BF%E4%B8%8A%E6%8E%92%E6%9F%A5%E6%A1%88%E4%BE%8B-2%EF%BC%9A%E6%8E%A5%E5%8F%A3%E6%97%A0%E5%93%8D%E5%BA%94-%E5%81%87%E6%AD%BB"><span class="nav-text">八、线上排查案例 2：接口无响应 &#x2F; 假死</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B9%9D%E3%80%81%E7%BA%BF%E4%B8%8A%E6%8E%92%E6%9F%A5%E6%A1%88%E4%BE%8B-3%EF%BC%9A%E7%BA%BF%E7%A8%8B%E6%B1%A0%E8%80%97%E5%B0%BD"><span class="nav-text">九、线上排查案例 3：线程池耗尽</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8D%81%E3%80%81jstack-%E4%BD%BF%E7%94%A8%E5%BB%BA%E8%AE%AE%EF%BC%88%E7%94%9F%E4%BA%A7%E7%BB%8F%E9%AA%8C%EF%BC%89"><span class="nav-text">十、jstack 使用建议（生产经验）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8D%81%E4%B8%80%E3%80%81%E4%B8%80%E5%8F%A5%E8%AF%9D%E6%80%BB%E7%BB%93"><span class="nav-text">十一、一句话总结</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">YeChengfeng</p>
+  <div class="site-description" itemprop="description">Make Learning and Organizing a Habit!</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">224</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">46</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">58</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">YeChengfeng</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="站点总字数">478k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">7:14</span>
+</div>
+
+        
+
+
+
+
+
+
+<script>
+  (function() {
+    function leancloudSelector(url) {
+      url = encodeURI(url);
+      return document.getElementById(url).querySelector('.leancloud-visitors-count');
+    }
+
+    function addCount(Counter) {
+      var visitors = document.querySelector('.leancloud_visitors');
+      var url = decodeURI(visitors.id);
+      var title = visitors.dataset.flagTitle;
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          if (results.length > 0) {
+            var counter = results[0];
+            leancloudSelector(url).innerText = counter.time + 1;
+            Counter('put', '/classes/Counter/' + counter.objectId, { time: { '__op': 'Increment', 'amount': 1 } })
+              .catch(error => {
+                console.error('Failed to save visitor count', error);
+              });
+          } else {
+              Counter('post', '/classes/Counter', { title, url, time: 1 })
+                .then(response => response.json())
+                .then(() => {
+                  leancloudSelector(url).innerText = 1;
+                })
+                .catch(error => {
+                  console.error('Failed to create', error);
+                });
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    function showTime(Counter) {
+      var visitors = document.querySelectorAll('.leancloud_visitors');
+      var entries = [...visitors].map(element => {
+        return decodeURI(element.id);
+      });
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url: { '$in': entries } })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          for (let url of entries) {
+            let target = results.find(item => item.url === url);
+            leancloudSelector(url).innerText = target ? target.time : 0;
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    let { app_id, app_key, server_url } = {"enable":true,"app_id":"h7vZITYMXKA8TGvtiJFms589-MdYXbMMI","app_key":"TcCRmGMIrnp7A76AiTj67XKC","security":false};
+    function fetchData(api_server) {
+      var Counter = (method, url, data) => {
+        return fetch(`${api_server}/1.1${url}`, {
+          method,
+          headers: {
+            'X-LC-Id'     : app_id,
+            'X-LC-Key'    : app_key,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data)
+        });
+      };
+      if (CONFIG.page.isPost) {
+        if (CONFIG.hostname !== location.hostname) return;
+        addCount(Counter);
+      } else if (document.querySelectorAll('.post-title-link').length >= 1) {
+        showTime(Counter);
+      }
+    }
+
+    let api_server = app_id.slice(-9) !== '-MdYXbMMI' ? server_url : `https://${app_id.slice(0, 8).toLowerCase()}.api.lncldglobal.com`;
+
+    if (api_server) {
+      fetchData(api_server);
+    } else {
+      fetch('https://app-router.leancloud.cn/2/route?appId=' + app_id)
+        .then(response => response.json())
+        .then(({ api_server }) => {
+          fetchData('https://' + api_server);
+        });
+    }
+  })();
+</script>
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+  <script>
+  if (CONFIG.page.isPost) {
+    wpac_init = window.wpac_init || [];
+    wpac_init.push({
+      widget: 'Rating',
+      id    : h7vZITYMXKA8TGvtiJFms589-MdYXbMMI,
+      el    : 'wpac-rating',
+      color : 'fc6423'
+    });
+    (function() {
+      if ('WIDGETPACK_LOADED' in window) return;
+      WIDGETPACK_LOADED = true;
+      var mc = document.createElement('script');
+      mc.type = 'text/javascript';
+      mc.async = true;
+      mc.src = '//embed.widgetpack.com/widget.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(mc, s.nextSibling);
+    })();
+  }
+  </script>
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+<script>
+NexT.utils.loadComments(document.querySelector('#lv-container'), () => {
+  window.livereOptions = {
+    refer: location.pathname.replace(CONFIG.root, '').replace('index.html', '')
+  };
+  (function(d, s) {
+    var j, e = d.getElementsByTagName(s)[0];
+    if (typeof LivereTower === 'function') { return; }
+    j = d.createElement(s);
+    j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+    j.async = true;
+    e.parentNode.insertBefore(j, e);
+  })(document, 'script');
+});
+</script>
+
+</body>
+</html>

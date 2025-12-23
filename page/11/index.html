@@ -212,6 +212,241 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://leslie-shell.github.io/2025/11/23/mysql/mysql--%E5%8A%9B%E6%89%A3--6.%E6%89%BE%E5%87%BA%E6%AF%94%E7%BB%8F%E7%90%86%E5%B7%A5%E8%B5%84%E9%AB%98%E7%9A%84%E5%91%98%E5%B7%A5/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="YeChengfeng">
+      <meta itemprop="description" content="Make Learning and Organizing a Habit!">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="随笔">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2025/11/23/mysql/mysql--%E5%8A%9B%E6%89%A3--6.%E6%89%BE%E5%87%BA%E6%AF%94%E7%BB%8F%E7%90%86%E5%B7%A5%E8%B5%84%E9%AB%98%E7%9A%84%E5%91%98%E5%B7%A5/" class="post-title-link" itemprop="url">6.找出比经理工资高的员工(Easy)</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2025-11-23 12:30:46" itemprop="dateCreated datePublished" datetime="2025-11-23T12:30:46+08:00">2025-11-23</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2025-11-29 23:17:36" itemprop="dateModified" datetime="2025-11-29T23:17:36+08:00">2025-11-29</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Mysql/" itemprop="url" rel="index"><span itemprop="name">Mysql</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/2025/11/23/mysql/mysql--%E5%8A%9B%E6%89%A3--6.%E6%89%BE%E5%87%BA%E6%AF%94%E7%BB%8F%E7%90%86%E5%B7%A5%E8%B5%84%E9%AB%98%E7%9A%84%E5%91%98%E5%B7%A5/" class="post-meta-item leancloud_visitors" data-flag-title="6.找出比经理工资高的员工(Easy)" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>656</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>1 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">Employee</span><br><span class="line">+-------------+---------+</span><br><span class="line">| Column Name | Type    |</span><br><span class="line">+-------------+---------+</span><br><span class="line">| id          | int     |</span><br><span class="line">| name        | varchar |</span><br><span class="line">| salary      | int     |</span><br><span class="line">| managerId   | int     |</span><br><span class="line">+-------------+---------+</span><br><span class="line">id 是该表的主键（具有唯一值的列）。</span><br><span class="line">该表的每一行都表示雇员的ID、姓名、工资和经理的ID。</span><br></pre></td></tr></table></figure>
+
+<p>编写解决方案，找出收入比经理高的员工。</p>
+<p>以 <strong>任意顺序</strong> 返回结果表。</p>
+<p>结果格式如下所示。</p>
+<p><strong>示例 1:</strong></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">输入: </span><br><span class="line">Employee 表:</span><br><span class="line">+----+-------+--------+-----------+</span><br><span class="line">| id | name  | salary | managerId |</span><br><span class="line">+----+-------+--------+-----------+</span><br><span class="line">| 1  | Joe   | 70000  | 3         |</span><br><span class="line">| 2  | Henry | 80000  | 4         |</span><br><span class="line">| 3  | Sam   | 60000  | Null      |</span><br><span class="line">| 4  | Max   | 90000  | Null      |</span><br><span class="line">+----+-------+--------+-----------+</span><br><span class="line">输出: </span><br><span class="line">+----------+</span><br><span class="line">| Employee |</span><br><span class="line">+----------+</span><br><span class="line">| Joe      |</span><br><span class="line">+----------+</span><br><span class="line">解释: Joe 是唯一挣得比经理多的雇员。</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> a.name  <span class="keyword">as</span> Employee <span class="keyword">from</span> Employee a  <span class="keyword">left</span> <span class="keyword">join</span> Employee b <span class="keyword">on</span> a.managerId <span class="operator">=</span>b.id <span class="keyword">where</span> a.salary <span class="operator">&gt;</span> b.salary</span><br></pre></td></tr></table></figure>
+
+
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2025/11/23/mysql/mysql--%E5%8A%9B%E6%89%A3--6.%E6%89%BE%E5%87%BA%E6%AF%94%E7%BB%8F%E7%90%86%E5%B7%A5%E8%B5%84%E9%AB%98%E7%9A%84%E5%91%98%E5%B7%A5/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+
+
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://leslie-shell.github.io/2025/11/23/mysql/mysql--%E5%8A%9B%E6%89%A3--5%E8%BF%9E%E7%BB%AD%E5%87%BA%E7%8E%B03%E6%AC%A1%E7%9A%84%E6%95%B0%E5%AD%97/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="YeChengfeng">
+      <meta itemprop="description" content="Make Learning and Organizing a Habit!">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="随笔">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2025/11/23/mysql/mysql--%E5%8A%9B%E6%89%A3--5%E8%BF%9E%E7%BB%AD%E5%87%BA%E7%8E%B03%E6%AC%A1%E7%9A%84%E6%95%B0%E5%AD%97/" class="post-title-link" itemprop="url">5.力扣-Mysql-连续出现三次的数字 (Medium)</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2025-11-23 12:03:37" itemprop="dateCreated datePublished" datetime="2025-11-23T12:03:37+08:00">2025-11-23</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2025-12-23 23:14:09" itemprop="dateModified" datetime="2025-12-23T23:14:09+08:00">2025-12-23</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Mysql/" itemprop="url" rel="index"><span itemprop="name">Mysql</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/2025/11/23/mysql/mysql--%E5%8A%9B%E6%89%A3--5%E8%BF%9E%E7%BB%AD%E5%87%BA%E7%8E%B03%E6%AC%A1%E7%9A%84%E6%95%B0%E5%AD%97/" class="post-meta-item leancloud_visitors" data-flag-title="5.力扣-Mysql-连续出现三次的数字 (Medium)" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>1.6k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>1 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">Logs</span><br><span class="line">+-------------+---------+</span><br><span class="line">| Column Name | Type    |</span><br><span class="line">+-------------+---------+</span><br><span class="line">| id          | int     |</span><br><span class="line">| num         | varchar |</span><br><span class="line">+-------------+---------+</span><br><span class="line">在 SQL 中，id 是该表的主键。</span><br><span class="line">id 是一个自增列。</span><br></pre></td></tr></table></figure>
+
+<p>找出所有至少连续出现三次的数字。</p>
+<p>返回的结果表中的数据可以按 <strong>任意顺序</strong> 排列。</p>
+<p>结果格式如下面的例子所示：</p>
+<p><strong>示例 1:</strong></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">输入：</span><br><span class="line">Logs 表：</span><br><span class="line">+----+-----+</span><br><span class="line">| id | num |</span><br><span class="line">+----+-----+</span><br><span class="line">| 1  | 1   |</span><br><span class="line">| 2  | 1   |</span><br><span class="line">| 3  | 1   |</span><br><span class="line">| 4  | 2   |</span><br><span class="line">| 5  | 1   |</span><br><span class="line">| 6  | 2   |</span><br><span class="line">| 7  | 2   |</span><br><span class="line">+----+-----+</span><br><span class="line">输出：</span><br><span class="line">Result 表：</span><br><span class="line">+-----------------+</span><br><span class="line">| ConsecutiveNums |</span><br><span class="line">+-----------------+</span><br><span class="line">| 1               |</span><br><span class="line">+-----------------+</span><br><span class="line">解释：1 是唯一连续出现至少三次的数字。</span><br></pre></td></tr></table></figure>
+
+
+
+<h4 id="解答"><a href="#解答" class="headerlink" title="解答"></a>解答</h4><blockquote>
+<p>利用LEAD窗口函数，取下一天的num.</p>
+</blockquote>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> num <span class="keyword">as</span> ConsecutiveNums  <span class="keyword">from</span> (</span><br><span class="line"> <span class="keyword">select</span> num, </span><br><span class="line"><span class="built_in">LEAD</span>(num,<span class="number">1</span>) <span class="keyword">over</span> (<span class="keyword">order</span> <span class="keyword">by</span> id) <span class="keyword">as</span> num1,</span><br><span class="line"><span class="built_in">LEAD</span>(num,<span class="number">2</span>) <span class="keyword">over</span> (<span class="keyword">order</span> <span class="keyword">by</span> id) <span class="keyword">as</span> num2  <span class="keyword">from</span> Logs ) <span class="keyword">as</span> t1 <span class="keyword">where</span> num1 <span class="operator">=</span>num <span class="keyword">and</span> num <span class="operator">=</span>num2	</span><br></pre></td></tr></table></figure>
+
+
+
+<h6 id="官网和其他解法"><a href="#官网和其他解法" class="headerlink" title="官网和其他解法"></a>官网和其他解法</h6>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2025/11/23/mysql/mysql--%E5%8A%9B%E6%89%A3--5%E8%BF%9E%E7%BB%AD%E5%87%BA%E7%8E%B03%E6%AC%A1%E7%9A%84%E6%95%B0%E5%AD%97/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+
+
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="https://leslie-shell.github.io/2025/11/23/mysql/mysql--%E5%8A%9B%E6%89%A3--4%E5%88%86%E6%95%B0%E6%8E%92%E5%90%8D/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -226,7 +461,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2025/11/23/mysql/mysql--%E5%8A%9B%E6%89%A3--4%E5%88%86%E6%95%B0%E6%8E%92%E5%90%8D/" class="post-title-link" itemprop="url">力扣-Mysql-分数排名 （Medium）</a>
+            <a href="/2025/11/23/mysql/mysql--%E5%8A%9B%E6%89%A3--4%E5%88%86%E6%95%B0%E6%8E%92%E5%90%8D/" class="post-title-link" itemprop="url">4.力扣-Mysql-分数排名 （Medium）</a>
         </h2>
 
         <div class="post-meta">
@@ -243,7 +478,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2025-11-29 23:18:18" itemprop="dateModified" datetime="2025-11-29T23:18:18+08:00">2025-11-29</time>
+                <time title="修改时间：2025-12-23 23:14:05" itemprop="dateModified" datetime="2025-12-23T23:14:05+08:00">2025-12-23</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -256,7 +491,7 @@
             </span>
 
           
-            <span id="/2025/11/23/mysql/mysql--%E5%8A%9B%E6%89%A3--4%E5%88%86%E6%95%B0%E6%8E%92%E5%90%8D/" class="post-meta-item leancloud_visitors" data-flag-title="力扣-Mysql-分数排名 （Medium）" title="阅读次数">
+            <span id="/2025/11/23/mysql/mysql--%E5%8A%9B%E6%89%A3--4%E5%88%86%E6%95%B0%E6%8E%92%E5%90%8D/" class="post-meta-item leancloud_visitors" data-flag-title="4.力扣-Mysql-分数排名 （Medium）" title="阅读次数">
               <span class="post-meta-item-icon">
                 <i class="fa fa-eye"></i>
               </span>
@@ -1073,318 +1308,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://leslie-shell.github.io/2025/11/22/redis/redis%E9%AB%98%E5%8F%AF%E7%94%A8%E6%9E%B6%E6%9E%84/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="YeChengfeng">
-      <meta itemprop="description" content="Make Learning and Organizing a Habit!">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="随笔">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2025/11/22/redis/redis%E9%AB%98%E5%8F%AF%E7%94%A8%E6%9E%B6%E6%9E%84/" class="post-title-link" itemprop="url">Redis 高可用架构</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2025-11-22 21:32:30" itemprop="dateCreated datePublished" datetime="2025-11-22T21:32:30+08:00">2025-11-22</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2025-11-29 23:10:52" itemprop="dateModified" datetime="2025-11-29T23:10:52+08:00">2025-11-29</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Java/" itemprop="url" rel="index"><span itemprop="name">Java</span></a>
-                </span>
-                  ，
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Java/Redis/" itemprop="url" rel="index"><span itemprop="name">Redis</span></a>
-                </span>
-            </span>
-
-          
-            <span id="/2025/11/22/redis/redis%E9%AB%98%E5%8F%AF%E7%94%A8%E6%9E%B6%E6%9E%84/" class="post-meta-item leancloud_visitors" data-flag-title="Redis 高可用架构" title="阅读次数">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-eye"></i>
-              </span>
-              <span class="post-meta-item-text">阅读次数：</span>
-              <span class="leancloud-visitors-count"></span>
-            </span><br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>1k</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>1 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="Redis-高可用架构"><a href="#Redis-高可用架构" class="headerlink" title="Redis 高可用架构"></a>Redis 高可用架构</h1><p>Redis 高可用架构的目标是保证系统在单点故障下仍然可用，同时尽量保证数据一致性和快速恢复。</p>
-<hr>
-<h2 id="1-主从复制（Replication）"><a href="#1-主从复制（Replication）" class="headerlink" title="1. 主从复制（Replication）"></a>1. 主从复制（Replication）</h2><ul>
-<li><strong>概念</strong>：将主节点（Master）数据复制到从节点（Slave），保证数据冗余，提高读性能。</li>
-<li><strong>特点</strong>：<ul>
-<li>数据复制是单向的：Master → Slave</li>
-<li>Slave 可用于读操作，提高读取吞吐量</li>
-</ul>
-</li>
-<li><strong>实现原理</strong>：<ol>
-<li><strong>连接建立阶段</strong>：<ul>
-<li>从节点执行 <code>SLAVEOF &lt;master-ip&gt; &lt;master-port&gt;</code> 命令</li>
-<li>保存主节点信息（masterhost、masterport）</li>
-<li>建立 TCP 连接，发送 <code>PING</code> 检查连接</li>
-<li>进行身份验证（若设置 <code>masterauth</code>）</li>
-</ul>
-</li>
-<li><strong>数据同步阶段</strong>：<ul>
-<li>Slave 会全量同步主节点数据</li>
-<li>之后进入增量同步，实时接收主节点写操作</li>
-</ul>
-</li>
-<li><strong>命令传播阶段</strong>：<ul>
-<li>Master 执行写命令 → 异步发送给 Slave</li>
-<li>Slave 执行命令保持数据一致性</li>
-<li>注意：命令传播异步，可能存在短暂延迟</li>
-</ul>
-</li>
-</ol>
-</li>
-</ul>
-<hr>
-<h2 id="2-哨兵模式（Sentinel）"><a href="#2-哨兵模式（Sentinel）" class="headerlink" title="2. 哨兵模式（Sentinel）"></a>2. 哨兵模式（Sentinel）</h2><ul>
-<li><strong>概念</strong>：Sentinel 负责监控 Redis 集群节点健康状态，实现故障发现、故障转移，并通知客户端。</li>
-<li><strong>主要功能</strong>：<ol>
-<li><strong>监控</strong>：监控 Master 和 Slave 节点状态</li>
-<li><strong>故障转移</strong>：Master 宕机时，自动选举新的 Master</li>
-<li><strong>通知客户端</strong>：通过发布&#x2F;订阅通知客户端新 Master</li>
-</ol>
-</li>
-<li><strong>实现机制</strong>：<ol>
-<li><strong>Sentinel 与 Redis 节点心跳</strong><ul>
-<li>Sentinel 定期向 Master&#x2F;Slave 节点发送 <code>INFO</code> 命令获取状态</li>
-</ul>
-</li>
-<li><strong>Sentinel 之间心跳</strong><ul>
-<li>Sentinel 使用 Redis 的订阅&#x2F;发布功能（频道 <code>sentinel:hello</code>）</li>
-<li>共享节点状态和对 Master 的判断</li>
-</ul>
-</li>
-</ol>
-</li>
-<li><strong>注意事项</strong>：<ul>
-<li>多个 Sentinel 组成集群，保证故障判断准确</li>
-<li>哨兵模式可实现自动切换 Master，保证高可用</li>
-</ul>
-</li>
-</ul>
-<hr>
-<h2 id="3-集群模式（Cluster）"><a href="#3-集群模式（Cluster）" class="headerlink" title="3. 集群模式（Cluster）"></a>3. 集群模式（Cluster）</h2>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2025/11/22/redis/redis%E9%AB%98%E5%8F%AF%E7%94%A8%E6%9E%B6%E6%9E%84/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-
-
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://leslie-shell.github.io/2025/11/22/redis/redis%E7%BC%93%E5%AD%98%E5%BC%82%E5%B8%B8%E5%9C%BA%E6%99%AF/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="YeChengfeng">
-      <meta itemprop="description" content="Make Learning and Organizing a Habit!">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="随笔">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2025/11/22/redis/redis%E7%BC%93%E5%AD%98%E5%BC%82%E5%B8%B8%E5%9C%BA%E6%99%AF/" class="post-title-link" itemprop="url">Redis 缓存异常场景与优化策略</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2025-11-22 21:30:33" itemprop="dateCreated datePublished" datetime="2025-11-22T21:30:33+08:00">2025-11-22</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2025-11-29 23:10:25" itemprop="dateModified" datetime="2025-11-29T23:10:25+08:00">2025-11-29</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Java/" itemprop="url" rel="index"><span itemprop="name">Java</span></a>
-                </span>
-                  ，
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Java/Redis/" itemprop="url" rel="index"><span itemprop="name">Redis</span></a>
-                </span>
-            </span>
-
-          
-            <span id="/2025/11/22/redis/redis%E7%BC%93%E5%AD%98%E5%BC%82%E5%B8%B8%E5%9C%BA%E6%99%AF/" class="post-meta-item leancloud_visitors" data-flag-title="Redis 缓存异常场景与优化策略" title="阅读次数">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-eye"></i>
-              </span>
-              <span class="post-meta-item-text">阅读次数：</span>
-              <span class="leancloud-visitors-count"></span>
-            </span><br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>675</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>1 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="Redis-缓存异常场景与优化策略"><a href="#Redis-缓存异常场景与优化策略" class="headerlink" title="Redis 缓存异常场景与优化策略"></a>Redis 缓存异常场景与优化策略</h1><p>Redis 作为缓存系统，在高并发或异常情况下可能出现一些问题，主要包括 <strong>缓存穿透、缓存击穿、缓存雪崩</strong>，同时涉及 <strong>缓存预热与缓存降级</strong>。</p>
-<hr>
-<h2 id="1-缓存穿透"><a href="#1-缓存穿透" class="headerlink" title="1. 缓存穿透"></a>1. 缓存穿透</h2><ul>
-<li><strong>概念</strong>：请求的数据在缓存中不存在，也在数据库中不存在，每次请求都会直接查询数据库，造成数据库压力。</li>
-<li><strong>解决方案</strong>：<ol>
-<li><strong>布隆过滤器</strong>（推荐）<ul>
-<li>用于判断数据是否存在，例如：<ul>
-<li>爬虫系统 URL 去重</li>
-<li>垃圾邮件过滤</li>
-<li>黑名单校验</li>
-</ul>
-</li>
-</ul>
-</li>
-<li><strong>返回空对象</strong><ul>
-<li>将查询结果为空的数据也缓存，避免重复查询数据库</li>
-</ul>
-</li>
-</ol>
-</li>
-</ul>
-<hr>
-<h2 id="2-缓存击穿"><a href="#2-缓存击穿" class="headerlink" title="2. 缓存击穿"></a>2. 缓存击穿</h2><ul>
-<li><strong>概念</strong>：某个热点 key 高并发访问，在 key 失效瞬间，所有请求同时穿透缓存访问数据库。</li>
-<li><strong>解决方案</strong>：<ol>
-<li><strong>互斥锁（mutex key）</strong><ul>
-<li>只有一条线程查询数据库并更新缓存，其他线程等待</li>
-</ul>
-</li>
-<li><strong>热点数据永不过期</strong><ul>
-<li>对关键热点数据设置固定或非常长的过期时间</li>
-</ul>
-</li>
-</ol>
-</li>
-</ul>
-<hr>
-<h2 id="3-缓存雪崩"><a href="#3-缓存雪崩" class="headerlink" title="3. 缓存雪崩"></a>3. 缓存雪崩</h2>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2025/11/22/redis/redis%E7%BC%93%E5%AD%98%E5%BC%82%E5%B8%B8%E5%9C%BA%E6%99%AF/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-
-
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -1454,20 +1377,20 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">222</span>
+          <span class="site-state-item-count">224</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">45</span>
+        <span class="site-state-item-count">46</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">57</span>
+        <span class="site-state-item-count">58</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -1503,12 +1426,12 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-area"></i>
     </span>
-    <span title="站点总字数">475k</span>
+    <span title="站点总字数">478k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">7:12</span>
+    <span title="站点阅读时长">7:14</span>
 </div>
 
         

@@ -212,6 +212,273 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://leslie-shell.github.io/2025/11/19/mysql/mysql--8.%E5%87%BD%E6%95%B0%E5%92%8C%E5%AD%98%E5%82%A8%E8%BF%87%E7%A8%8B/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="YeChengfeng">
+      <meta itemprop="description" content="Make Learning and Organizing a Habit!">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="随笔">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2025/11/19/mysql/mysql--8.%E5%87%BD%E6%95%B0%E5%92%8C%E5%AD%98%E5%82%A8%E8%BF%87%E7%A8%8B/" class="post-title-link" itemprop="url">mysql函数和存储过程</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2025-11-19 23:40:58" itemprop="dateCreated datePublished" datetime="2025-11-19T23:40:58+08:00">2025-11-19</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2025-11-29 23:17:43" itemprop="dateModified" datetime="2025-11-29T23:17:43+08:00">2025-11-29</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Mysql/" itemprop="url" rel="index"><span itemprop="name">Mysql</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/2025/11/19/mysql/mysql--8.%E5%87%BD%E6%95%B0%E5%92%8C%E5%AD%98%E5%82%A8%E8%BF%87%E7%A8%8B/" class="post-meta-item leancloud_visitors" data-flag-title="mysql函数和存储过程" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>2.1k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>2 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <hr>
+<h1 id="MySQL-函数（Function）"><a href="#MySQL-函数（Function）" class="headerlink" title="MySQL 函数（Function）"></a>MySQL 函数（Function）</h1><h3 id="1-1-定义"><a href="#1-1-定义" class="headerlink" title="1.1 定义"></a>1.1 定义</h3><blockquote>
+<p>函数就是一个可以返回单个值的 SQL 代码块。<br> 它可以接收参数，做计算或处理，然后返回一个结果。</p>
+</blockquote>
+<ul>
+<li><strong>特点</strong><ul>
+<li>必须有返回值（RETURN）</li>
+<li>可在 SELECT、WHERE、INSERT 等语句中使用</li>
+<li>一般用于封装计算或重复逻辑</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h3 id="1-2-语法"><a href="#1-2-语法" class="headerlink" title="1.2 语法"></a>1.2 语法</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> <span class="keyword">FUNCTION</span> 函数名 (参数列表)</span><br><span class="line"><span class="keyword">RETURNS</span> 数据类型</span><br><span class="line"><span class="keyword">DETERMINISTIC</span> <span class="operator">|</span> <span class="keyword">NOT</span> <span class="keyword">DETERMINISTIC</span></span><br><span class="line"><span class="keyword">READS</span> <span class="keyword">SQL</span> DATA <span class="operator">|</span> <span class="keyword">MODIFIES</span> <span class="keyword">SQL</span> DATA</span><br><span class="line"><span class="keyword">BEGIN</span></span><br><span class="line">    <span class="comment">-- 函数体</span></span><br><span class="line">    <span class="keyword">RETURN</span> 值;</span><br><span class="line"><span class="keyword">END</span>;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><code>DETERMINISTIC</code>：相同输入是否总返回相同结果</li>
+<li><code>READS SQL DATA</code>：函数内是否读取数据</li>
+<li><code>MODIFIES SQL DATA</code>：是否修改数据（一般不推荐在函数里修改表）</li>
+</ul>
+<hr>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2025/11/19/mysql/mysql--8.%E5%87%BD%E6%95%B0%E5%92%8C%E5%AD%98%E5%82%A8%E8%BF%87%E7%A8%8B/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+
+
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://leslie-shell.github.io/2025/11/19/mysql/mysql--7%E7%AA%97%E5%8F%A3%E5%87%BD%E6%95%B0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="YeChengfeng">
+      <meta itemprop="description" content="Make Learning and Organizing a Habit!">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="随笔">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2025/11/19/mysql/mysql--7%E7%AA%97%E5%8F%A3%E5%87%BD%E6%95%B0/" class="post-title-link" itemprop="url">mysql窗口函数</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2025-11-19 23:33:34" itemprop="dateCreated datePublished" datetime="2025-11-19T23:33:34+08:00">2025-11-19</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2025-11-29 23:19:36" itemprop="dateModified" datetime="2025-11-29T23:19:36+08:00">2025-11-29</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Mysql/" itemprop="url" rel="index"><span itemprop="name">Mysql</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/2025/11/19/mysql/mysql--7%E7%AA%97%E5%8F%A3%E5%87%BD%E6%95%B0/" class="post-meta-item leancloud_visitors" data-flag-title="mysql窗口函数" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>1.9k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>2 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>参考:</p>
+<ol>
+<li><a target="_blank" rel="noopener" href="https://www.cnblogs.com/shoshana-kong/p/16621254.html">https://www.cnblogs.com/shoshana-kong/p/16621254.html</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.51cto.com/article/759300.html">https://www.51cto.com/article/759300.html</a></li>
+</ol>
+<hr>
+<h1 id="什么是窗口函数？"><a href="#什么是窗口函数？" class="headerlink" title="什么是窗口函数？"></a>什么是窗口函数？</h1><p>一句话：</p>
+<blockquote>
+<p><strong>窗口函数 &#x3D; 在不分组的情况下，对某一范围（窗口）内的多行数据做计算，并把结果“附加”到每一行上。</strong></p>
+</blockquote>
+<p>它不会把多行合并为一行（不像 GROUP BY）。<br> 它只是“看一下周围的行”，然后计算。</p>
+<h1 id="为什么需要窗口函数？（直觉理解）"><a href="#为什么需要窗口函数？（直觉理解）" class="headerlink" title="为什么需要窗口函数？（直觉理解）"></a>为什么需要窗口函数？（直觉理解）</h1><p>假设你有工资表：</p>
+<table>
+<thead>
+<tr>
+<th>id</th>
+<th>name</th>
+<th>dept</th>
+<th>salary</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td>张三</td>
+<td>A</td>
+<td>8000</td>
+</tr>
+<tr>
+<td>2</td>
+<td>李四</td>
+<td>A</td>
+<td>9000</td>
+</tr>
+<tr>
+<td>3</td>
+<td>王五</td>
+<td>A</td>
+<td>10000</td>
+</tr>
+</tbody></table>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2025/11/19/mysql/mysql--7%E7%AA%97%E5%8F%A3%E5%87%BD%E6%95%B0/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+
+
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="https://leslie-shell.github.io/2025/11/19/mysql/mysql--4%E6%9C%80%E5%B8%B8%E7%94%A8%E7%9A%84%E5%87%BD%E6%95%B0/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -546,7 +813,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2025/11/19/mysql/mysql--%E5%8A%9B%E6%89%A3--3%E7%AC%ACn%E9%AB%98%E7%9A%84%E8%96%AA%E6%B0%B4/" class="post-title-link" itemprop="url">力扣-Mysql-第n高的薪水 （Normal）</a>
+            <a href="/2025/11/19/mysql/mysql--%E5%8A%9B%E6%89%A3--3%E7%AC%ACn%E9%AB%98%E7%9A%84%E8%96%AA%E6%B0%B4/" class="post-title-link" itemprop="url">3.力扣-Mysql-第n高的薪水 （Normal）</a>
         </h2>
 
         <div class="post-meta">
@@ -563,7 +830,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2025-11-29 23:18:37" itemprop="dateModified" datetime="2025-11-29T23:18:37+08:00">2025-11-29</time>
+                <time title="修改时间：2025-12-23 23:14:01" itemprop="dateModified" datetime="2025-12-23T23:14:01+08:00">2025-12-23</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -576,7 +843,7 @@
             </span>
 
           
-            <span id="/2025/11/19/mysql/mysql--%E5%8A%9B%E6%89%A3--3%E7%AC%ACn%E9%AB%98%E7%9A%84%E8%96%AA%E6%B0%B4/" class="post-meta-item leancloud_visitors" data-flag-title="力扣-Mysql-第n高的薪水 （Normal）" title="阅读次数">
+            <span id="/2025/11/19/mysql/mysql--%E5%8A%9B%E6%89%A3--3%E7%AC%ACn%E9%AB%98%E7%9A%84%E8%96%AA%E6%B0%B4/" class="post-meta-item leancloud_visitors" data-flag-title="3.力扣-Mysql-第n高的薪水 （Normal）" title="阅读次数">
               <span class="post-meta-item-icon">
                 <i class="fa fa-eye"></i>
               </span>
@@ -662,7 +929,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2025/11/19/mysql/mysql--%E5%8A%9B%E6%89%A3--2%E7%AC%AC%E4%BA%8C%E9%AB%98%E7%9A%84%E8%96%AA%E6%B0%B4/" class="post-title-link" itemprop="url">力扣-Mysql-第二高的薪水 (Normal)</a>
+            <a href="/2025/11/19/mysql/mysql--%E5%8A%9B%E6%89%A3--2%E7%AC%AC%E4%BA%8C%E9%AB%98%E7%9A%84%E8%96%AA%E6%B0%B4/" class="post-title-link" itemprop="url">2.力扣-Mysql-第二高的薪水 (Normal)</a>
         </h2>
 
         <div class="post-meta">
@@ -679,7 +946,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2025-11-29 23:17:47" itemprop="dateModified" datetime="2025-11-29T23:17:47+08:00">2025-11-29</time>
+                <time title="修改时间：2025-12-23 23:13:57" itemprop="dateModified" datetime="2025-12-23T23:13:57+08:00">2025-12-23</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -692,7 +959,7 @@
             </span>
 
           
-            <span id="/2025/11/19/mysql/mysql--%E5%8A%9B%E6%89%A3--2%E7%AC%AC%E4%BA%8C%E9%AB%98%E7%9A%84%E8%96%AA%E6%B0%B4/" class="post-meta-item leancloud_visitors" data-flag-title="力扣-Mysql-第二高的薪水 (Normal)" title="阅读次数">
+            <span id="/2025/11/19/mysql/mysql--%E5%8A%9B%E6%89%A3--2%E7%AC%AC%E4%BA%8C%E9%AB%98%E7%9A%84%E8%96%AA%E6%B0%B4/" class="post-meta-item leancloud_visitors" data-flag-title="2.力扣-Mysql-第二高的薪水 (Normal)" title="阅读次数">
               <span class="post-meta-item-icon">
                 <i class="fa fa-eye"></i>
               </span>
@@ -798,7 +1065,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2025/11/19/mysql/mysql--%E5%8A%9B%E6%89%A3--1%E7%BB%84%E5%90%88%E4%BF%A9%E4%B8%AA%E8%A1%A8/" class="post-title-link" itemprop="url">力扣-Mysql-组合俩个表 (Easy)</a>
+            <a href="/2025/11/19/mysql/mysql--%E5%8A%9B%E6%89%A3--1%E7%BB%84%E5%90%88%E4%BF%A9%E4%B8%AA%E8%A1%A8/" class="post-title-link" itemprop="url">1.力扣-Mysql-组合俩个表 (Easy)</a>
         </h2>
 
         <div class="post-meta">
@@ -815,7 +1082,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2025-11-29 23:19:04" itemprop="dateModified" datetime="2025-11-29T23:19:04+08:00">2025-11-29</time>
+                <time title="修改时间：2025-12-23 23:13:53" itemprop="dateModified" datetime="2025-12-23T23:13:53+08:00">2025-12-23</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -828,7 +1095,7 @@
             </span>
 
           
-            <span id="/2025/11/19/mysql/mysql--%E5%8A%9B%E6%89%A3--1%E7%BB%84%E5%90%88%E4%BF%A9%E4%B8%AA%E8%A1%A8/" class="post-meta-item leancloud_visitors" data-flag-title="力扣-Mysql-组合俩个表 (Easy)" title="阅读次数">
+            <span id="/2025/11/19/mysql/mysql--%E5%8A%9B%E6%89%A3--1%E7%BB%84%E5%90%88%E4%BF%A9%E4%B8%AA%E8%A1%A8/" class="post-meta-item leancloud_visitors" data-flag-title="1.力扣-Mysql-组合俩个表 (Easy)" title="阅读次数">
               <span class="post-meta-item-icon">
                 <i class="fa fa-eye"></i>
               </span>
@@ -1115,218 +1382,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://leslie-shell.github.io/2025/11/09/english/common/word--%E5%B7%A5%E4%BD%9C%E5%8D%95%E8%AF%8D%E6%94%B6%E8%97%8F202211-2/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="YeChengfeng">
-      <meta itemprop="description" content="Make Learning and Organizing a Habit!">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="随笔">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2025/11/09/english/common/word--%E5%B7%A5%E4%BD%9C%E5%8D%95%E8%AF%8D%E6%94%B6%E8%97%8F202211-2/" class="post-title-link" itemprop="url">impulse | vital | eliminate | ubiquitous | cumbersome | redundancy</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-              
-
-              <time title="创建时间：2025-11-09 20:04:39 / 修改时间：20:08:02" itemprop="dateCreated datePublished" datetime="2025-11-09T20:04:39+08:00">2025-11-09</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/English/" itemprop="url" rel="index"><span itemprop="name">English</span></a>
-                </span>
-                  ，
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/English/Vocabulary/" itemprop="url" rel="index"><span itemprop="name">Vocabulary</span></a>
-                </span>
-                  ，
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/English/Vocabulary/20221102/" itemprop="url" rel="index"><span itemprop="name">20221102</span></a>
-                </span>
-            </span>
-
-          
-            <span id="/2025/11/09/english/common/word--%E5%B7%A5%E4%BD%9C%E5%8D%95%E8%AF%8D%E6%94%B6%E8%97%8F202211-2/" class="post-meta-item leancloud_visitors" data-flag-title="impulse | vital | eliminate | ubiquitous | cumbersome | redundancy" title="阅读次数">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-eye"></i>
-              </span>
-              <span class="post-meta-item-text">阅读次数：</span>
-              <span class="leancloud-visitors-count"></span>
-            </span><br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>2.2k</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>2 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>impulse | vital | eliminate | ubiquitous | cumbersome | redundancy</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2025/11/09/english/common/word--%E5%B7%A5%E4%BD%9C%E5%8D%95%E8%AF%8D%E6%94%B6%E8%97%8F202211-2/">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-
-
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://leslie-shell.github.io/2025/11/09/english/common/word--%E5%B7%A5%E4%BD%9C%E5%8D%95%E8%AF%8D%E6%94%B6%E8%97%8F202211-3/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="YeChengfeng">
-      <meta itemprop="description" content="Make Learning and Organizing a Habit!">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="随笔">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2025/11/09/english/common/word--%E5%B7%A5%E4%BD%9C%E5%8D%95%E8%AF%8D%E6%94%B6%E8%97%8F202211-3/" class="post-title-link" itemprop="url">deteriorating | complacent | motivate | inclusive | animate | constipated | surfaces | instantaneously | elaborate | entire | intricate | denser</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-              
-
-              <time title="创建时间：2025-11-09 20:04:39 / 修改时间：20:09:00" itemprop="dateCreated datePublished" datetime="2025-11-09T20:04:39+08:00">2025-11-09</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/English/" itemprop="url" rel="index"><span itemprop="name">English</span></a>
-                </span>
-                  ，
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/English/Vocabulary/" itemprop="url" rel="index"><span itemprop="name">Vocabulary</span></a>
-                </span>
-                  ，
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/English/Vocabulary/20221102/" itemprop="url" rel="index"><span itemprop="name">20221102</span></a>
-                </span>
-            </span>
-
-          
-            <span id="/2025/11/09/english/common/word--%E5%B7%A5%E4%BD%9C%E5%8D%95%E8%AF%8D%E6%94%B6%E8%97%8F202211-3/" class="post-meta-item leancloud_visitors" data-flag-title="deteriorating | complacent | motivate | inclusive | animate | constipated | surfaces | instantaneously | elaborate | entire | intricate | denser" title="阅读次数">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-eye"></i>
-              </span>
-              <span class="post-meta-item-text">阅读次数：</span>
-              <span class="leancloud-visitors-count"></span>
-            </span><br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>4.1k</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>4 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>deteriorating | complacent | motivate | inclusive | animate | constipated | surfaces | instantaneously | elaborate | entire | intricate | denser</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2025/11/09/english/common/word--%E5%B7%A5%E4%BD%9C%E5%8D%95%E8%AF%8D%E6%94%B6%E8%97%8F202211-3/">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-
-
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -1396,20 +1451,20 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">222</span>
+          <span class="site-state-item-count">224</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">45</span>
+        <span class="site-state-item-count">46</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">57</span>
+        <span class="site-state-item-count">58</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -1445,12 +1500,12 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-area"></i>
     </span>
-    <span title="站点总字数">475k</span>
+    <span title="站点总字数">478k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">7:12</span>
+    <span title="站点阅读时长">7:14</span>
 </div>
 
         
