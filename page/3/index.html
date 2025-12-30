@@ -212,6 +212,130 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://leslie-shell.github.io/2025/12/01/spring/springBeanFactory%E8%AE%BE%E8%AE%A1%E6%80%9D%E6%83%B3/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="YeChengfeng">
+      <meta itemprop="description" content="Make Learning and Organizing a Habit!">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="随笔">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2025/12/01/spring/springBeanFactory%E8%AE%BE%E8%AE%A1%E6%80%9D%E6%83%B3/" class="post-title-link" itemprop="url">spring核心容器继承关系详解</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2025-12-01 21:41:06 / 修改时间：21:48:41" itemprop="dateCreated datePublished" datetime="2025-12-01T21:41:06+08:00">2025-12-01</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Java/" itemprop="url" rel="index"><span itemprop="name">Java</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Java/Spring/" itemprop="url" rel="index"><span itemprop="name">Spring</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/2025/12/01/spring/springBeanFactory%E8%AE%BE%E8%AE%A1%E6%80%9D%E6%83%B3/" class="post-meta-item leancloud_visitors" data-flag-title="spring核心容器继承关系详解" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>4.5k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>4 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>参考:<a target="_blank" rel="noopener" href="https://javadoop.com/post/spring-ioc">https://javadoop.com/post/spring-ioc</a></p>
+<h3 id="核心接口层级关系图"><a href="#核心接口层级关系图" class="headerlink" title="核心接口层级关系图"></a>核心接口层级关系图</h3><p>首先，我们通过一张图来直观地理解它们的层级关系（这是一个简化图，聚焦于你提到的这几个接口）：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">BeanFactory (顶级核心接口)</span><br><span class="line">|</span><br><span class="line">+-- ListableBeanFactory (接口，扩展BeanFactory,见名知意，提供枚举所有bean实例的能力)</span><br><span class="line">|</span><br><span class="line">+-- HierarchicalBeanFactory (接口，扩展BeanFactory，给容器提供层级关系)</span><br><span class="line">|</span><br><span class="line">+-- AutowireCapableBeanFactory (接口，扩展BeanFactory ，提供了自动装配、创建和配置Bean)</span><br><span class="line">|</span><br><span class="line">+-- ConfigurableBeanFactory (接口，扩展HierarchicalBeanFactory, SingletonBeanRegistry)</span><br><span class="line">    |</span><br><span class="line">    +-- ConfigurableListableBeanFactory (接口，最终集大成者)</span><br><span class="line">        |</span><br><span class="line">        +-- (具体实现类，如：DefaultListableBeanFactory)</span><br><span class="line"></span><br><span class="line">ApplicationContext (顶级应用上下文接口)</span><br><span class="line">|</span><br><span class="line">+-- ConfigurableApplicationContext (接口)</span><br><span class="line">    |</span><br><span class="line">    +-- (具体实现类，如：AnnotationConfigApplicationContext, ClassPathXmlApplicationContext)</span><br><span class="line">    |</span><br><span class="line">    (ApplicationContext 的实现类内部通常持有一个 ConfigurableListableBeanFactory 的引用)</span><br></pre></td></tr></table></figure>
+
+<p><strong>关键点</strong>：</p>
+<ol>
+<li><code>BeanFactory</code> 是绝对的核心和顶层接口。</li>
+<li><code>ListableBeanFactory</code>, <code>HierarchicalBeanFactory</code>, <code>AutowireCapableBeanFactory</code> 是三个<strong>平行</strong>的接口，它们从不同维度扩展了 <code>BeanFactory</code> 的基础功能。</li>
+<li><code>ConfigurableBeanFactory</code> 进一步扩展了 <code>HierarchicalBeanFactory</code>，主要提供了<strong>配置</strong> BeanFactory 的能力。</li>
+<li><code>ConfigurableListableBeanFactory</code> 是 <strong>BeanFactory 体系的集大成者</strong>，它同时继承了上述三个重要接口（Listable, Hierarchical, AutowireCapable）以及 ConfigurableBeanFactory，成为一个功能最全面的 BeanFactory 类型。</li>
+<li><code>ApplicationContext</code> 是 <strong>BeanFactory 的超集</strong>。它不仅仅是一个BeanFactory，还集成了更多企业级功能（如国际化、事件发布、资源加载等）。在内部，它通常<strong>包含</strong>一个 <code>ConfigurableListableBeanFactory</code> 的实例来委托处理基础的Bean生命周期管理。</li>
+</ol>
+<hr>
+<h3 id="各接口职责与设计思路分析"><a href="#各接口职责与设计思路分析" class="headerlink" title="各接口职责与设计思路分析"></a>各接口职责与设计思路分析</h3><h4 id="1-BeanFactory-org-springframework-beans-factory"><a href="#1-BeanFactory-org-springframework-beans-factory" class="headerlink" title="1. BeanFactory (org.springframework.beans.factory)"></a>1. BeanFactory (org.springframework.beans.factory)</h4><ul>
+<li><strong>职责</strong>：定义了IoC容器最基础的功能。<ul>
+<li><code>getBean(String name)</code>：根据名称获取Bean实例。</li>
+<li><code>containsBean(String name)</code>：判断是否包含指定名称的Bean。</li>
+<li><code>isSingleton(String name)</code> &#x2F; <code>isPrototype(String name)</code>：判断Bean的作用域。</li>
+<li><code>getType(String name)</code>：获取Bean的类型。</li>
+</ul>
+</li>
+<li><strong>设计思路</strong>：这是<strong>最小化接口</strong>原则的体现。它只定义了作为一个“Bean工厂”必须提供的最核心方法——获取和管理Bean实例。这种设计使得我们可以有多种不同功能的BeanFactory实现，而不必被庞大的接口所束缚。</li>
+</ul>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2025/12/01/spring/springBeanFactory%E8%AE%BE%E8%AE%A1%E6%80%9D%E6%83%B3/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+
+
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="https://leslie-shell.github.io/2025/11/29/interest/%E7%9C%8B%E5%AE%8C%E4%BD%A0%E7%9A%84%E7%89%A9%E6%AC%B2%E5%B0%B1%E6%B6%88%E5%A4%B1%E4%BA%86/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1263,108 +1387,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://leslie-shell.github.io/2025/11/29/english/common/word--ielts-1/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="YeChengfeng">
-      <meta itemprop="description" content="Make Learning and Organizing a Habit!">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="随笔">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2025/11/29/english/common/word--ielts-1/" class="post-title-link" itemprop="url">ielts word-- the envelope of gases surrounding the Earth; the mood or feeling of a place</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-              
-
-              <time title="创建时间：2025-11-29 18:55:46 / 修改时间：19:18:23" itemprop="dateCreated datePublished" datetime="2025-11-29T18:55:46+08:00">2025-11-29</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/English/" itemprop="url" rel="index"><span itemprop="name">English</span></a>
-                </span>
-                  ，
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/English/Vocabulary/" itemprop="url" rel="index"><span itemprop="name">Vocabulary</span></a>
-                </span>
-            </span>
-
-          
-            <span id="/2025/11/29/english/common/word--ielts-1/" class="post-meta-item leancloud_visitors" data-flag-title="ielts word-- the envelope of gases surrounding the Earth; the mood or feeling of a place" title="阅读次数">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-eye"></i>
-              </span>
-              <span class="post-meta-item-text">阅读次数：</span>
-              <span class="leancloud-visitors-count"></span>
-            </span><br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>2.3k</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>2 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>all the waters on the Earth's surface </p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2025/11/29/english/common/word--ielts-1/">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-
-
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -1434,7 +1456,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">224</span>
+          <span class="site-state-item-count">225</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -1483,12 +1505,12 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-area"></i>
     </span>
-    <span title="站点总字数">478k</span>
+    <span title="站点总字数">479k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">7:14</span>
+    <span title="站点阅读时长">7:15</span>
 </div>
 
         
